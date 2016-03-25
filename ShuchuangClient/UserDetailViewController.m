@@ -114,7 +114,23 @@
 
 - (void)onRightButton {
     NSDictionary *dict = @{@"username":self.userInfo[@"username"], @"remainopen":self.userInfo[@"remainopen"], @"timeofvalidity":self.userInfo[@"timeofvalidity"]};
-    NSLog(@"%@", dict);
+    [self.acFrame startAc];
+    [self.client topupUser:dict success:^(NSURLSessionDataTask* task, id response) {
+        [self.acFrame stopAc];
+        if ([response[@"result"] isEqualToString:@"good"]) {
+            [SCUtil viewController:self showAlertTitle:@"提示" message:@"修改用户门禁使用权限成功" action:^(UIAlertAction* action) {
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }];
+        }
+        else {
+            [SCUtil viewController:self showAlertTitle:@"提示" message:response[@"detail"] action:^(UIAlertAction* action) {
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }];
+        }
+    } failure:^(NSURLSessionDataTask* task, NSError* error) {
+        [self.acFrame stopAc];
+        [SCUtil viewController:self showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
+    }];
 }
 
 - (void)onDateLabel {
