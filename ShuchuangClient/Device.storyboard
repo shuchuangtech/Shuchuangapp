@@ -279,7 +279,6 @@
                     <connections>
                         <outlet property="naviBar" destination="FAk-sb-dyi" id="3mb-2L-cda"/>
                         <outlet property="swButton" destination="ocB-oH-Rd8" id="ZQn-OW-gGO"/>
-                        <segue destination="nKq-pf-jRt" kind="showDetail" identifier="DeviceDetailToPassword" id="6rL-4f-HDe"/>
                         <segue destination="4w6-OV-vNq" kind="showDetail" identifier="DetailToUserSegue" id="tEf-BN-9SO"/>
                         <segue destination="1JI-LG-V7a" kind="showDetail" identifier="DetailToRecordSegue" id="56x-94-Zgx"/>
                         <segue destination="mMb-JV-t5r" kind="showDetail" identifier="DetailToChangePassword" id="lBx-2w-gxG"/>
@@ -1969,7 +1968,4 @@
         <image name="clock" width="83" height="83"/>
         <image name="search" width="28" height="28"/>
     </resources>
-    <inferredMetricsTieBreakers>
-        <segue reference="ifm-QC-QkD"/>
-    </inferredMetricsTieBreakers>
 </document>

@@ -67,6 +67,7 @@
 #define COMPONENT_DEVICE_STR @"device"
 #define COMPONENT_RECORD_STR @"record"
 #define COMPONENT_SERVER_STR @"server"
+#define COMPONENT_SYSTEM_STR @"system"
 //Method>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 //user
 #define USER_METHOD_LOGIN @"login"
@@ -94,6 +95,8 @@
 #define SERVER_METHOD_TOKEN @"token"
 #define SERVER_METHOD_REGISTER @"register"
 #define SERVER_METHOD_KEEPALIVE @"keepalive"
+//system
+#define SYSTEM_METHOD_RESET @"reset"
 //result>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #define RESULT_GOOD_STR @"good"
 #define RESULT_FAIL_STR @"failed"

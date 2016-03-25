@@ -30,6 +30,7 @@ extern NSString * _Nonnull const DevIdStr;
 - (void)addTask:(nonnull NSDictionary *)task forDevice:(nonnull NSString *)uuid;
 - (void)removeTask:(NSInteger)index forDevice:(nonnull NSString *)uuid;
 - (void)updateTask:(nonnull NSDictionary *)task forDevice:(nonnull NSString *)uuid atIndex:(NSInteger)index;
+- (void)clearTasksForDevice:(nonnull NSString *)uuid;
 
 - (nonnull NSDictionary *)getConfig:(nonnull NSString *)uuid;
 - (void)setConfig:(nonnull NSDictionary *)config forDevice:(nonnull NSString *)uuid;

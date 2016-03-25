@@ -154,7 +154,6 @@
     if ([segue.identifier  isEqual: @"DeviceAddToPassword"]) {
         id desVC = segue.destinationViewController;
         [desVC setValue:self.uuid forKey:@"devId"];
-        [desVC setValue:@YES forKey:@"firstAdd"];
     }
 }
 

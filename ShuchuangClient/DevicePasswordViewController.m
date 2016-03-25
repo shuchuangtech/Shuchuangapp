@@ -18,7 +18,6 @@
 @property (weak, nonatomic) IBOutlet UIButton *buttonNext;
 @property (strong, nonatomic) MyActivityIndicatorView *acFrame;
 @property (strong, nonatomic) NSString *devId;
-@property (nonatomic) BOOL firstAdd;
 @property (weak, nonatomic) IBOutlet UILabel *authLabel;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *authSeg;
 @property NSInteger userAuth;
@@ -63,16 +62,8 @@
     
     [self.authSeg addTarget:self action:@selector(onSegValueChanged) forControlEvents:UIControlEventValueChanged];
     self.userAuth = 9;
-    if (self.firstAdd) {
-        [self.buttonNext setTitle:@"添加完成" forState:UIControlStateNormal];
-        self.authLabel.hidden = NO;
-        self.authSeg.hidden = NO;
-    }
-    else {
-        self.authLabel.hidden = YES;
-        self.authSeg.hidden = YES;
-        [self.buttonNext setTitle:@"重新验证" forState:UIControlStateNormal];
-    }
+    [self.buttonNext setTitle:@"添加完成" forState:UIControlStateNormal];
+
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -97,15 +88,10 @@
 }
 
 - (void)onLeftButton {
-    if (!self.firstAdd) {
-        [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-    }
-    else {
-        [SCUtil viewController:self showAlertTitle:@"提示" message:@"确认放弃添加新设备吗？" yesAction:^(UIAlertAction *action) {
-                [[SCDeviceManager instance] removeDevice:self.devId];
-                [self.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-        } noAction:nil];
-    }
+    [SCUtil viewController:self showAlertTitle:@"提示" message:@"确认放弃添加新设备吗？" yesAction:^(UIAlertAction *action) {
+            [[SCDeviceManager instance] removeDevice:self.devId];
+            [self.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    } noAction:nil];
 }
 
 /*
@@ -150,41 +136,36 @@
     success:^(NSURLSessionDataTask *task, id response) {
         [self.acFrame stopAc];
         if ([response[@"result"] isEqualToString:@"good"]) {
-            if (self.firstAdd) {
-                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"提示" message:@"设备绑定成功" preferredStyle:UIAlertControllerStyleAlert];
-                UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-                    if ([alert.textFields[0] isFirstResponder]) {
-                        [alert.textFields[0] resignFirstResponder];
-                    }
-                    NSString *devName = @"默认设备";
-                    [client updateDeviceName:devName];
-                    [self.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-                }];
-                UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                    if ([alert.textFields[0] isFirstResponder]) {
-                        [alert.textFields[0] resignFirstResponder];
-                    }
-                    NSString *devName;
-                    if ([alert.textFields[0].text length] == 0) {
-                        devName = @"默认设备";
-                    }
-                    else {
-                        devName = alert.textFields[0].text;
-                    }
-                    [client updateDeviceName:devName];
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"AddCompletionNoti" object:nil];
-                    [self.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-                }];
-                [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-                    textField.placeholder = @"给设备起个名字吧";
-                }];
-                [alert addAction:cancelAction];
-                [alert addAction:defaultAction];
-                [self presentViewController:alert animated:YES completion:nil];
-            }
-            else {
-                [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-            }
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"提示" message:@"设备绑定成功" preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+                if ([alert.textFields[0] isFirstResponder]) {
+                    [alert.textFields[0] resignFirstResponder];
+                }
+                NSString *devName = @"默认设备";
+                [client updateDeviceName:devName];
+                [self.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+            }];
+            UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                if ([alert.textFields[0] isFirstResponder]) {
+                    [alert.textFields[0] resignFirstResponder];
+                }
+                NSString *devName;
+                if ([alert.textFields[0].text length] == 0) {
+                    devName = @"默认设备";
+                }
+                else {
+                    devName = alert.textFields[0].text;
+                }
+                [client updateDeviceName:devName];
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"AddCompletionNoti" object:nil];
+                [self.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+            }];
+            [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                textField.placeholder = @"给设备起个名字吧";
+            }];
+            [alert addAction:cancelAction];
+            [alert addAction:defaultAction];
+            [self presentViewController:alert animated:YES completion:nil];
         }
         else {
             [SCUtil viewController:self showAlertTitle:@"提示" message:response[@"detail"] action:nil];

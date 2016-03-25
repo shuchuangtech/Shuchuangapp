@@ -181,6 +181,14 @@ static DeviceDAO* sharedMem = nil;
     [array writeToFile:taskPath atomically:YES];
 }
 
+- (void)clearTasksForDevice:(NSString *)uuid {
+    NSString *taskFile = [NSString stringWithFormat:@"%@/Task", uuid];
+    NSString *taskPath = [self userDocumentsDirectoryFile:taskFile];
+    NSMutableArray *array = [[NSMutableArray alloc] initWithContentsOfFile:taskPath];
+    [array removeAllObjects];
+    [array writeToFile:taskPath atomically:YES];
+}
+
 - (void)updateTask:(NSDictionary *)task forDevice:(NSString *)uuid atIndex:(NSInteger)index{
     NSString *taskFile = [NSString stringWithFormat:@"%@/Task", uuid];
     NSString *taskPath = [self userDocumentsDirectoryFile:taskFile];

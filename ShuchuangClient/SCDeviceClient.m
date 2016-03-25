@@ -387,7 +387,6 @@
         }
         success(dataTask, response);
     } failure:failure];
-
 }
 
 - (void)updateTask:(NSDictionary *)task atIndex:(NSInteger)index success:(void (^)(NSURLSessionDataTask * _Nullable, id _Nonnull))success failure:(void (^)(NSURLSessionDataTask * _Nullable, NSError * _Nonnull))failure {
@@ -432,6 +431,26 @@
     } failure:failure];
 }
 
+- (void)resetDeviceSuccess:(void (^)(NSURLSessionDataTask * _Nullable, id _Nonnull))success failure:(void (^)(NSURLSessionDataTask * _Nullable, NSError * _Nonnull))failure {
+    SCHTTPManager *http = [SCHTTPManager instance];
+    NSString *action = [NSString stringWithFormat:@"%@.%@", COMPONENT_SYSTEM_STR, SYSTEM_METHOD_RESET];
+    NSDictionary* param = @{REG_UUID_STR:self.uuid, REG_TOKEN_STR:self.token};
+    NSDictionary* dict = @{KEY_TYPE_STR:TYPE_REQUEST_STR, KEY_ACTION_STR:action, KEY_PARAM_STR:param};
+    [http sendMessage:dict success:^(NSURLSessionDataTask *dataTask, id serverResponse){
+        NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
+        if ([serverResponse[KEY_RESULT_STR] isEqualToString:RESULT_GOOD_STR]) {
+            [response setValue:@"good" forKey:@"result"];
+        }
+        else {
+            NSString *detail = [SCErrorString errorString:serverResponse[@"detail"]];
+            [response setValue:@"fail" forKey:@"result"];
+            [response setValue:detail forKey:@"detail"];
+        }
+        success(dataTask, response);
+    } failure:failure];
+
+}
+
 - (void)updateDeviceInfo {
     NSDictionary *dict = @{DevNameStr:self.name, DevTypeStr:self.type, DevUserStr:self.user, DevIdStr:self.uuid};
     [self.devDao setDeviceInfo:dict token:self.token forDevice:self.uuid];
@@ -444,4 +463,9 @@
 - (NSArray *)getLocalTasks {
     return [self.devDao getTasks:self.uuid];
 }
+
+- (void)clearLocalTasks {
+    [self.devDao clearTasksForDevice:self.uuid];
+}
+
 @end

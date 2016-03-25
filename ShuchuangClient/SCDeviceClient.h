@@ -58,6 +58,11 @@
 //record option
 - (void)getRecord:(NSDictionary * _Nonnull)condition success:(nullable void (^)(NSURLSessionDataTask * _Nullable task, id _Nonnull responseObject))success failure:(nullable void (^)(NSURLSessionDataTask * _Nullable task, NSError *   _Nonnull error))failure;
 
+//device system option
+- (void)resetDeviceSuccess:(nullable void (^)(NSURLSessionDataTask * _Nullable task, id _Nonnull responseObject))success failure:(nullable void (^)(NSURLSessionDataTask * _Nullable task, NSError *   _Nonnull error))failure;
+
 - (nullable NSArray *)getLocalTasks;
+
+- (void)clearLocalTasks;
 
 @end

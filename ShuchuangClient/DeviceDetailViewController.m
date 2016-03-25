@@ -30,6 +30,7 @@
 - (void)showDeviceInfo;
 - (void)changeDeviceName;
 - (void)reVerifyPassword;
+- (void)resetDeviceConfig;
 - (void)rightButtonAnimationWillStart;
 - (void)rightButtonAnimationDidStop;
 - (IBAction)onSwButton:(id)sender;
@@ -375,9 +376,36 @@
     }];
     [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
         textField.placeholder = @"请输入设备密码";
+        textField.secureTextEntry = YES;
+        textField.autocorrectionType = UITextAutocorrectionTypeNo;
+        textField.spellCheckingType = UITextSpellCheckingTypeNo;
     }];
     [alert addAction:cancelAction];
     [alert addAction:defaultAction];
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+- (void)resetDeviceConfig {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"提示" message:@"恢复设备出厂设置会还原设备的管理密码，删除设备上的所有自定义用户、定时任务。\n是否要继续？" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction* okAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDestructive handler:^(UIAlertAction* action) {
+        [self.acFrame startAc];
+        [self.device resetDeviceSuccess:^(NSURLSessionDataTask* task, id response) {
+            [self.acFrame stopAc];
+            if ([response[@"result"] isEqualToString:@"good"]) {
+                [self.device clearLocalTasks];
+                [self reVerifyPassword];
+            }
+            else {
+                [SCUtil viewController:self showAlertTitle:@"提示" message:response[@"detail"] action:nil];
+            }
+        } failure:^(NSURLSessionDataTask* task, NSError* error) {
+            [self.acFrame stopAc];
+            [SCUtil viewController:self showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
+        }];
+    }];
+    UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil];
+    [alert addAction:okAction];
+    [alert addAction:cancelAction];
     [self presentViewController:alert animated:YES completion:nil];
 }
 
@@ -387,12 +415,7 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     // Get the new view controller using [segue destinationViewController].
     // Pass the selected object to the new view controller.
-    if ([segue.identifier isEqualToString:@"DeviceDetailToPassword"]) {
-        id desVC = segue.destinationViewController;
-        [desVC setValue:self.uuid forKey:@"devId"];
-        [desVC setValue:@NO forKey:@"firstAdd"];
-    }
-    else if ([segue.identifier isEqualToString:@"DetailToChangePassword"]){
+    if ([segue.identifier isEqualToString:@"DetailToChangePassword"]){
         id desVC = segue.destinationViewController;
         [desVC setValue:self.uuid forKey:@"uuid"];
     }
@@ -454,7 +477,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     switch (indexPath.row) {
         case 0:
-            [self performSegueWithIdentifier:@"DeviceDetailToPassword" sender:self];
+            [self reVerifyPassword];
             break;
         case 1:
             [self changeDeviceName];
@@ -468,6 +491,7 @@
         case 4:
             break;
         case 5:
+            [self resetDeviceConfig];
             break;
         default:
             break;
