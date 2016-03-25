@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9531" systemVersion="15C50" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="c4l-WN-7pT">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
+    </dependencies>
+    <scenes>
+        <!--Main View Controller-->
+        <scene sceneID="C2S-o7-ltO">
+            <objects>
+                <viewController id="c4l-WN-7pT" customClass="SCMainViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="APG-8K-lUy"/>
+                        <viewControllerLayoutGuide type="bottom" id="a8Y-A6-NGL"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="c5N-vX-IZl">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="background" translatesAutoresizingMaskIntoConstraints="NO" id="xR6-81-rrM">
+                                <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="xR6-81-rrM" firstAttribute="leading" secondItem="c5N-vX-IZl" secondAttribute="leading" id="2i7-8c-z5D"/>
+                            <constraint firstItem="xR6-81-rrM" firstAttribute="bottom" secondItem="a8Y-A6-NGL" secondAttribute="top" id="Xzr-in-4oQ"/>
+                            <constraint firstItem="xR6-81-rrM" firstAttribute="top" secondItem="c5N-vX-IZl" secondAttribute="top" id="jGZ-Q0-jef"/>
+                            <constraint firstAttribute="trailing" secondItem="xR6-81-rrM" secondAttribute="trailing" id="xtc-gx-3p9"/>
+                        </constraints>
+                        <variation key="default">
+                            <mask key="subviews">
+                                <exclude reference="xR6-81-rrM"/>
+                            </mask>
+                            <mask key="constraints">
+                                <exclude reference="2i7-8c-z5D"/>
+                                <exclude reference="Xzr-in-4oQ"/>
+                                <exclude reference="jGZ-Q0-jef"/>
+                                <exclude reference="xtc-gx-3p9"/>
+                            </mask>
+                        </variation>
+                        <variation key="widthClass=compact">
+                            <mask key="subviews">
+                                <include reference="xR6-81-rrM"/>
+                            </mask>
+                            <mask key="constraints">
+                                <include reference="2i7-8c-z5D"/>
+                                <include reference="Xzr-in-4oQ"/>
+                                <include reference="jGZ-Q0-jef"/>
+                                <include reference="xtc-gx-3p9"/>
+                            </mask>
+                        </variation>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ID5-uV-HdY" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-609" y="84"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="background" width="375" height="667"/>
+    </resources>
+</document>
