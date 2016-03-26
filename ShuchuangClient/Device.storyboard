@@ -204,6 +204,23 @@
             </objects>
             <point key="canvasLocation" x="-1413" y="-575"/>
         </scene>
+        <!--Device Update View Controller-->
+        <scene sceneID="47N-pJ-C5U">
+            <objects>
+                <viewController id="ucg-wx-aHc" customClass="DeviceUpdateViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="rHb-EI-ZgW"/>
+                        <viewControllerLayoutGuide type="bottom" id="kTy-Xc-5BE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="mWZ-0B-AOn">
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="DKA-PH-WZC" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-489" y="8"/>
+        </scene>
         <!--Device Detail View Controller-->
         <scene sceneID="C4A-Aj-VgV">
             <objects>
@@ -283,6 +300,7 @@
                         <segue destination="1JI-LG-V7a" kind="showDetail" identifier="DetailToRecordSegue" id="56x-94-Zgx"/>
                         <segue destination="mMb-JV-t5r" kind="showDetail" identifier="DetailToChangePassword" id="lBx-2w-gxG"/>
                         <segue destination="cXj-VV-rHI" kind="showDetail" identifier="DetailToTaskSegue" id="pVh-Gx-Oic"/>
+                        <segue destination="ucg-wx-aHc" kind="showDetail" identifier="DetailToUpdate" id="0B1-ff-Gu4"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="61X-7G-Afn" userLabel="First Responder" sceneMemberID="firstResponder"/>

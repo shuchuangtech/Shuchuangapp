@@ -45,7 +45,7 @@
 @end
 
 @implementation DeviceDetailViewController
-#define TABLE_ITEM_NUM 6
+#define TABLE_ITEM_NUM 7
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
@@ -415,20 +415,20 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     // Get the new view controller using [segue destinationViewController].
     // Pass the selected object to the new view controller.
+    id desVC = segue.destinationViewController;
     if ([segue.identifier isEqualToString:@"DetailToChangePassword"]){
-        id desVC = segue.destinationViewController;
         [desVC setValue:self.uuid forKey:@"uuid"];
     }
     else if ([segue.identifier isEqualToString:@"DetailToTaskSegue"]) {
-        id desVC = segue.destinationViewController;
         [desVC setValue:self.uuid forKey:@"uuid"];
     }
     else if ([segue.identifier isEqualToString:@"DetailToRecordSegue"]) {
-        id desVC = segue.destinationViewController;
         [desVC setValue:self.uuid forKey:@"uuid"];
     }
     else if ([segue.identifier isEqualToString:@"DetailToUserSegue"]) {
-        id desVC = segue.destinationViewController;
+        [desVC setValue:self.uuid forKey:@"uuid"];
+    }
+    else if ([segue.identifier isEqualToString:@"DetailToUpdate"]) {
         [desVC setValue:self.uuid forKey:@"uuid"];
     }
 }
@@ -464,6 +464,10 @@
             break;
         case 5:
             [cell setImage:[UIImage imageNamed:@"table_info"] labelText:@"恢复设置"];
+            break;
+        case 6:
+            [cell setImage:[UIImage imageNamed:@"table_update"] labelText:@"检查更新"];
+            break;
         default:
             break;
     }
@@ -493,6 +497,8 @@
         case 5:
             [self resetDeviceConfig];
             break;
+        case 6:
+            [self performSegueWithIdentifier:@"DetailToUpdate" sender:self];
         default:
             break;
     }
