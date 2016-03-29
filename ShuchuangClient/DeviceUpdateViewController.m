@@ -209,8 +209,8 @@
             [cell.myImageView setImage:[UIImage imageNamed:@"reddot"]];
             self.canOpen = YES;
         }
-        NSString* buildTime = self.deviceVersion[@"buildtime"];
-        cell.myDetailTextLabel.text = [NSString stringWithFormat:@"%@(%@)", self.deviceVersion[@"version"], [buildTime substringToIndex:[buildTime length] - 6]];
+        NSString* buildTime = self.serverVersion[@"buildtime"];
+        cell.myDetailTextLabel.text = [NSString stringWithFormat:@"%@(%@)", self.serverVersion[@"version"], [buildTime substringToIndex:[buildTime length] - 6]];
         cell.featureLabel.text = self.featureLabel.text;
         cell.featureLabel.numberOfLines = self.featureLabel.numberOfLines;
         if (!self.isSelected || !self.canOpen) {

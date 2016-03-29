@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <objects>
@@ -15,11 +16,11 @@
                 <rect key="frame" x="0.0" y="0.0" width="320" height="164.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7wE-UB-pTe">
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7wE-UB-pTe">
                         <rect key="frame" x="15" y="12" width="25" height="25"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="19.5" id="J8T-Qw-1H0"/>
-                            <constraint firstAttribute="width" constant="19.5" id="LeS-Ce-Gtj"/>
+                            <constraint firstAttribute="height" constant="10" id="J8T-Qw-1H0"/>
+                            <constraint firstAttribute="width" constant="10" id="LeS-Ce-Gtj"/>
                         </constraints>
                         <variation key="default">
                             <mask key="constraints">
@@ -86,16 +87,16 @@
                         <exclude reference="pU4-AT-Lel"/>
                     </mask>
                     <mask key="constraints">
-                        <exclude reference="McN-eg-LDd"/>
-                        <exclude reference="gG5-sl-X3T"/>
-                        <exclude reference="WpO-em-yet"/>
-                        <exclude reference="geJ-AZ-5qm"/>
-                        <exclude reference="UPK-bs-WBT"/>
-                        <exclude reference="Wxz-Za-Y73"/>
                         <exclude reference="FW7-65-UDb"/>
                         <exclude reference="vyH-7n-W4M"/>
+                        <exclude reference="UPK-bs-WBT"/>
+                        <exclude reference="Wxz-Za-Y73"/>
+                        <exclude reference="WpO-em-yet"/>
+                        <exclude reference="geJ-AZ-5qm"/>
                         <exclude reference="CzS-Uj-Sp1"/>
                         <exclude reference="tnh-hk-NBE"/>
+                        <exclude reference="McN-eg-LDd"/>
+                        <exclude reference="gG5-sl-X3T"/>
                     </mask>
                 </variation>
                 <variation key="widthClass=compact">
@@ -106,16 +107,16 @@
                         <include reference="pU4-AT-Lel"/>
                     </mask>
                     <mask key="constraints">
-                        <include reference="McN-eg-LDd"/>
-                        <include reference="gG5-sl-X3T"/>
-                        <include reference="WpO-em-yet"/>
-                        <include reference="geJ-AZ-5qm"/>
-                        <include reference="UPK-bs-WBT"/>
-                        <include reference="Wxz-Za-Y73"/>
                         <include reference="FW7-65-UDb"/>
                         <include reference="vyH-7n-W4M"/>
+                        <include reference="UPK-bs-WBT"/>
+                        <include reference="Wxz-Za-Y73"/>
+                        <include reference="WpO-em-yet"/>
+                        <include reference="geJ-AZ-5qm"/>
                         <include reference="CzS-Uj-Sp1"/>
                         <include reference="tnh-hk-NBE"/>
+                        <include reference="McN-eg-LDd"/>
+                        <include reference="gG5-sl-X3T"/>
                     </mask>
                 </variation>
             </tableViewCellContentView>
