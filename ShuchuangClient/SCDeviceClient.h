@@ -61,6 +61,12 @@
 //device system option
 - (void)resetDeviceSuccess:(nullable void (^)(NSURLSessionDataTask * _Nullable task, id _Nonnull responseObject))success failure:(nullable void (^)(NSURLSessionDataTask * _Nullable task, NSError *   _Nonnull error))failure;
 
+- (void)checkDeviceVersionSuccess:(nullable void (^)(NSURLSessionDataTask * _Nullable task, id _Nonnull responseObject))success failure:(nullable void (^)(NSURLSessionDataTask * _Nullable task, NSError *   _Nonnull error))failure;
+
+- (void)checkServerVersionSuccess:(nullable void (^)(NSURLSessionDataTask * _Nullable task, id _Nonnull responseObject))success failure:(nullable void (^)(NSURLSessionDataTask * _Nullable task, NSError *   _Nonnull error))failure;
+
+- (void)updateDeviceTo:(nonnull NSString*)version success:(nullable void (^)(NSURLSessionDataTask * _Nullable task, id _Nonnull responseObject))success failure:(nullable void (^)(NSURLSessionDataTask * _Nullable task, NSError *   _Nonnull error))failure;
+
 - (nullable NSArray *)getLocalTasks;
 
 - (void)clearLocalTasks;

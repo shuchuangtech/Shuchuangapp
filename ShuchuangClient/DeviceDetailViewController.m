@@ -428,7 +428,7 @@
     else if ([segue.identifier isEqualToString:@"DetailToUserSegue"]) {
         [desVC setValue:self.uuid forKey:@"uuid"];
     }
-    else if ([segue.identifier isEqualToString:@"DetailToUpdate"]) {
+    else if ([segue.identifier isEqualToString:@"DetailToUpdateSegue"]) {
         [desVC setValue:self.uuid forKey:@"uuid"];
     }
 }
@@ -498,7 +498,7 @@
             [self resetDeviceConfig];
             break;
         case 6:
-            [self performSegueWithIdentifier:@"DetailToUpdate" sender:self];
+            [self performSegueWithIdentifier:@"DetailToUpdateSegue" sender:self];
         default:
             break;
     }

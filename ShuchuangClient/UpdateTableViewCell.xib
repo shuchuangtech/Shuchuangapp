@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="UpdateTableViewCell" rowHeight="136" id="KGk-i7-Jjw" customClass="UpdateTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="165"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="164.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7wE-UB-pTe">
+                        <rect key="frame" x="15" y="12" width="25" height="25"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="19.5" id="J8T-Qw-1H0"/>
+                            <constraint firstAttribute="width" constant="19.5" id="LeS-Ce-Gtj"/>
+                        </constraints>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="J8T-Qw-1H0"/>
+                                <exclude reference="LeS-Ce-Gtj"/>
+                            </mask>
+                        </variation>
+                        <variation key="widthClass=compact">
+                            <mask key="constraints">
+                                <include reference="J8T-Qw-1H0"/>
+                                <include reference="LeS-Ce-Gtj"/>
+                            </mask>
+                        </variation>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xbi-J4-iKe">
+                        <rect key="frame" x="-42" y="-21" width="42" height="21"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                        <nil key="highlightedColor"/>
+                        <variation key="widthClass=compact">
+                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                        </variation>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xWB-83-8HZ">
+                        <rect key="frame" x="-42" y="-21" width="42" height="21"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <color key="textColor" red="0.5568627451" green="0.5568627451" blue="0.57647058819999997" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                        <variation key="widthClass=compact">
+                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                        </variation>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TQ3-M5-xn3">
+                        <rect key="frame" x="-42" y="-21" width="42" height="21"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                        <nil key="highlightedColor"/>
+                        <variation key="widthClass=compact">
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        </variation>
+                    </label>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pU4-AT-Lel">
+                        <rect key="frame" x="-23" y="-15" width="46" height="30"/>
+                        <state key="normal" title="升级设备"/>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailingMargin" secondItem="xWB-83-8HZ" secondAttribute="trailing" constant="7" id="CzS-Uj-Sp1"/>
+                    <constraint firstItem="pU4-AT-Lel" firstAttribute="top" secondItem="xWB-83-8HZ" secondAttribute="bottom" constant="7.5" id="FW7-65-UDb"/>
+                    <constraint firstItem="7wE-UB-pTe" firstAttribute="centerY" secondItem="Xbi-J4-iKe" secondAttribute="centerY" id="McN-eg-LDd"/>
+                    <constraint firstItem="TQ3-M5-xn3" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" constant="7" id="UPK-bs-WBT"/>
+                    <constraint firstItem="Xbi-J4-iKe" firstAttribute="leading" secondItem="7wE-UB-pTe" secondAttribute="trailing" constant="2.5" id="WpO-em-yet"/>
+                    <constraint firstItem="TQ3-M5-xn3" firstAttribute="top" secondItem="Xbi-J4-iKe" secondAttribute="bottom" constant="8" id="Wxz-Za-Y73"/>
+                    <constraint firstItem="7wE-UB-pTe" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" constant="7" id="gG5-sl-X3T"/>
+                    <constraint firstItem="Xbi-J4-iKe" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" constant="4" id="geJ-AZ-5qm"/>
+                    <constraint firstItem="xWB-83-8HZ" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" constant="4" id="tnh-hk-NBE"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="pU4-AT-Lel" secondAttribute="trailing" constant="7" id="vyH-7n-W4M"/>
+                </constraints>
+                <variation key="default">
+                    <mask key="subviews">
+                        <exclude reference="Xbi-J4-iKe"/>
+                        <exclude reference="xWB-83-8HZ"/>
+                        <exclude reference="TQ3-M5-xn3"/>
+                        <exclude reference="pU4-AT-Lel"/>
+                    </mask>
+                    <mask key="constraints">
+                        <exclude reference="McN-eg-LDd"/>
+                        <exclude reference="gG5-sl-X3T"/>
+                        <exclude reference="WpO-em-yet"/>
+                        <exclude reference="geJ-AZ-5qm"/>
+                        <exclude reference="UPK-bs-WBT"/>
+                        <exclude reference="Wxz-Za-Y73"/>
+                        <exclude reference="FW7-65-UDb"/>
+                        <exclude reference="vyH-7n-W4M"/>
+                        <exclude reference="CzS-Uj-Sp1"/>
+                        <exclude reference="tnh-hk-NBE"/>
+                    </mask>
+                </variation>
+                <variation key="widthClass=compact">
+                    <mask key="subviews">
+                        <include reference="Xbi-J4-iKe"/>
+                        <include reference="xWB-83-8HZ"/>
+                        <include reference="TQ3-M5-xn3"/>
+                        <include reference="pU4-AT-Lel"/>
+                    </mask>
+                    <mask key="constraints">
+                        <include reference="McN-eg-LDd"/>
+                        <include reference="gG5-sl-X3T"/>
+                        <include reference="WpO-em-yet"/>
+                        <include reference="geJ-AZ-5qm"/>
+                        <include reference="UPK-bs-WBT"/>
+                        <include reference="Wxz-Za-Y73"/>
+                        <include reference="FW7-65-UDb"/>
+                        <include reference="vyH-7n-W4M"/>
+                        <include reference="CzS-Uj-Sp1"/>
+                        <include reference="tnh-hk-NBE"/>
+                    </mask>
+                </variation>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="buttonUpdate" destination="pU4-AT-Lel" id="u7k-vA-yvx"/>
+                <outlet property="featureLabel" destination="TQ3-M5-xn3" id="lDO-Zk-8rh"/>
+                <outlet property="heightConstr" destination="J8T-Qw-1H0" id="CBU-UU-i8e"/>
+                <outlet property="myDetailTextLabel" destination="xWB-83-8HZ" id="GDP-pv-v7P"/>
+                <outlet property="myImageView" destination="7wE-UB-pTe" id="mpg-1k-oYE"/>
+                <outlet property="myTextLabel" destination="Xbi-J4-iKe" id="Dh5-4J-wo3"/>
+                <outlet property="widthConstr" destination="LeS-Ce-Gtj" id="nmS-09-S6T"/>
+            </connections>
+            <point key="canvasLocation" x="353" y="259"/>
+        </tableViewCell>
+    </objects>
+</document>

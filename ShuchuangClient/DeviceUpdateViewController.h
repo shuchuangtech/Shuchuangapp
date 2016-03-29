@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DeviceUpdateViewController : UIViewController
+@interface DeviceUpdateViewController : UIViewController<UITableViewDelegate, UITableViewDataSource>
 
 @end

@@ -61,6 +61,8 @@
 #define DEVICE_SWITCH_STR @"switch"
 #define DEVICE_OPEN_STR @"open"
 #define DEVICE_CLOSE_STR @"close"
+//system
+#define SYSTEM_VERSION_STR @"version"
 //Component>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #define COMPONENT_USER_STR @"user"
 #define COMPONENT_TASK_STR @"task"
@@ -68,6 +70,7 @@
 #define COMPONENT_RECORD_STR @"record"
 #define COMPONENT_SERVER_STR @"server"
 #define COMPONENT_SYSTEM_STR @"system"
+#define COMPONENT_UPDATE_STR @"update"
 //Method>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 //user
 #define USER_METHOD_LOGIN @"login"
@@ -97,6 +100,10 @@
 #define SERVER_METHOD_KEEPALIVE @"keepalive"
 //system
 #define SYSTEM_METHOD_RESET @"reset"
+#define SYSTEM_METHOD_VERSION @"version"
+#define SYSTEM_METHOD_UPDATE @"update"
+//update
+#define UPDATE_METHOD_CHECK @"check"
 //result>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #define RESULT_GOOD_STR @"good"
 #define RESULT_FAIL_STR @"failed"
