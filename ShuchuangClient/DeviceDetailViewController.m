@@ -431,6 +431,9 @@
     else if ([segue.identifier isEqualToString:@"DetailToUpdateSegue"]) {
         [desVC setValue:self.uuid forKey:@"uuid"];
     }
+    else if ([segue.identifier isEqualToString:@"DetailToAddUserSegue"]) {
+        [desVC setValue:self.uuid forKey:@"uuid"];
+    }
 }
 
 #pragma mark - Table DataSource
@@ -493,6 +496,7 @@
             [self showDeviceInfo];
             break;
         case 4:
+            [self performSegueWithIdentifier:@"DetailToAddUserSegue" sender:self];
             break;
         case 5:
             [self resetDeviceConfig];

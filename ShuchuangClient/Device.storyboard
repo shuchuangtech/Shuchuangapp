@@ -202,7 +202,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="g1X-Mt-mHa" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1413" y="-575"/>
+            <point key="canvasLocation" x="-1341" y="-991"/>
         </scene>
         <!--Device Update View Controller-->
         <scene sceneID="47N-pJ-C5U">
@@ -348,7 +348,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="DKA-PH-WZC" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-489" y="8"/>
+            <point key="canvasLocation" x="-489" y="-472"/>
         </scene>
         <!--Device Detail View Controller-->
         <scene sceneID="C4A-Aj-VgV">
@@ -430,6 +430,7 @@
                         <segue destination="mMb-JV-t5r" kind="showDetail" identifier="DetailToChangePassword" id="lBx-2w-gxG"/>
                         <segue destination="cXj-VV-rHI" kind="showDetail" identifier="DetailToTaskSegue" id="pVh-Gx-Oic"/>
                         <segue destination="ucg-wx-aHc" kind="showDetail" identifier="DetailToUpdateSegue" id="0B1-ff-Gu4"/>
+                        <segue destination="Dz4-5a-Oce" kind="showDetail" identifier="DetailToAddUserSegue" id="FF4-nz-K7i"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="61X-7G-Afn" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -786,7 +787,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aSz-Xo-q78" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1939.5" y="-102"/>
+            <point key="canvasLocation" x="1915.5" y="-838"/>
         </scene>
         <!--Add Task View Controller-->
         <scene sceneID="M7o-Qg-I09">
@@ -1941,7 +1942,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="zAS-C6-Obd" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1941" y="578"/>
+            <point key="canvasLocation" x="2013" y="154"/>
         </scene>
         <!--Device Password View Controller-->
         <scene sceneID="rYn-fk-SKx">
@@ -2106,7 +2107,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0uR-Ed-nYP" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="948" y="-567"/>
+            <point key="canvasLocation" x="960" y="-991"/>
         </scene>
     </scenes>
     <resources>
@@ -2116,4 +2117,7 @@
         <image name="clock" width="83" height="83"/>
         <image name="search" width="28" height="28"/>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="FF4-nz-K7i"/>
+    </inferredMetricsTieBreakers>
 </document>
