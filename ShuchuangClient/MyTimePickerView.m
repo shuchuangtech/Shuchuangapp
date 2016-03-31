@@ -10,6 +10,7 @@
 
 @interface MyTimePickerView()
 @property (strong, nonatomic) UIPickerView* pickerView;
+@property (strong, nonatomic) UIView* pickerSuperView;
 @property BOOL showView;
 - (void)onPickerOK;
 - (void)onPickerCancel;
@@ -29,32 +30,33 @@
     CGFloat height = view.frame.size.height / 3.0;
     CGFloat width = view.frame.size.width;
     self = [super initWithFrame:CGRectMake(0, 0, width, view.frame.size.height)];
-
-    UILabel* title = [[UILabel alloc] initWithFrame:CGRectMake(0, view.frame.size.height - height, width, height / 6.0)];
+    self.pickerSuperView = [[UIView alloc] initWithFrame:CGRectMake(0, 2.0 * height, width, height)];
+    UILabel* title = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, width, height / 6.0)];
     title.text = @"选择时间";
     title.textAlignment = NSTextAlignmentCenter;
     [title setBackgroundColor:[UIColor lightGrayColor]];
-    UIButton* leftButton = [[UIButton alloc] initWithFrame:CGRectMake(5, view.frame.size.height - height, width / 8.0, height / 6.0)];
+    UIButton* leftButton = [[UIButton alloc] initWithFrame:CGRectMake(5, 0, width / 8.0, height / 6.0)];
     [leftButton setTitle:@"取消" forState:UIControlStateNormal];
     [leftButton setTitleColor:[UIColor grayColor] forState:UIControlStateHighlighted];
     [leftButton.titleLabel setFont:[UIFont systemFontOfSize:17.0]];
     [leftButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [leftButton addTarget:self action:@selector(onPickerCancel) forControlEvents:UIControlEventTouchUpInside];
     
-    UIButton* rightButton = [[UIButton alloc] initWithFrame:CGRectMake(width - 5 - width / 8.0, view.frame.size.height - height, width / 8.0, height / 6.0)];
+    UIButton* rightButton = [[UIButton alloc] initWithFrame:CGRectMake(width - 5 - width / 8.0, 0, width / 8.0, height / 6.0)];
     [rightButton setTitle:@"确定" forState:UIControlStateNormal];
     [rightButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [rightButton setTitleColor:[UIColor grayColor] forState:UIControlStateHighlighted];
     [rightButton.titleLabel setFont:[UIFont systemFontOfSize:17.0]];
     [rightButton addTarget:self action:@selector(onPickerOK) forControlEvents:UIControlEventTouchUpInside];
     
-    self.pickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(0, view.frame.size.height - height *  5.0 / 6.0, width, height * 5.0 / 6.0)];
+    self.pickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(0, height / 6.0, width, height * 5.0 / 6.0)];
     self.pickerView.delegate = self;
     self.pickerView.dataSource = self;
-    [self addSubview:title];
-    [self addSubview:leftButton];
-    [self addSubview:rightButton];
-    [self addSubview:self.pickerView];
+    [self.pickerSuperView addSubview:title];
+    [self.pickerSuperView addSubview:leftButton];
+    [self.pickerSuperView addSubview:rightButton];
+    [self.pickerSuperView addSubview:self.pickerView];
+    [self addSubview:self.pickerSuperView];
     [view addSubview:self];
     self.hidden = YES;
     self.showView = NO;
@@ -74,14 +76,13 @@
 - (void)showPicker {
     if (self.showView)
         return;
-    NSLog(@"time picker show picker");
     CABasicAnimation *anima = [CABasicAnimation animation];
     anima.keyPath = @"position";
-    anima.fromValue = [NSValue valueWithCGPoint:CGPointMake(self.frame.size.width / 2, self.frame.size.height * 5 / 6)];
-    anima.toValue =[NSValue valueWithCGPoint:CGPointMake(self.frame.size.width / 2, self.frame.size.height / 2)];
+    anima.fromValue = [NSValue valueWithCGPoint:CGPointMake(self.pickerSuperView.center.x, self.pickerSuperView.center.y + self.pickerSuperView.frame.size.height)];
+    anima.toValue =[NSValue valueWithCGPoint:CGPointMake(self.pickerSuperView.center.x, self.pickerSuperView.center.y)];
     anima.delegate = self;
     self.showView = YES;
-    [self.layer addAnimation:anima forKey:nil];
+    [self.pickerSuperView.layer addAnimation:anima forKey:nil];
 }
 
 - (void)hidePicker {
@@ -89,11 +90,11 @@
         return;
     CABasicAnimation *anima = [CABasicAnimation animation];
     anima.keyPath = @"position";
-    anima.fromValue = [NSValue valueWithCGPoint:CGPointMake(self.frame.size.width / 2, self.frame.size.height / 2)];
-    anima.toValue =[NSValue valueWithCGPoint:CGPointMake(self.frame.size.width / 2, self.frame.size.height * 5 / 6)];
+    anima.fromValue = [NSValue valueWithCGPoint:CGPointMake(self.pickerSuperView.center.x, self.pickerSuperView.center.y)];
+    anima.toValue =[NSValue valueWithCGPoint:CGPointMake(self.pickerSuperView.center.x, self.pickerSuperView.center.y +  + self.pickerSuperView.frame.size.height)];
     anima.delegate = self;
     self.showView = NO;
-    [self.layer addAnimation:anima forKey:nil];
+    [self.pickerSuperView.layer addAnimation:anima forKey:nil];
 }
 
 - (void)animationDidStart:(CAAnimation *)anim {
@@ -101,12 +102,16 @@
         [self.superview bringSubviewToFront:self];
         self.hidden = NO;
     }
+    else {
+        [self.pickerSuperView.layer setPosition:CGPointMake(self.frame.size.width / 2, self.frame.size.height + self.pickerSuperView.frame.size.height / 2)];
+    }
 }
 
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag {
     if (!self.showView) {
-        [self.superview sendSubviewToBack:self];
         self.hidden = YES;
+        [self.superview sendSubviewToBack:self];
+        [self.pickerSuperView.layer setPosition:CGPointMake(self.frame.size.width / 2, self.frame.size.height - self.pickerSuperView.frame.size.height / 2)];
     }
 }
 
