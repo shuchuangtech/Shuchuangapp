@@ -57,7 +57,7 @@
     self.acFrame = [[MyActivityIndicatorView alloc] initWithFrameInView:self.view];
 }
 
-- (void)viewWillAppear:(BOOL)animated {
+- (void)viewDidAppear:(BOOL)animated {
     [self.usersArray removeAllObjects];
     self.tableView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMoreData)];
     [self loadMoreData];

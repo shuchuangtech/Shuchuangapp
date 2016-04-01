@@ -48,7 +48,7 @@
             return 1;
             break;
         case 1:
-            return 5;
+            return 3;
             break;
         case 2:
             return 1;
@@ -81,14 +81,30 @@
     UITableViewCell *cell;
     if (indexPath.section == 0) {
         cell = [tableView dequeueReusableCellWithIdentifier:@"HeaderCell" forIndexPath:indexPath];
-        [(MeHeaderTableViewCell *)cell setUserName:@"18768113819"];
+        BmobUser *user = [BmobUser getCurrentUser];
+        [(MeHeaderTableViewCell *)cell setUserName:[user username]];
     }
     else if (indexPath.section == 1) {
         cell = [tableView dequeueReusableCellWithIdentifier:@"MiddleCell" forIndexPath:indexPath];
-        NSString *labelText = [NSString stringWithFormat:@"设置菜单%ld", indexPath.row];
-        [(MeTableViewCell *)cell setLabelText:labelText];
-        NSString *imgName = [NSString stringWithFormat:@"tablecell%ld", indexPath.row + 1];
-        [(MeTableViewCell *)cell setLeftImage:[UIImage imageNamed:imgName]];
+        switch (indexPath.row) {
+            case 0: {
+                [(MeTableViewCell *)cell setLabelText:@"社交分享"];
+                [(MeTableViewCell *)cell setLeftImage:[UIImage imageNamed:@"tablecell4"]];
+                break;
+            }
+            case 1: {
+                [(MeTableViewCell *)cell setLabelText:@"意见反馈"];
+                [(MeTableViewCell *)cell setLeftImage:[UIImage imageNamed:@"tablecell2"]];
+                break;
+            }
+            case 2: {
+                [(MeTableViewCell *)cell setLabelText:@"关于我们"];
+                [(MeTableViewCell *)cell setLeftImage:[UIImage imageNamed:@"tablecell5"]];
+                break;
+            }
+        }
+        
+        
     }
     else if (indexPath.section == 2) {
         cell = [tableView dequeueReusableCellWithIdentifier:@"FooterCell" forIndexPath:indexPath];

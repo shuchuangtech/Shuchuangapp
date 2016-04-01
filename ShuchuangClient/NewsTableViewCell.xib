@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="NewsTableCell" rowHeight="107" id="KGk-i7-Jjw" customClass="NewsTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="107"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="106.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zRg-lZ-10b">
+                        <rect key="frame" x="8" y="8" width="304" height="90"/>
+                    </imageView>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="zRg-lZ-10b" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" id="EW8-sO-Tff"/>
+                    <constraint firstItem="zRg-lZ-10b" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" id="LIa-f0-RzL"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="zRg-lZ-10b" secondAttribute="trailing" id="eUv-Yz-JQO"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="zRg-lZ-10b" secondAttribute="bottom" constant="0.5" id="lyL-AQ-2RJ"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="myImageView" destination="zRg-lZ-10b" id="px6-nZ-64T"/>
+            </connections>
+            <point key="canvasLocation" x="353" y="315.5"/>
+        </tableViewCell>
+    </objects>
+</document>

@@ -22,6 +22,11 @@
     // Override point for customization after application launch.
     //Bmob
     [Bmob registerWithAppKey:@"27f1f3599a223cfa40bb5c5e5daedd7a"];
+    UIMutableUserNotificationCategory *categorys = [[UIMutableUserNotificationCategory alloc] init];
+    categorys.identifier = @"com.Shuchuang.ShuchuangClient";
+    UIUserNotificationSettings *userNotifiSetting = [UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeAlert|UIUserNotificationTypeBadge|UIUserNotificationTypeSound) categories:[NSSet setWithObjects:categorys, nil]];
+    [[UIApplication sharedApplication] registerUserNotificationSettings:userNotifiSetting];
+    [[UIApplication sharedApplication] registerForRemoteNotifications];
     //SCHTTPManager
     SCHTTPManager *http = [SCHTTPManager instance];
     [http initWithCertificate:@"server" serverAddress:@"www.shuchuangtech.com" port:9888];
@@ -50,4 +55,14 @@
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(nonnull NSData *)deviceToken {
+    NSLog(@"register device token:%@", deviceToken);
+    BmobInstallation *currentInstallation = [BmobInstallation currentInstallation];
+    [currentInstallation setDeviceTokenFromData:deviceToken];
+    [currentInstallation saveInBackground];
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
+    NSLog(@"userinfo:%@", userInfo);
+}
 @end

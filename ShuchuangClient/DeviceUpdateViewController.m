@@ -78,7 +78,7 @@
     }];
 }
 
-- (void)viewWillAppear:(BOOL)animated {
+- (void)viewDidAppear:(BOOL)animated {
     self.deviceCheckFinish = NO;
     self.serverCheckFinish = NO;
     [self.acFrame startAc];

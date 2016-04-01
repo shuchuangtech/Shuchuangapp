@@ -7,7 +7,7 @@
 //
 
 #import "NewsViewController.h"
-
+#import "NewsTableViewCell.h"
 @interface NewsViewController ()
 @property (weak, nonatomic) IBOutlet UINavigationBar *naviBar;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
@@ -21,7 +21,7 @@
     // Do any additional setup after loading the view.
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
-    
+    [self.tableView registerNib:[UINib nibWithNibName:@"NewsTableViewCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"NewsTableCell"];
     UINavigationItem *naviItem = [[UINavigationItem alloc] initWithTitle:@"发现"];
     [self.naviBar pushNavigationItem:naviItem animated:NO];
     [self.view addSubview:self.naviBar];
@@ -33,6 +33,10 @@
 }
 
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 120.0;
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return 5;
 }
@@ -42,7 +46,8 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NewsPrototypeCell" forIndexPath:indexPath];
+    NewsTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NewsTableCell" forIndexPath:indexPath];
+    [cell.myImageView setImage:[UIImage imageNamed:@"discover"]];
     return cell;
 }
 /*
