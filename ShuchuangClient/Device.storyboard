@@ -198,11 +198,96 @@
                         <outlet property="naviBar" destination="anS-2Q-3QS" id="82D-sD-5Ny"/>
                         <outlet property="uuidTextField" destination="ntj-vA-6E5" id="h0U-TW-mkm"/>
                         <segue destination="nKq-pf-jRt" kind="showDetail" identifier="DeviceAddToPassword" id="ifm-QC-QkD"/>
+                        <segue destination="5Ak-iv-9lj" kind="showDetail" identifier="DeviceAddToQRCode" id="6bI-aB-fMs"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="g1X-Mt-mHa" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1341" y="-991"/>
+        </scene>
+        <!--Code View Controller-->
+        <scene sceneID="Z35-eU-KkE">
+            <objects>
+                <viewController id="5Ak-iv-9lj" customClass="QRCodeViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="aa4-9C-hFe"/>
+                        <viewControllerLayoutGuide type="bottom" id="D1g-AW-i94"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="UpN-Gr-Rlk">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gLZ-wR-9Do">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="Bnw-5m-nHK"/>
+                                </constraints>
+                                <color key="barTintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="Bnw-5m-nHK"/>
+                                    </mask>
+                                </variation>
+                                <variation key="widthClass=compact">
+                                    <mask key="constraints">
+                                        <include reference="Bnw-5m-nHK"/>
+                                    </mask>
+                                </variation>
+                            </navigationBar>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7KT-9f-TrF">
+                                <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="D1g-AW-i94" firstAttribute="top" secondItem="7KT-9f-TrF" secondAttribute="bottom" id="3lJ-vp-MES"/>
+                            <constraint firstItem="7KT-9f-TrF" firstAttribute="leading" secondItem="UpN-Gr-Rlk" secondAttribute="leadingMargin" constant="-20" id="8ai-g8-BAF"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="7KT-9f-TrF" secondAttribute="trailing" constant="-20" id="C4G-cF-IJ7"/>
+                            <constraint firstItem="7KT-9f-TrF" firstAttribute="top" secondItem="gLZ-wR-9Do" secondAttribute="bottom" id="KTL-Ie-k1f"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="gLZ-wR-9Do" secondAttribute="trailing" constant="-20" id="ZTF-cU-RHA"/>
+                            <constraint firstItem="gLZ-wR-9Do" firstAttribute="top" secondItem="aa4-9C-hFe" secondAttribute="bottom" id="bdR-9U-5bB"/>
+                            <constraint firstItem="gLZ-wR-9Do" firstAttribute="leading" secondItem="UpN-Gr-Rlk" secondAttribute="leadingMargin" constant="-20" id="oYT-Aa-fzZ"/>
+                        </constraints>
+                        <variation key="default">
+                            <mask key="subviews">
+                                <exclude reference="gLZ-wR-9Do"/>
+                                <exclude reference="7KT-9f-TrF"/>
+                            </mask>
+                            <mask key="constraints">
+                                <exclude reference="ZTF-cU-RHA"/>
+                                <exclude reference="bdR-9U-5bB"/>
+                                <exclude reference="oYT-Aa-fzZ"/>
+                                <exclude reference="8ai-g8-BAF"/>
+                                <exclude reference="C4G-cF-IJ7"/>
+                                <exclude reference="KTL-Ie-k1f"/>
+                                <exclude reference="3lJ-vp-MES"/>
+                            </mask>
+                        </variation>
+                        <variation key="widthClass=compact">
+                            <mask key="subviews">
+                                <include reference="gLZ-wR-9Do"/>
+                                <include reference="7KT-9f-TrF"/>
+                            </mask>
+                            <mask key="constraints">
+                                <include reference="ZTF-cU-RHA"/>
+                                <include reference="bdR-9U-5bB"/>
+                                <include reference="oYT-Aa-fzZ"/>
+                                <include reference="8ai-g8-BAF"/>
+                                <include reference="C4G-cF-IJ7"/>
+                                <include reference="KTL-Ie-k1f"/>
+                                <include reference="3lJ-vp-MES"/>
+                            </mask>
+                        </variation>
+                    </view>
+                    <connections>
+                        <outlet property="bgView" destination="7KT-9f-TrF" id="U2l-14-Y5P"/>
+                        <outlet property="naviBar" destination="gLZ-wR-9Do" id="3Ua-di-LMa"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="eYe-IC-r68" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-225" y="-1456"/>
         </scene>
         <!--Device Update View Controller-->
         <scene sceneID="47N-pJ-C5U">

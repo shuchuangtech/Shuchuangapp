@@ -12,8 +12,9 @@
 #import "SCUtil.h"
 #import "SCDeviceClient.h"
 #import "SCDeviceManager.h"
+#import "ScanQRCodeProtocol.h"
 
-@interface DeviceAddViewController ()
+@interface DeviceAddViewController () <ScanQRCodeProtocol>
 @property (weak, nonatomic) IBOutlet UINavigationBar *naviBar;
 @property (weak, nonatomic) IBOutlet UITextField *uuidTextField;
 @property (weak, nonatomic) IBOutlet UIButton *buttonNext;
@@ -127,17 +128,12 @@
 }
 
 - (IBAction)onButtonQR:(id)sender {
-    /*
-    SCHTTPManager *http = [SCHTTPManager instance];
-    NSDictionary *dict = @{@"type":@"request", @"action":@"server.check", @"param":@{@"uuid":self.uuidTextField.text}};
-    NSLog(@"%@", dict);
-    [http sendMessage:dict success:^(NSURLSessionDataTask *task, id response) {
-        NSLog(@"%@", response);
-    } failure:^(NSURLSessionDataTask* task, NSError *error) {
-        NSLog(@"%@", error);
-    }];
-     */
+    [self performSegueWithIdentifier:@"DeviceAddToQRCode" sender:self];
+}
 
+- (void)getQRCodeStringValue:(NSString *)stringValue {
+    self.uuidTextField.text = stringValue;
+    self.buttonNext.enabled = YES;
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
@@ -151,9 +147,13 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     // Get the new view controller using [segue destinationViewController].
     // Pass the selected object to the new view controller.
+    id desVC = segue.destinationViewController;
     if ([segue.identifier  isEqual: @"DeviceAddToPassword"]) {
-        id desVC = segue.destinationViewController;
         [desVC setValue:self.uuid forKey:@"devId"];
+        
+    }
+    else {
+        [desVC setValue:self forKey:@"scanDelegate"];
     }
 }
 
