@@ -255,13 +255,13 @@
                                 <exclude reference="7KT-9f-TrF"/>
                             </mask>
                             <mask key="constraints">
+                                <exclude reference="3lJ-vp-MES"/>
                                 <exclude reference="ZTF-cU-RHA"/>
                                 <exclude reference="bdR-9U-5bB"/>
                                 <exclude reference="oYT-Aa-fzZ"/>
                                 <exclude reference="8ai-g8-BAF"/>
                                 <exclude reference="C4G-cF-IJ7"/>
                                 <exclude reference="KTL-Ie-k1f"/>
-                                <exclude reference="3lJ-vp-MES"/>
                             </mask>
                         </variation>
                         <variation key="widthClass=compact">
@@ -270,13 +270,13 @@
                                 <include reference="7KT-9f-TrF"/>
                             </mask>
                             <mask key="constraints">
+                                <include reference="3lJ-vp-MES"/>
                                 <include reference="ZTF-cU-RHA"/>
                                 <include reference="bdR-9U-5bB"/>
                                 <include reference="oYT-Aa-fzZ"/>
                                 <include reference="8ai-g8-BAF"/>
                                 <include reference="C4G-cF-IJ7"/>
                                 <include reference="KTL-Ie-k1f"/>
-                                <include reference="3lJ-vp-MES"/>
                             </mask>
                         </variation>
                     </view>
@@ -339,7 +339,7 @@
                             </imageView>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="ifb-IL-EoC">
                                 <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
-                                <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="UpdatePrototypeCell" textLabel="tTF-ZN-BEM" detailTextLabel="t8Y-dE-Hy3" imageView="7cW-T3-nYo" style="IBUITableViewCellStyleValue1" id="D6G-GQ-YTR">
                                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
@@ -352,7 +352,7 @@
                                                     <rect key="frame" x="15" y="12" width="33.5" height="20.5"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                     <variation key="widthClass=compact">
                                                         <fontDescription key="fontDescription" type="system" pointSize="16"/>
@@ -471,43 +471,59 @@
                                     <action selector="onSwButton:" destination="cQW-IQ-7Oa" eventType="touchUpInside" id="wjg-Qx-7qW"/>
                                 </connections>
                             </button>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="qZi-Ud-f5d">
+                                <rect key="frame" x="-60" y="-14" width="121" height="29"/>
+                                <segments>
+                                    <segment title="普通模式" width="80"/>
+                                    <segment title="管理员模式" width="80"/>
+                                </segments>
+                            </segmentedControl>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="ocB-oH-Rd8" firstAttribute="centerX" secondItem="8Nb-yP-w6D" secondAttribute="centerX" id="8vf-ex-THk"/>
                             <constraint firstItem="FAk-sb-dyi" firstAttribute="leading" secondItem="8Nb-yP-w6D" secondAttribute="leadingMargin" constant="-20" id="GcG-OW-sXk"/>
                             <constraint firstAttribute="trailingMargin" secondItem="FAk-sb-dyi" secondAttribute="trailing" constant="-20" id="H6h-xe-nLj"/>
+                            <constraint firstItem="qZi-Ud-f5d" firstAttribute="centerX" secondItem="8Nb-yP-w6D" secondAttribute="centerX" id="IYE-Ml-eO2"/>
                             <constraint firstItem="FAk-sb-dyi" firstAttribute="top" secondItem="QmB-0a-lyV" secondAttribute="bottom" id="WbE-hX-pLc"/>
+                            <constraint firstItem="qZi-Ud-f5d" firstAttribute="top" secondItem="ocB-oH-Rd8" secondAttribute="bottom" constant="45" id="g8P-Qs-JQu"/>
                             <constraint firstItem="ocB-oH-Rd8" firstAttribute="top" secondItem="FAk-sb-dyi" secondAttribute="bottom" constant="140" id="teP-m3-tqs"/>
                         </constraints>
                         <variation key="default">
                             <mask key="subviews">
                                 <exclude reference="FAk-sb-dyi"/>
                                 <exclude reference="ocB-oH-Rd8"/>
+                                <exclude reference="qZi-Ud-f5d"/>
                             </mask>
                             <mask key="constraints">
-                                <exclude reference="8vf-ex-THk"/>
-                                <exclude reference="teP-m3-tqs"/>
                                 <exclude reference="GcG-OW-sXk"/>
                                 <exclude reference="H6h-xe-nLj"/>
                                 <exclude reference="WbE-hX-pLc"/>
+                                <exclude reference="8vf-ex-THk"/>
+                                <exclude reference="teP-m3-tqs"/>
+                                <exclude reference="IYE-Ml-eO2"/>
+                                <exclude reference="g8P-Qs-JQu"/>
                             </mask>
                         </variation>
                         <variation key="widthClass=compact">
                             <mask key="subviews">
                                 <include reference="FAk-sb-dyi"/>
                                 <include reference="ocB-oH-Rd8"/>
+                                <include reference="qZi-Ud-f5d"/>
                             </mask>
                             <mask key="constraints">
-                                <include reference="8vf-ex-THk"/>
-                                <include reference="teP-m3-tqs"/>
                                 <include reference="GcG-OW-sXk"/>
                                 <include reference="H6h-xe-nLj"/>
                                 <include reference="WbE-hX-pLc"/>
+                                <include reference="8vf-ex-THk"/>
+                                <include reference="teP-m3-tqs"/>
+                                <include reference="IYE-Ml-eO2"/>
+                                <include reference="g8P-Qs-JQu"/>
                             </mask>
                         </variation>
                     </view>
                     <connections>
+                        <outlet property="modeSegController" destination="qZi-Ud-f5d" id="rrQ-L1-Od2"/>
                         <outlet property="naviBar" destination="FAk-sb-dyi" id="3mb-2L-cda"/>
                         <outlet property="swButton" destination="ocB-oH-Rd8" id="ZQn-OW-gGO"/>
                         <segue destination="4w6-OV-vNq" kind="showDetail" identifier="DetailToUserSegue" id="tEf-BN-9SO"/>

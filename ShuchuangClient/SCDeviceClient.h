@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 @interface SCDeviceClient : NSObject
+@property (strong, nonatomic) NSString * _Nonnull user;
 @property (strong, nonatomic) NSString * _Nonnull uuid;
 @property (strong, nonatomic) NSString * _Nonnull name;
 @property (strong, nonatomic) NSString * _Nonnull type;
@@ -45,6 +46,10 @@
 - (void)openDoorSuccess:(nullable void (^)(NSURLSessionDataTask * _Nullable task, id _Nonnull responseObject))success failure:(nullable void (^)(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error))failure;
 
 - (void)closeDoorSuccess:(nullable void (^)(NSURLSessionDataTask * _Nullable task, id _Nonnull responseObject))success failure:(nullable void (^)(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error))failure;
+
+- (void)getDeviceModeSuccess:(nullable void (^)(NSURLSessionDataTask * _Nullable task, id _Nonnull responseObject))success failure:(nullable void (^)(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error))failure;
+
+- (void)changeDeviceMode:(NSInteger)mode success:(nullable void (^)(NSURLSessionDataTask * _Nullable task, id _Nonnull responseObject))success failure:(nullable void (^)(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error))failure;
 
 //task option
 - (void)getTasksSuccess:(nullable void (^)(NSURLSessionDataTask * _Nullable task, id _Nonnull responseObject))success failure:(nullable void (^)(NSURLSessionDataTask * _Nullable task, NSError *   _Nonnull error))failure;

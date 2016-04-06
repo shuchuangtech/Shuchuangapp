@@ -14,7 +14,6 @@
 #import "RPCDef.h"
 #import "Bmob.h"
 @interface SCDeviceClient()
-@property (strong, nonatomic) NSString *user;
 @property (strong, nonatomic) NSString *token;
 @property (weak, nonatomic) DeviceDAO *devDao;
 
@@ -89,7 +88,12 @@
                          self.token = responseParam[REG_TOKEN_STR];
                          NSString * challenge = responseParam[USER_CHALLENGE_STR];
                          NSMutableString * passwordmd5 = [SCUtil generateMD5Password:password withChallenge:challenge andPrefix:@"login"];
-                         NSDictionary * parameter2 = @{@"action":@"user.login", @"type":@"request", @"param":@{@"uuid":self.uuid, @"token":self.token, @"password":passwordmd5, @"username":username, @"binduser":binduser}};
+                         NSUserDefaults *userDef = [NSUserDefaults standardUserDefaults];
+                         NSString *mobile_token;
+                         if(userDef != nil) {
+                             mobile_token = [userDef objectForKey:@"MobileToken"];
+                         }
+                         NSDictionary * parameter2 = @{@"action":@"user.login", @"type":@"request", @"param":@{@"uuid":self.uuid, @"token":self.token, @"password":passwordmd5, @"username":username, @"binduser":binduser, @"mobiletoken":mobile_token}};
                          [http sendMessage:parameter2 success:^(NSURLSessionDataTask *task, id responseObject_step2) {
                              if([responseObject_step2[@"result"] isEqualToString:@"good"]) {
                                  [response setValue:@"good" forKey:@"result"];
@@ -306,6 +310,45 @@
 - (void)closeDoorSuccess:(void (^)(NSURLSessionDataTask * _Nullable, id _Nonnull))success failure:(void (^)(NSURLSessionDataTask * _Nullable, NSError * _Nonnull))failure {
     SCHTTPManager *http = [SCHTTPManager instance];
     NSDictionary *dict = @{@"type":@"request", @"action":@"device.close", @"param":@{@"uuid":self.uuid, @"token":self.token}};
+    [http sendMessage:dict
+              success:^(NSURLSessionDataTask *task, id serverResponse) {
+                  NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
+                  if ([serverResponse[@"result"] isEqualToString:@"good"]) {
+                      [response setValue:@"good" forKey:@"result"];
+                  }
+                  else {
+                      NSString *detail = [SCErrorString errorString:serverResponse[@"detail"]];
+                      [response setValue:@"fail" forKey:@"result"];
+                      [response setValue:detail forKey:@"detail"];
+                  }
+                  success(task, response);
+              }
+              failure:failure];
+}
+
+- (void)getDeviceModeSuccess:(void (^)(NSURLSessionDataTask * _Nullable, id _Nonnull))success failure:(void (^)(NSURLSessionDataTask * _Nullable, NSError * _Nonnull))failure {
+    SCHTTPManager *http = [SCHTTPManager instance];
+    NSDictionary *dict = @{@"type":@"request", @"action":@"device.getmode", @"param":@{@"uuid":self.uuid, @"token":self.token}};
+    [http sendMessage:dict
+              success:^(NSURLSessionDataTask *task, id serverResponse) {
+                  NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
+                  if ([serverResponse[@"result"] isEqualToString:@"good"]) {
+                      [response setValue:@"good" forKey:@"result"];
+                      [response setValue:serverResponse[@"param"][@"mode"] forKey:@"mode"];
+                  }
+                  else {
+                      NSString *detail = [SCErrorString errorString:serverResponse[@"detail"]];
+                      [response setValue:@"fail" forKey:@"result"];
+                      [response setValue:detail forKey:@"detail"];
+                  }
+                  success(task, response);
+              }
+              failure:failure];
+}
+
+- (void)changeDeviceMode:(NSInteger)mode success:(void (^)(NSURLSessionDataTask * _Nullable, id _Nonnull))success failure:(void (^)(NSURLSessionDataTask * _Nullable, NSError * _Nonnull))failure {
+    SCHTTPManager *http = [SCHTTPManager instance];
+    NSDictionary *dict = @{@"type":@"request", @"action":@"device.chmode", @"param":@{@"uuid":self.uuid, @"token":self.token, @"mode":[NSNumber numberWithInteger:mode]}};
     [http sendMessage:dict
               success:^(NSURLSessionDataTask *task, id serverResponse) {
                   NSMutableDictionary *response = [[NSMutableDictionary alloc] init];

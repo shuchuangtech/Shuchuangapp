@@ -23,9 +23,12 @@
 @property (strong, nonatomic) UIView *tableContainer;
 @property (nonatomic) BOOL showTable;
 @property (nonatomic) BOOL needFresh;
+@property (nonatomic) BOOL stateRefreshFinish;
+@property (nonatomic) BOOL modeRefreshFinish;
 @property (strong, nonatomic) MyActivityIndicatorView* acFrame;
 @property (strong, nonatomic) SCDeviceClient *device;
-
+@property (nonatomic) NSInteger selectItem;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *modeSegController;
 
 - (void)showDeviceInfo;
 - (void)changeDeviceName;
@@ -119,6 +122,10 @@
     
     self.device = [[SCDeviceManager instance] getDevice:self.uuid];
     self.needFresh = YES;
+    
+    self.selectItem = -1;
+    
+    [self.modeSegController addTarget:self action:@selector(onModeChange) forControlEvents:UIControlEventValueChanged];
 }
 
 - (void)viewWillLayoutSubviews {
@@ -130,14 +137,23 @@
     CGFloat tc_width = self.view.frame.size.width / 4;
     CGFloat tc_height = tc_width * TABLE_ITEM_NUM / 3 + 13;
     [self.tableContainer setFrame:CGRectMake(self.view.frame.size.width * 3 / 4 - 10, self.naviBar.frame.origin.y + self.naviBar.frame.size.height, tc_width, tc_height)];
+    
+    if (![self.device.user isEqualToString:@"admin"]) {
+        self.modeSegController.hidden = YES;
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     if (self.needFresh) {
         self.needFresh = NO;
         [self.acFrame startAc];
+        self.stateRefreshFinish = NO;
+        self.modeRefreshFinish = NO;
         [self.device checkDoorSuccess:^(NSURLSessionDataTask *task, id response) {
-            [self.acFrame stopAc];
+            self.stateRefreshFinish = YES;
+            if (self.stateRefreshFinish && self.modeRefreshFinish) {
+                [self.acFrame stopAc];
+            }
             if ([response[@"result"] isEqualToString:@"good"]) {
                 if (self.device.switchClose) {
                     [self.swButton setImage:[UIImage imageNamed:@"buttonSw_active"] forState:UIControlStateNormal];
@@ -154,9 +170,34 @@
             
         }
         failure:^(NSURLSessionDataTask *task, NSError *error) {
-            [self.acFrame stopAc];
+            self.stateRefreshFinish = YES;
+            if (self.stateRefreshFinish && self.modeRefreshFinish) {
+                [self.acFrame stopAc];
+            }
             [SCUtil viewController:self showAlertTitle:@"提示" message:@"网络错误，获取设备状态失败" action:nil];
         }];
+        if (!self.modeSegController.hidden) {
+            [self.device getDeviceModeSuccess:^(NSURLSessionDataTask *task, id response) {
+                self.modeRefreshFinish = YES;
+                if (self.stateRefreshFinish && self.modeRefreshFinish) {
+                    [self.acFrame stopAc];
+                }
+                if ([response[@"result"] isEqualToString:@"good"]) {
+                    [self.modeSegController setSelectedSegmentIndex:[[response objectForKey:@"mode"] integerValue]];
+                }
+            } failure:^(NSURLSessionDataTask *task, NSError *error) {
+                self.modeRefreshFinish = YES;
+                if (self.stateRefreshFinish && self.modeRefreshFinish) {
+                    [self.acFrame stopAc];
+                }
+            }];
+        }
+        else {
+            self.modeRefreshFinish = YES;
+            if (self.stateRefreshFinish && self.modeRefreshFinish) {
+                [self.acFrame stopAc];
+            }
+        }
     }
     else {
         if (self.device.switchClose) {
@@ -185,6 +226,22 @@
 
 - (void)onUserButton {
     [self performSegueWithIdentifier:@"DetailToUserSegue" sender:self];
+}
+
+- (void)onModeChange {
+    [self.acFrame startAc];
+    [self.device changeDeviceMode:[self.modeSegController selectedSegmentIndex] success:^(NSURLSessionDataTask *task, id response) {
+        [self.acFrame stopAc];
+        if (![response[@"result"] isEqualToString:@"good"]) {
+            [SCUtil viewController:self showAlertTitle:@"提示" message:response[@"detail"] action:^(UIAlertAction *action) {
+                [self.modeSegController setSelectedSegmentIndex:(1 - [self.modeSegController selectedSegmentIndex])];
+            }];
+        }
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        [SCUtil viewController:self showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:^(UIAlertAction *action) {
+            [self.modeSegController setSelectedSegmentIndex:(1 - [self.modeSegController selectedSegmentIndex])];
+        }];
+    }];
 }
 
 - (IBAction)onSwButton:(id)sender {
@@ -302,6 +359,31 @@
     else if (![self.tableContainer isHidden] && !self.showTable) {
         self.tableContainer.hidden = YES;
         [self.view sendSubviewToBack:self.tableContainer];
+        switch (self.selectItem) {
+            case 0:
+                [self reVerifyPassword];
+                break;
+            case 1:
+                [self changeDeviceName];
+                break;
+            case 2:
+                [self performSegueWithIdentifier:@"DetailToChangePassword" sender:self];
+                break;
+            case 3:
+                [self showDeviceInfo];
+                break;
+            case 4:
+                [self performSegueWithIdentifier:@"DetailToAddUserSegue" sender:self];
+                break;
+            case 5:
+                [self resetDeviceConfig];
+                break;
+            case 6:
+                [self performSegueWithIdentifier:@"DetailToUpdateSegue" sender:self];
+            default:
+                break;
+        }
+        self.selectItem = -1;
     }
 }
 
@@ -482,31 +564,8 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    switch (indexPath.row) {
-        case 0:
-            [self reVerifyPassword];
-            break;
-        case 1:
-            [self changeDeviceName];
-            break;
-        case 2:
-            [self performSegueWithIdentifier:@"DetailToChangePassword" sender:self];
-            break;
-        case 3:
-            [self showDeviceInfo];
-            break;
-        case 4:
-            [self performSegueWithIdentifier:@"DetailToAddUserSegue" sender:self];
-            break;
-        case 5:
-            [self resetDeviceConfig];
-            break;
-        case 6:
-            [self performSegueWithIdentifier:@"DetailToUpdateSegue" sender:self];
-        default:
-            break;
-    }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     [self onRightButton];
+    self.selectItem = indexPath.row;
 }
 @end

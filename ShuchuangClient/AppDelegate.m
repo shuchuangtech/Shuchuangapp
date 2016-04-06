@@ -56,9 +56,14 @@
 }
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(nonnull NSData *)deviceToken {
-    NSLog(@"register device token:%@", deviceToken);
     BmobInstallation *currentInstallation = [BmobInstallation currentInstallation];
     [currentInstallation setDeviceTokenFromData:deviceToken];
+    NSString *mobile_token = [[[[deviceToken description] stringByReplacingOccurrencesOfString:@"<" withString:@""] stringByReplacingOccurrencesOfString:@">" withString:@""] stringByReplacingOccurrencesOfString:@" " withString:@""];
+    NSUserDefaults *userDef = [NSUserDefaults standardUserDefaults];
+    if(userDef != nil) {
+        [userDef setObject:mobile_token forKey:@"MobileToken"];
+        [userDef synchronize];
+    }
     [currentInstallation saveInBackground];
 }
 
