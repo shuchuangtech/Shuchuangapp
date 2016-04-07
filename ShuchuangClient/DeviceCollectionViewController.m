@@ -109,7 +109,6 @@ static NSString * const reuseIdentifier = @"CollectionCell";
             SCDeviceClient* client = [[SCDeviceManager instance] getDevice:key];
             [client checkDoorSuccess:^(NSURLSessionDataTask *task, id response) {
                 finished++;
-                //NSLog(@"%ld %@ success %@", finished, key, response);
                 if (finished == num ) {
                     if ([self.acFrame isAnimating]) {
                         [self.acFrame stopAc];
@@ -121,7 +120,6 @@ static NSString * const reuseIdentifier = @"CollectionCell";
                 }
             } failure:^(NSURLSessionDataTask *task, NSError* error) {
                 finished++;
-                NSLog(@"%ld", finished);
                 if (finished == num) {
                     if ([self.acFrame isAnimating]) {
                         [self.acFrame stopAc];
