@@ -10,6 +10,9 @@
 #import "Bmob.h"
 #import "SCHTTPManager.h"
 #import "SCDeviceManager.h"
+#import "ShareSDK/ShareSDK.h"
+#import "ShareSDKConnector/ShareSDKConnector.h"
+#import "WXApi.h"
 
 @interface AppDelegate ()
 
@@ -30,6 +33,24 @@
     //SCHTTPManager
     SCHTTPManager *http = [SCHTTPManager instance];
     [http initWithCertificate:@"server" serverAddress:@"www.shuchuangtech.com" port:9888];
+    //shareSDK
+    [ShareSDK registerApp:@"1157afc798210" activePlatforms:@[@(SSDKPlatformTypeWechat)] onImport:^(SSDKPlatformType platformType) {
+        switch (platformType) {
+            case SSDKPlatformTypeWechat :
+                [ShareSDKConnector connectWeChat:[WXApi class]];
+                break;
+            default:
+                break;
+        }
+    } onConfiguration:^(SSDKPlatformType platformType, NSMutableDictionary *appInfo) {
+        switch (platformType) {
+            case SSDKPlatformTypeWechat:
+                [appInfo SSDKSetupWeChatByAppId:@"wxb03a7bb272f830e7" appSecret:@"18a8971fa41cff248e254e24a7b38937"];
+                break;
+            default:
+                break;
+        }
+    }];
     return YES;
 }
 

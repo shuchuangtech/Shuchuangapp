@@ -11,6 +11,9 @@
 #import "MeHeaderTableViewCell.h"
 #import "MeTableViewCell.h"
 #import "SCMainViewController.h"
+#import "ShareSDK/ShareSDK.h"
+#import "ShareSDKUI/ShareSDK+SSUI.h"
+#import "SCUtil.h"
 @interface UserinfoViewController ()
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UINavigationBar *naviBar;
@@ -117,6 +120,34 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == 1) {
+        if (indexPath.row == 0) {
+            NSArray *imageArray = @[@"http://mob.com/Assets/images/logo.png?v=20150320"];
+            if (imageArray) {
+                NSMutableDictionary *shareParams = [NSMutableDictionary dictionary];
+                [shareParams SSDKSetupShareParamsByText:@"分享内容" images:imageArray url:[NSURL URLWithString:@"http://mob.com"] title:@"测试分享" type:SSDKContentTypeAuto];
+                [ShareSDK showShareActionSheet:nil items:nil shareParams:shareParams onShareStateChanged:^(SSDKResponseState state, SSDKPlatformType platformType, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error, BOOL end) {
+                    switch (state) {
+                        case SSDKResponseStateSuccess: {
+                            [SCUtil viewController:self showAlertTitle:@"提示" message:@"分享成功" action:nil];
+                            break;
+                        }
+                        case SSDKResponseStateFail: {
+                            [SCUtil viewController:self showAlertTitle:@"提示" message:@"分享失败" action:nil];
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                }];
+            }
+        }
+        else if (indexPath.row == 1) {
+            UIStoryboard *story = [UIStoryboard storyboardWithName:@"UserInfo" bundle:[NSBundle mainBundle]];
+            UIViewController *vc = [story instantiateViewControllerWithIdentifier:@"UserInfoVC"];
+            [self presentViewController:vc animated:YES completion:nil];
+        }
+    }
     if (indexPath.section == 2 && indexPath.row == 0) {
         if ([self.presentingViewController isKindOfClass:[SCMainViewController class]]) {
             [BmobUser logout];
