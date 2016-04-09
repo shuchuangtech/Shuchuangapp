@@ -172,10 +172,6 @@ Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selecta
                             <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="CG9-FO-guX">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                                 <color key="tintColor" red="1" green="0.77647058820000003" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
-                                <color key="barTintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <items>
-                                    <navigationItem title="Title" id="FCp-JH-QId"/>
-                                </items>
                             </navigationBar>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="请输入手机号或者邮箱" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="toN-xy-tfs">
                                 <rect key="frame" x="-25" y="-30" width="97" height="30"/>
@@ -291,7 +287,6 @@ Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selecta
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <color key="tintColor" red="1" green="0.77647058820000003" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="CG9-FO-guX" firstAttribute="top" secondItem="iBB-QE-UwM" secondAttribute="bottom" id="7kk-V8-d0S"/>
                             <constraint firstAttribute="trailingMargin" secondItem="0zH-Zl-GaS" secondAttribute="trailing" id="AC7-F2-gNB"/>
@@ -371,7 +366,6 @@ Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selecta
                         <outlet property="buttonLogin" destination="TUk-hm-2mY" id="fTe-Uj-hBT"/>
                         <outlet property="idField" destination="toN-xy-tfs" id="Yxa-GW-UY0"/>
                         <outlet property="naviBar" destination="CG9-FO-guX" id="cT3-mS-ymU"/>
-                        <outlet property="naviItem" destination="FCp-JH-QId" id="TIQ-JJ-MnO"/>
                         <outlet property="passwordField" destination="8KQ-E5-3GR" id="I5B-ar-ve4"/>
                         <segue destination="b0c-wE-dOQ" kind="showDetail" identifier="loginToRegister" id="lrS-Ol-FAB"/>
                     </connections>
@@ -422,9 +416,6 @@ Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selecta
                                     <constraint firstAttribute="height" constant="44" id="kCw-kP-c1L"/>
                                 </constraints>
                                 <color key="barTintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <items>
-                                    <navigationItem title="Title" id="q5H-2j-fmp"/>
-                                </items>
                                 <variation key="default">
                                     <mask key="constraints">
                                         <exclude reference="kCw-kP-c1L"/>
@@ -459,7 +450,6 @@ Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selecta
                             </textField>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <color key="tintColor" red="1" green="0.77647058820000003" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstAttribute="trailingMargin" secondItem="j5M-io-d7a" secondAttribute="trailing" constant="-20" id="Aap-xx-d7r"/>
                             <constraint firstAttribute="leadingMargin" secondItem="3LL-LA-DJH" secondAttribute="leading" id="D3v-I9-SEx"/>
@@ -510,7 +500,6 @@ Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selecta
                     </view>
                     <connections>
                         <outlet property="naviBar" destination="j5M-io-d7a" id="0dj-TA-hEs"/>
-                        <outlet property="naviItem" destination="q5H-2j-fmp" id="D2j-Eq-8K9"/>
                         <outlet property="nextButton" destination="3LL-LA-DJH" id="Jy8-AO-FFu"/>
                         <outlet property="textField" destination="AIi-w7-0oz" id="tuN-xl-iFj"/>
                         <segue destination="I9c-6b-URi" kind="showDetail" identifier="regToMobileVerify" action="showViewController:sender:" id="iOw-bA-F3M"/>
@@ -540,9 +529,6 @@ Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selecta
                                 </constraints>
                                 <color key="tintColor" red="1" green="0.77647058820000003" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
                                 <color key="barTintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <items>
-                                    <navigationItem title="Title" id="IbA-Rn-VMr"/>
-                                </items>
                                 <variation key="default">
                                     <mask key="constraints">
                                         <exclude reference="cR3-1z-8rL"/>
@@ -571,6 +557,9 @@ Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selecta
                                         <include reference="3QW-gs-vqI"/>
                                     </mask>
                                 </variation>
+                                <connections>
+                                    <action selector="passwordChanged:" destination="o94-LD-ccD" eventType="editingChanged" id="HMJ-DH-zqw"/>
+                                </connections>
                             </textField>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="请再次输入密码" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="fmW-o8-1rQ">
                                 <rect key="frame" x="-25" y="-30" width="97" height="30"/>
@@ -589,6 +578,9 @@ Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selecta
                                         <include reference="DZe-EJ-XYg"/>
                                     </mask>
                                 </variation>
+                                <connections>
+                                    <action selector="passwordRepeatChanged:" destination="o94-LD-ccD" eventType="editingChanged" id="lfH-kb-dW6"/>
+                                </connections>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ady-Ux-JR2">
                                 <rect key="frame" x="-23" y="-15" width="46" height="30"/>
@@ -615,7 +607,6 @@ Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selecta
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <color key="tintColor" red="1" green="0.77647058820000003" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstAttribute="trailingMargin" secondItem="Htr-hv-icT" secondAttribute="trailing" constant="-20" id="49g-YB-RoH"/>
                             <constraint firstItem="fmW-o8-1rQ" firstAttribute="top" secondItem="QzG-VZ-ieZ" secondAttribute="bottom" constant="20" id="4WR-82-vYP"/>
@@ -678,7 +669,6 @@ Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selecta
                     <connections>
                         <outlet property="btnRegister" destination="ady-Ux-JR2" id="qaD-Cw-Iy9"/>
                         <outlet property="naviBar" destination="Htr-hv-icT" id="LFs-xZ-WOL"/>
-                        <outlet property="naviItem" destination="IbA-Rn-VMr" id="Vgc-uT-Gfe"/>
                         <outlet property="textFieldPass" destination="QzG-VZ-ieZ" id="80K-MS-gAc"/>
                         <outlet property="textFieldPassRepeat" destination="fmW-o8-1rQ" id="hV3-dQ-H8g"/>
                     </connections>
@@ -706,9 +696,6 @@ Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selecta
                                 </constraints>
                                 <color key="tintColor" red="1" green="0.77647058820000003" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
                                 <color key="barTintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <items>
-                                    <navigationItem title="Title" id="KFu-fX-vQk"/>
-                                </items>
                                 <variation key="default">
                                     <mask key="constraints">
                                         <exclude reference="4Ve-k3-V7U"/>
@@ -809,7 +796,6 @@ Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selecta
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <color key="tintColor" red="1" green="0.77647058820000003" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="5xW-H3-zST" firstAttribute="top" secondItem="Yck-ly-z9X" secondAttribute="bottom" constant="13.5" id="1E1-vt-VkS"/>
                             <constraint firstItem="Zcf-fP-iUF" firstAttribute="top" secondItem="Yck-ly-z9X" secondAttribute="bottom" constant="35" id="4cl-Jq-1NK"/>
@@ -894,7 +880,6 @@ Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selecta
                         <outlet property="btnNext" destination="Drr-2c-6w0" id="8xm-rv-gaw"/>
                         <outlet property="btnResend" destination="Zcf-fP-iUF" id="mxj-kT-Zsd"/>
                         <outlet property="naviBar" destination="Yck-ly-z9X" id="csb-SS-J3h"/>
-                        <outlet property="naviItem" destination="KFu-fX-vQk" id="edV-cY-IfU"/>
                         <outlet property="phoneNumberLabel" destination="32n-Rn-faH" id="oob-wr-5Tx"/>
                         <outlet property="textField" destination="kpS-wT-RHZ" id="slk-xv-hfy"/>
                         <segue destination="o94-LD-ccD" kind="showDetail" identifier="verifyToSetPassword" id="RRb-qg-6Ga"/>
@@ -907,6 +892,6 @@ Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selecta
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="lrS-Ol-FAB"/>
-        <segue reference="RRb-qg-6Ga"/>
+        <segue reference="WM8-ff-J4i"/>
     </inferredMetricsTieBreakers>
 </document>

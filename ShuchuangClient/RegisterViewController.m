@@ -13,7 +13,6 @@
 #import "Bmob.h"
 @interface RegisterViewController ()
 @property (weak, nonatomic) IBOutlet UINavigationBar *naviBar;
-@property (weak, nonatomic) IBOutlet UINavigationItem *naviItem;
 @property (weak, nonatomic) IBOutlet UITextField *textField;
 @property (weak, nonatomic) IBOutlet UIButton *nextButton;
 @property (strong, nonatomic) MyActivityIndicatorView *acFrame;
@@ -34,9 +33,9 @@
 
     //navigation bar and navigation item
     UIBarButtonItem * leftBarBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStyleDone target:self action:@selector(leftBarBtnClicked)];
-    [leftBarBtn setTintColor:[UIColor colorWithRed:1.0 green:129.0/255.0 blue:0.0 alpha:1.0]];
-    self.naviItem.leftBarButtonItem = leftBarBtn;
-    
+    [leftBarBtn setTintColor:[UIColor whiteColor]];
+    UINavigationItem *naviItem = [[UINavigationItem alloc] init];
+    naviItem.leftBarButtonItem = leftBarBtn;
     UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.naviBar.frame.size.width - 100, self.naviBar.frame.size.height)];
     if (self.registerNewUser) {
         [titleLab setText:@"新用户注册"];
@@ -44,15 +43,16 @@
     else {
         [titleLab setText:@"忘记密码"];
     }
-    [titleLab setTextColor:[UIColor colorWithWhite:0.0 alpha:1.0]];
-    [titleLab setFont:[UIFont systemFontOfSize:15.0]];
+    [titleLab setTextColor:[UIColor whiteColor]];
+    [titleLab setFont:[UIFont systemFontOfSize:17.0]];
     titleLab.textAlignment = NSTextAlignmentCenter;
-    self.naviItem.titleView = titleLab;
+    naviItem.titleView = titleLab;
+    [self.naviBar pushNavigationItem:naviItem animated:NO];
+    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
     
     //next button
-    [self.nextButton setBackgroundImage:[UIButton imageWithColor:[UIButton getColorFromHex:0xffba73 Alpha:1.0]] forState:UIControlStateNormal];
-    [self.nextButton setBackgroundImage:[UIButton imageWithColor:[UIButton getColorFromHex:0xc0c0c0 Alpha:1.0]] forState:UIControlStateDisabled];
-    [self.nextButton setBackgroundImage:[UIButton imageWithColor:[UIButton getColorFromHex:0xff8100 Alpha:1.0]] forState:UIControlStateHighlighted];
+    [self.nextButton setBackgroundImage:[UIImage imageNamed:@"longButtonActive"] forState:UIControlStateNormal];
+    [self.nextButton setBackgroundImage:[UIImage imageNamed:@"longButton"] forState:UIControlStateDisabled];
     self.nextButton.layer.cornerRadius = 5.0;
     self.nextButton.layer.opaque = NO;
     self.nextButton.layer.masksToBounds = YES;
@@ -60,6 +60,22 @@
     
     //textField
     self.textField.delegate = self;
+    [self.textField setBackgroundColor:[UIColor clearColor]];
+}
+
+- (void)viewWillLayoutSubviews {
+    UIImageView *barBg = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.naviBar.frame.size.height + self.naviBar.frame.origin.y)];
+    [barBg setImage:[UIImage imageNamed:@"barBg"]];
+    [self.view addSubview:barBg];
+    [self.view bringSubviewToFront:self.naviBar];
+    UIImageView *bgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - barBg.frame.size.height)];
+    [bgView setImage:[UIImage imageNamed:@"background"]];
+    UIImageView *textFieldBg = [[UIImageView alloc] initWithFrame:self.textField.frame];
+    [textFieldBg setImage:[UIImage imageNamed:@"textFieldBg"]];
+    [self.view addSubview:textFieldBg];
+    [self.view addSubview:bgView];
+    [self.view sendSubviewToBack:bgView];
+    [super viewWillLayoutSubviews];
 }
 
 - (void)didReceiveMemoryWarning {
