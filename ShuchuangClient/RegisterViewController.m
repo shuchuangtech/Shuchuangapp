@@ -21,7 +21,6 @@
 
 - (IBAction)onNextBtn:(id)sender;
 - (IBAction)textFieldChanged:(id)sender;
-- (void) showAlertTitle:(NSString *)title Message:(NSString *)message;
 - (void) leftBarBtnClicked;
 @end
 
@@ -75,7 +74,7 @@
     BOOL isMobile = [SCUtil validateMobile:self.registerId];
     BOOL isEmail = [SCUtil validateEmail:self.registerId];
     if (!isMobile && !isEmail) {
-        [self showAlertTitle:@"提示" Message:@"请输入正确的手机号码或电子邮箱"];
+        [SCUtil viewController:self showAlertTitle:@"提示" message:@"请输入正确的手机号码或电子邮箱" action:nil];
         self.textField.text = @"";
     }
     else {
@@ -87,40 +86,37 @@
             [query whereKey:@"email" equalTo:self.registerId];
         }
         [self.acFrame startAc];
+        __weak RegisterViewController *weakSelf = self;
         [query findObjectsInBackgroundWithBlock:^(NSArray *array, NSError *error) {
-            [self.acFrame stopAc];
-            if (self.registerNewUser && [array count] != 0) {
-                [self showAlertTitle:@"提示" Message:@"用户已注册"];
+            [weakSelf.acFrame stopAc];
+            if (weakSelf.registerNewUser && [array count] != 0) {
+                [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"用户已注册" action:nil];
             }
-            else if (!self.registerNewUser && [array count] == 0) {
-                [self showAlertTitle:@"提示" Message:@"用户不存在"];
+            else if (!weakSelf.registerNewUser && [array count] == 0) {
+                [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"用户不存在" action:nil];
             }
             else {
                 if (isMobile) {
-                    [BmobSMS requestSMSCodeInBackgroundWithPhoneNumber:self.registerId andTemplate:@"验证码" resultBlock:^(int number, NSError *error) {
+                    [BmobSMS requestSMSCodeInBackgroundWithPhoneNumber:weakSelf.registerId andTemplate:@"验证码" resultBlock:^(int number, NSError *error) {
                         if (error != nil) {
-                            [self showAlertTitle:@"提示" Message:@"获取短信验证码失败，请稍后再试"];
+                            [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"获取短信验证码失败，请稍后再试" action:nil];
                         }
                         else {
-                            [self performSegueWithIdentifier:@"regToMobileVerify" sender:self];
+                            [weakSelf performSegueWithIdentifier:@"regToMobileVerify" sender:weakSelf];
                         }
                     }];
                 }
                 else {
                     if ([array count] != 0) {
-                        [self.acFrame startAc];
-                        [BmobUser requestPasswordResetInBackgroundWithEmail:self.registerId];
-                        [self.acFrame stopAc];
-                        UIAlertController * alert = [UIAlertController alertControllerWithTitle:@"提示" message:@"一封邮件已经发往您注册邮箱，请前往查收" preferredStyle:UIAlertControllerStyleAlert];
-                        
-                        UIAlertAction * defaultAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                            [self dismissViewControllerAnimated:YES completion:nil];
+                        [weakSelf.acFrame startAc];
+                        [BmobUser requestPasswordResetInBackgroundWithEmail:weakSelf.registerId];
+                        [weakSelf.acFrame stopAc];
+                        [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"一封邮件已经发往您注册邮箱，请前往查收" action:^(UIAlertAction * action) {
+                            [weakSelf dismissViewControllerAnimated:YES completion:nil];
                         }];
-                        [alert addAction:defaultAction];
-                        [self presentViewController:alert animated:YES completion:nil];
                     }
                     else {
-                        [self performSegueWithIdentifier:@"regToSetPassword" sender:self];
+                        [weakSelf performSegueWithIdentifier:@"regToSetPassword" sender:weakSelf];
                     }
                 }
             }
@@ -150,15 +146,6 @@
     [self.textField resignFirstResponder];
     [textField endEditing:YES];
     return YES;
-}
-
--(void) showAlertTitle:(NSString *)title Message:(NSString *)message {
-    UIAlertController * alert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    
-    UIAlertAction * defaultAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-    }];
-    [alert addAction:defaultAction];
-    [self presentViewController:alert animated:YES completion:nil];
 }
 
 #pragma mark - Navigation

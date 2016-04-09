@@ -35,36 +35,22 @@
     [self.acFrame setBackgroundColor:[UIColor colorWithWhite:0.15 alpha:1.0]];
     [self addSubview:self.acFrame];
     [self setBackgroundColor:[UIColor colorWithWhite:0.3 alpha:0.4]];
-    self.acFrame.hidden = YES;
     self.hidden = YES;
-    self.superView = view;
-    [self.superView addSubview:self];
+    self.mySuperView = view;
     return self;
 }
 
 - (void) startAc {
+    [self.mySuperView addSubview:self];
+    [self.mySuperView bringSubviewToFront:self];
     self.hidden = NO;
-    [self.superView bringSubviewToFront:self];
-    self.acFrame.transform = CGAffineTransformMakeScale(0.5, 0.5);
-    [UIView beginAnimations:nil context:UIGraphicsGetCurrentContext()];
-    [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-    [UIView setAnimationDuration:0.2f];
-    self.acFrame.transform = CGAffineTransformMakeScale(1.0, 1.0);
-    [UIView commitAnimations];
-    self.acFrame.hidden = NO;
     [self.activityIndicator startAnimating];
 }
 
 - (void) stopAc {
+    [self removeFromSuperview];
     [self.activityIndicator stopAnimating];
-    [UIView beginAnimations:nil context:UIGraphicsGetCurrentContext()];
-    [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-    [UIView setAnimationDuration:0.2f];
-    self.acFrame.transform = CGAffineTransformMakeScale(0.5, 0.5);
-    [UIView commitAnimations];
-    self.acFrame.hidden = YES;
     self.hidden = YES;
-    [self.superView sendSubviewToBack:self];
 }
 
 - (BOOL)isAnimating {

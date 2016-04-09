@@ -108,6 +108,7 @@
 }
 
 - (void) leftBarBtnClicked {
+    [self.timer invalidate];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -115,15 +116,16 @@
     if ([self.textField isFirstResponder]) {
         [self.textField resignFirstResponder];
     }
-
     [self.acFrame startAc];
-    [BmobSMS verifySMSCodeInBackgroundWithPhoneNumber:self.phoneNumber andSMSCode:self.textField.text resultBlock:^(BOOL isSuccessful, NSError *error) {
-        [self.acFrame stopAc];
+    __weak MobileVerifyViewController *weakSelf = self;
+    [BmobSMS verifySMSCodeInBackgroundWithPhoneNumber:weakSelf.phoneNumber andSMSCode:weakSelf.textField.text resultBlock:^(BOOL isSuccessful, NSError *error) {
+        [weakSelf.acFrame stopAc];
         if (isSuccessful) {
-            [self performSegueWithIdentifier:@"verifyToSetPassword" sender:self];
+            [weakSelf.timer invalidate];
+            [weakSelf performSegueWithIdentifier:@"verifyToSetPassword" sender:weakSelf];
         }
         else {
-            [SCUtil viewController:self showAlertTitle:@"提示" message:@"验证码错误" action:nil];
+            [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"验证码错误" action:nil];
         }
     }];
 }
@@ -131,7 +133,7 @@
 - (void) timerHandler {
     if (self.countdown != 0) {
         self.countdown--;
-        NSString *btnTitle = [[NSString alloc] initWithFormat:@"%ld s", (long)self.countdown];
+        NSString *btnTitle = [[NSString alloc] initWithFormat:@"%ld s", self.countdown];
         [self.btnResend setTitle:btnTitle forState:UIControlStateDisabled];
     }
     else {
@@ -163,16 +165,17 @@
 
 - (IBAction)onButtonResend:(id)sender {
     [self.acFrame startAc];
-    [BmobSMS requestSMSCodeInBackgroundWithPhoneNumber:self.phoneNumber andTemplate:@"验证码" resultBlock:^(int number, NSError *error) {
-        [self.acFrame stopAc];
+    __weak MobileVerifyViewController *weakSelf = self;
+    [BmobSMS requestSMSCodeInBackgroundWithPhoneNumber:weakSelf.phoneNumber andTemplate:@"验证码" resultBlock:^(int number, NSError *error) {
+        [weakSelf.acFrame stopAc];
         if (error != nil) {
-            [SCUtil viewController:self showAlertTitle:@"提示" message:@"获取短信验证码失败，请稍后再试" action:nil];
+            [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"获取短信验证码失败，请稍后再试" action:nil];
         }
         else {
-            self.btnResend.enabled = NO;
-            self.countdown = 60;
-            [self.btnResend setTitle:@"60 s" forState:UIControlStateDisabled];
-            self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(timerHandler) userInfo:nil repeats:YES];
+            weakSelf.btnResend.enabled = NO;
+            weakSelf.countdown = 60;
+            [weakSelf.btnResend setTitle:@"60 s" forState:UIControlStateDisabled];
+            weakSelf.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:weakSelf selector:@selector(timerHandler) userInfo:nil repeats:YES];
         }
     }];
 }

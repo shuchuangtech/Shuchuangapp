@@ -122,26 +122,27 @@
                 buser.username = self.email;
                 buser.email = self.email;
             }
+            __weak SetPasswordViewController *weakSelf = self;
             [buser signUpInBackgroundWithBlock:^(BOOL isSuccessful, NSError *error) {
-                [self.acFrame stopAc];
+                [weakSelf.acFrame stopAc];
                 if (error != nil) {
                     NSString *info = [[NSString alloc] initWithFormat:@"注册失败 %ld", (long)[error code]];
-                    [SCUtil viewController:self showAlertTitle:@"提示" message:info action:^(UIAlertAction * action) {
-                        if ([self.presentingViewController isKindOfClass:[MobileVerifyViewController class]]) {
-                            [self.presentingViewController.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                    [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:info action:^(UIAlertAction * action) {
+                        if ([weakSelf.presentingViewController isKindOfClass:[MobileVerifyViewController class]]) {
+                            [weakSelf.presentingViewController.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
                         }
                         else {
-                            [self.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                            [weakSelf.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
                         }
                     }];
                 }
                 else {
-                    [SCUtil viewController:self showAlertTitle:@"提示" message:@"注册成功" action:^(UIAlertAction * action) {
-                        if ([self.presentingViewController isKindOfClass:[MobileVerifyViewController class]]) {
-                            [self.presentingViewController.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                    [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"注册成功" action:^(UIAlertAction * action) {
+                        if ([weakSelf.presentingViewController isKindOfClass:[MobileVerifyViewController class]]) {
+                            [weakSelf.presentingViewController.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
                         }
                         else {
-                            [self.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                            [weakSelf.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
                         }
                     }];
                 }
@@ -150,31 +151,32 @@
         //找回密码此时只考虑手机
         else {
             NSDictionary *dict = @{@"phone":self.phoneNumber, @"password":self.textFieldPass.text};
+            __weak SetPasswordViewController *weakSelf = self;
             [BmobCloud callFunctionInBackground:@"forgetPassword" withParameters:dict block:^(id object, NSError *error) {
-                [self.acFrame stopAc];
+                [weakSelf.acFrame stopAc];
                 if (error) {
-                    [SCUtil viewController:self showAlertTitle:@"提示" message:@"密码重设失败" action:^(UIAlertAction * action) {
-                        if ([self.presentingViewController isKindOfClass:[MobileVerifyViewController class]]) {
-                            [self.presentingViewController.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                    [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"密码重设失败" action:^(UIAlertAction * action) {
+                        if ([weakSelf.presentingViewController isKindOfClass:[MobileVerifyViewController class]]) {
+                            [weakSelf.presentingViewController.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
                         }
                         else {
-                            [self.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                            [weakSelf.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
                         }
                     }];
                 }
                 else {
                     NSString *result = (NSString *)object;
                     if ([result isEqualToString:@"good"]) {
-                        [SCUtil viewController:self showAlertTitle:@"提示" message:@"密码重设成功" action:^(UIAlertAction * action) {
-                                if ([self.presentingViewController isKindOfClass:[MobileVerifyViewController class]]) {
-                                    [self.presentingViewController.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                        [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"密码重设成功" action:^(UIAlertAction * action) {
+                                if ([weakSelf.presentingViewController isKindOfClass:[MobileVerifyViewController class]]) {
+                                    [weakSelf.presentingViewController.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
                                 }
                             }];
                     }
                     else {
-                        [SCUtil viewController:self showAlertTitle:@"提示" message:@"密码重设失败" action:^(UIAlertAction * action) {
-                            if ([self.presentingViewController isKindOfClass:[MobileVerifyViewController class]]) {
-                                [self.presentingViewController.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                        [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"密码重设失败" action:^(UIAlertAction * action) {
+                            if ([weakSelf.presentingViewController isKindOfClass:[MobileVerifyViewController class]]) {
+                                [weakSelf.presentingViewController.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
                             }
                         }];
                     }

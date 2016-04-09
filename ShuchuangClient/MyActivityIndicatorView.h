@@ -14,6 +14,6 @@
 - (void) stopAc;
 - (BOOL) isAnimating;
 @property (strong, nonatomic) UIActivityIndicatorView *activityIndicator;
-@property (weak, nonatomic) UIView *superView;
 @property (strong, nonatomic) UIView *acFrame;
+@property (weak, nonatomic) UIView *mySuperView;
 @end

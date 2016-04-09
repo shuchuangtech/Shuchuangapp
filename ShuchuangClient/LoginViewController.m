@@ -87,9 +87,6 @@
     if ([textField isEqual:self.idField]) {
         [self.passwordField becomeFirstResponder];
     }
-    else if ([textField isEqual:self.passwordField]) {
-        [self onBtnLogin:self];
-    }
     return YES;
 }
 
@@ -123,23 +120,22 @@
         [self.passwordField resignFirstResponder];
     }
     [self.acFrame startAc];
-    [BmobUser loginWithUsernameInBackground:self.loginId password:self.loginPass block:^(BmobUser *user, NSError *error) {
-        [self.acFrame stopAc];
+    __weak LoginViewController *block_self = self;
+    [BmobUser loginWithUsernameInBackground:block_self.loginId password:block_self.loginPass block:^(BmobUser *user, NSError *error) {
+        [block_self.acFrame stopAc];
         if (user == nil) {
             if ([error code] == 101) {
-                [SCUtil viewController:self showAlertTitle:@"提示" message:@"用不不存在或密码错误" action:nil];
-                NSLog(@"error %@", error);
+                [SCUtil viewController:block_self showAlertTitle:@"提示" message:@"用不不存在或密码错误" action:nil];
             }
             else {
                 NSString *string = [NSString stringWithFormat:@"未知错误%ld", (long)[error code]];
-                [SCUtil viewController:self showAlertTitle:@"提示" message:string action:nil];
+                [SCUtil viewController:block_self showAlertTitle:@"提示" message:string action:nil];
             }
         }
         else {
-            [SCUtil viewController:self showAlertTitle:@"提示" message:@"登录成功" action:^(UIAlertAction *action) {
-                [self.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+            [SCUtil viewController:block_self showAlertTitle:@"提示" message:@"登录成功" action:^(UIAlertAction *action) {
+                [block_self.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
             }];
-            
         }
     }];
 }
