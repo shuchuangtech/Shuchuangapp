@@ -84,6 +84,7 @@
     [self.acFrame startAc];
     [self checkDeviceVersion];
     [self checkServerVersion];
+    [super viewDidAppear:animated];
 }
 
 - (void)checkDeviceVersion {

@@ -92,6 +92,7 @@
             break;
         case 422:
             detail = @"当前操作需要管理员身份";
+            break;
         case 430:
             detail = @"任务数已满";
             break;

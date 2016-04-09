@@ -61,6 +61,7 @@
     [self.usersArray removeAllObjects];
     self.tableView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMoreData)];
     [self loadMoreData];
+    [super viewDidAppear:animated];
 }
 
 - (void)loadMoreData {

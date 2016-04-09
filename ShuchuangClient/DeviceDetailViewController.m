@@ -209,6 +209,7 @@
             self.swActive = NO;
         }
     }
+    [super viewDidAppear:animated];
 }
 
 - (void)didReceiveMemoryWarning {

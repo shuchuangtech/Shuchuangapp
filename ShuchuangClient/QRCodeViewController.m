@@ -57,6 +57,7 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [self startReading];
+    [super viewDidAppear:animated];
 }
 
 - (void)didReceiveMemoryWarning {

@@ -93,6 +93,9 @@
                          if(userDef != nil) {
                              mobile_token = [userDef objectForKey:@"MobileToken"];
                          }
+                         else {
+                             mobile_token = @"";
+                         }
                          NSDictionary * parameter2 = @{@"action":@"user.login", @"type":@"request", @"param":@{@"uuid":self.uuid, @"token":self.token, @"password":passwordmd5, @"username":username, @"binduser":binduser, @"mobiletoken":mobile_token}};
                          [http sendMessage:parameter2 success:^(NSURLSessionDataTask *task, id responseObject_step2) {
                              if([responseObject_step2[@"result"] isEqualToString:@"good"]) {

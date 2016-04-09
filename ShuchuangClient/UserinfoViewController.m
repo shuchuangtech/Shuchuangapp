@@ -120,6 +120,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
     if (indexPath.section == 1) {
         if (indexPath.row == 0) {
             NSArray *imageArray = @[@"http://mob.com/Assets/images/logo.png?v=20150320"];
@@ -145,6 +146,11 @@
         else if (indexPath.row == 1) {
             UIStoryboard *story = [UIStoryboard storyboardWithName:@"UserInfo" bundle:[NSBundle mainBundle]];
             UIViewController *vc = [story instantiateViewControllerWithIdentifier:@"UserInfoVC"];
+            [self presentViewController:vc animated:YES completion:nil];
+        }
+        else if (indexPath.row == 2) {
+            UIStoryboard *story = [UIStoryboard storyboardWithName:@"UserInfo" bundle:[NSBundle mainBundle]];
+            UIViewController *vc = [story instantiateViewControllerWithIdentifier:@"AboutVC"];
             [self presentViewController:vc animated:YES completion:nil];
         }
     }
