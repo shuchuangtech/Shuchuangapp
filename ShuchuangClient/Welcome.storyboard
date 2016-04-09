@@ -78,7 +78,8 @@
                                     <action selector="onBtnLogin:" destination="Mee-Hy-5tU" eventType="touchUpInside" id="6HT-Ec-XDE"/>
                                 </connections>
                             </button>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" text="曙创科技 shuchuangtech.com Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ccS-Ah-dE5">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" text="曙创科技 shuchuangtech.com
+Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ccS-Ah-dE5">
                                 <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
                                 <accessibility key="accessibilityConfiguration">
                                     <accessibilityTraits key="traits" notEnabled="YES"/>

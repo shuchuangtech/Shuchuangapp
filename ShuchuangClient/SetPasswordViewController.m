@@ -15,12 +15,13 @@
 
 @interface SetPasswordViewController ()
 @property (weak, nonatomic) IBOutlet UINavigationBar *naviBar;
-@property (weak, nonatomic) IBOutlet UINavigationItem *naviItem;
 @property (weak, nonatomic) IBOutlet UITextField *textFieldPass;
 @property (weak, nonatomic) IBOutlet UITextField *textFieldPassRepeat;
 @property (weak, nonatomic) IBOutlet UIButton *btnRegister;
 @property (strong, nonatomic) MyActivityIndicatorView *acFrame;
 
+- (IBAction)passwordChanged:(id)sender;
+- (IBAction)passwordRepeatChanged:(id)sender;
 - (void) leftBarBtnClicked;
 - (IBAction)onButtonRegister:(id)sender;
 @end
@@ -36,12 +37,19 @@
     //text field
     self.textFieldPass.delegate = self;
     self.textFieldPassRepeat.delegate = self;
+    [self.textFieldPass setBackgroundColor:[UIColor clearColor]];
+    [self.textFieldPassRepeat setBackgroundColor:[UIColor clearColor]];
     
     //navigation bar
     UIBarButtonItem * leftBarBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStyleDone target:self action:@selector(leftBarBtnClicked)];
-    [leftBarBtn setTintColor:[UIColor colorWithRed:1.0 green:129.0/255.0 blue:0.0 alpha:1.0]];
-    self.naviItem.leftBarButtonItem = leftBarBtn;
-    UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 30)];
+    [leftBarBtn setTintColor:[UIColor whiteColor]];
+    UINavigationItem *naviItem = [[UINavigationItem alloc] init];
+    naviItem.leftBarButtonItem = leftBarBtn;
+    UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.naviBar.frame.size.width - 100, self.naviBar.frame.size.height)];
+    [titleLab setTextColor:[UIColor whiteColor]];
+    [titleLab setFont:[UIFont systemFontOfSize:17.0]];
+    titleLab.textAlignment = NSTextAlignmentCenter;
+    naviItem.titleView = titleLab;
     if (self.registerNewUser) {
         [titleLab setText:@"注册"];
         [self.btnRegister setTitle:@"注册成功" forState:UIControlStateNormal];
@@ -54,23 +62,53 @@
         [self.btnRegister setTitle:@"修改密码" forState:UIControlStateDisabled];
         [self.btnRegister setTitle:@"修改密码" forState:UIControlStateHighlighted];
     }
-    [titleLab setTextColor:[UIColor colorWithWhite:0.0 alpha:1.0]];
-    [titleLab setFont:[UIFont systemFontOfSize:15.0]];
-    titleLab.textAlignment = NSTextAlignmentCenter;
-    self.naviItem.titleView = titleLab;
+    naviItem.titleView = titleLab;
+    [self.naviBar pushNavigationItem:naviItem animated:NO];
+    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
     
     //button register
-    [self.btnRegister setBackgroundImage:[UIButton imageWithColor:[UIButton getColorFromHex:0xffba73 Alpha:1.0]] forState:UIControlStateNormal];
-    [self.btnRegister setBackgroundImage:[UIButton imageWithColor:[UIButton getColorFromHex:0xc0c0c0 Alpha:1.0]] forState:UIControlStateDisabled];
-    [self.btnRegister setBackgroundImage:[UIButton imageWithColor:[UIButton getColorFromHex:0xff8100 Alpha:1.0]] forState:UIControlStateHighlighted];
+    [self.btnRegister setBackgroundImage:[UIImage imageNamed:@"longButtonActive"] forState:UIControlStateNormal];
+    [self.btnRegister setBackgroundImage:[UIImage imageNamed:@"longButton"] forState:UIControlStateDisabled];
     self.btnRegister.layer.cornerRadius = 5.0;
     self.btnRegister.layer.opaque = NO;
     self.btnRegister.layer.masksToBounds = YES;
+    self.btnRegister.enabled = NO;
+}
+
+- (void)viewWillLayoutSubviews {
+    UIImageView *barBg = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.naviBar.frame.size.height + self.naviBar.frame.origin.y)];
+    [barBg setImage:[UIImage imageNamed:@"barBg"]];
+    [self.view addSubview:barBg];
+    [self.view bringSubviewToFront:self.naviBar];
+    UIImageView *bgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - barBg.frame.size.height)];
+    [bgView setImage:[UIImage imageNamed:@"background"]];
+    UIImageView *textFieldBg1 = [[UIImageView alloc] initWithFrame:self.textFieldPass.frame];
+    [textFieldBg1 setImage:[UIImage imageNamed:@"textFieldBg"]];
+    [self.view addSubview:textFieldBg1];
+    UIImageView *textFieldBg2 = [[UIImageView alloc] initWithFrame:self.textFieldPassRepeat.frame];
+    [textFieldBg2 setImage:[UIImage imageNamed:@"textFieldBg"]];
+    [self.view addSubview:textFieldBg2];
+
+    [self.view addSubview:bgView];
+    [self.view sendSubviewToBack:bgView];
+    [super viewWillLayoutSubviews];
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (IBAction)passwordChanged:(id)sender {
+    if (self.textFieldPass.text.length > 0 && self.textFieldPassRepeat.text.length > 0) {
+        self.btnRegister.enabled = YES;
+    }
+}
+
+- (IBAction)passwordRepeatChanged:(id)sender {
+    if (self.textFieldPass.text.length > 0 && self.textFieldPassRepeat.text.length > 0) {
+        self.btnRegister.enabled = YES;
+    }
 }
 
 - (void) leftBarBtnClicked {

@@ -42,15 +42,30 @@
     [self.bg3 setImage:[UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"welcomeBg3" ofType:@"png"]]];
     [self.bg4 setImage:[UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"welcomeBg4" ofType:@"png"]]];
     self = [super initWithFrame:CGRectMake(0, 0, width, height)];
-    [self addSubview:self.bg1];
-    [self addSubview:self.bg2];
-    [self addSubview:self.bg3];
     [self addSubview:self.bg4];
-    [self bringSubviewToFront:self.bg1];
+    [self addSubview:self.bg3];
+    [self addSubview:self.bg2];
+    [self addSubview:self.bg1];
+    
+    UIImageView *logo1 = [[UIImageView alloc] initWithImage:[UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"launchLogo1" ofType:@"png"]]];
+    UIImageView *logo2 = [[UIImageView alloc] initWithImage:[UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"launchLogo2" ofType:@"png"]]];
+    [logo1 setFrame:CGRectMake(0, 0, logo1.frame.size.width / 3, logo1.frame.size.height / 3)];
+    [logo2 setFrame:CGRectMake(0, 0, logo2.frame.size.width / 3, logo2.frame.size.height / 3)];
+    [logo1 setCenter:CGPointMake(self.center.x, self.frame.size.height / 4)];
+    [logo2 setCenter:CGPointMake(self.center.x, logo1.center.y + 50)];
+    [self addSubview:logo1];
+    [self addSubview:logo2];
     self.animaStep = 0;
     self.started = NO;
     self.animating = NO;
     return self;
+}
+
+- (void)dealloc {
+    self.bg1 = nil;
+    self.bg2 = nil;
+    self.bg3 = nil;
+    self.bg4 = nil;
 }
 
 - (void)startAnimation {
@@ -63,14 +78,6 @@
 
 - (void)stopAnimation {
     self.started = NO;
-}
-
-- (void)dealloc {
-    self.bg1 = nil;
-    self.bg2 = nil;
-    self.bg3 = nil;
-    self.bg4 = nil;
-    NSLog(@"my welcome view dealloc");
 }
 
 - (void)addAnimation {
@@ -95,7 +102,6 @@
         self.bg2.hidden = NO;
         self.bg3.hidden = YES;
         self.bg4.hidden = YES;
-        [self bringSubviewToFront:self.bg1];
         [self.bg1.layer addAnimation:anima forKey:nil];
         [self.bg1.layer addAnimation:opAnima forKey:nil];
     }
@@ -106,7 +112,6 @@
         self.bg2.hidden = NO;
         self.bg3.hidden = NO;
         self.bg4.hidden = YES;
-        [self bringSubviewToFront:self.bg2];
         [self.bg2.layer addAnimation:anima forKey:nil];
         [self.bg2.layer addAnimation:opAnima forKey:nil];
     }
@@ -117,7 +122,6 @@
         self.bg2.hidden = YES;
         self.bg3.hidden = NO;
         self.bg4.hidden = NO;
-        [self bringSubviewToFront:self.bg3];
         [self.bg3.layer addAnimation:anima forKey:nil];
         [self.bg3.layer addAnimation:opAnima forKey:nil];
     }
@@ -128,7 +132,6 @@
         self.bg2.hidden = YES;
         self.bg3.hidden = YES;
         self.bg4.hidden = NO;
-        [self bringSubviewToFront:self.bg4];
         [self.bg4.layer addAnimation:anima forKey:nil];
         [self.bg4.layer addAnimation:opAnima forKey:nil];
     }
@@ -139,6 +142,22 @@
 }
 
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag {
+    switch (self.animaStep) {
+        case 0:
+            [self sendSubviewToBack:self.bg1];
+            break;
+        case 1:
+            [self sendSubviewToBack:self.bg2];
+            break;
+        case 2:
+            [self sendSubviewToBack:self.bg3];
+            break;
+        case 3:
+            [self sendSubviewToBack:self.bg4];
+            break;
+        default:
+            break;
+    }
     self.animaStep = (self.animaStep + 1)%4;
     self.animating = NO;
     if (self.started) {
