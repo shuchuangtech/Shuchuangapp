@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9532" systemVersion="15D21" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="Mee-Hy-5tU">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="Mee-Hy-5tU">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9530"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
         <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
@@ -19,18 +19,17 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="background" translatesAutoresizingMaskIntoConstraints="NO" id="tfb-zY-W1M">
-                                <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
-                            </imageView>
                             <button opaque="NO" alpha="0.84999999999999998" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9Jm-no-7da">
                                 <rect key="frame" x="-23" y="-15" width="46" height="30"/>
-                                <color key="backgroundColor" red="1" green="0.77647058820000003" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="35" id="4vX-mx-TIR"/>
                                     <constraint firstAttribute="width" constant="95" id="af3-zy-S7j"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                <state key="normal" title="注册"/>
+                                <state key="normal" title="注册">
+                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
                                 <state key="highlighted">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -53,14 +52,14 @@
                             </button>
                             <button opaque="NO" alpha="0.84999999999999998" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ytw-WH-QRh">
                                 <rect key="frame" x="-23" y="-15" width="46" height="30"/>
-                                <color key="backgroundColor" red="1" green="0.50588235290000005" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="95" id="ATn-eE-TeU"/>
                                     <constraint firstAttribute="height" constant="35" id="VHy-l0-ie3"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                 <state key="normal" title="登录">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 </state>
                                 <variation key="default">
                                     <mask key="constraints">
@@ -79,9 +78,8 @@
                                     <action selector="onBtnLogin:" destination="Mee-Hy-5tU" eventType="touchUpInside" id="6HT-Ec-XDE"/>
                                 </connections>
                             </button>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" alpha="0.59999999999999998" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" text="曙创科技 shuchuangtech.com Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ccS-Ah-dE5">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" text="曙创科技 shuchuangtech.com Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ccS-Ah-dE5">
                                 <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
-                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <accessibility key="accessibilityConfiguration">
                                     <accessibilityTraits key="traits" notEnabled="YES"/>
                                     <bool key="isElement" value="NO"/>
@@ -110,17 +108,12 @@
                             <constraint firstItem="ccS-Ah-dE5" firstAttribute="width" secondItem="hfC-KA-L21" secondAttribute="width" id="9ti-p7-Xji"/>
                             <constraint firstItem="ccS-Ah-dE5" firstAttribute="centerX" secondItem="hfC-KA-L21" secondAttribute="centerX" id="ASr-G2-0SL"/>
                             <constraint firstItem="s8y-2k-Maa" firstAttribute="top" secondItem="ccS-Ah-dE5" secondAttribute="bottom" id="Ihg-Qp-03e"/>
-                            <constraint firstItem="tfb-zY-W1M" firstAttribute="bottom" secondItem="s8y-2k-Maa" secondAttribute="top" id="PCx-VF-78y"/>
                             <constraint firstItem="ytw-WH-QRh" firstAttribute="centerX" secondItem="hfC-KA-L21" secondAttribute="centerX" constant="70" id="RgQ-a7-pMM"/>
                             <constraint firstItem="s8y-2k-Maa" firstAttribute="top" secondItem="9Jm-no-7da" secondAttribute="bottom" constant="100" id="WfH-y2-AvU"/>
-                            <constraint firstItem="tfb-zY-W1M" firstAttribute="leading" secondItem="ccS-Ah-dE5" secondAttribute="leading" id="eea-Qt-bxd"/>
                             <constraint firstItem="s8y-2k-Maa" firstAttribute="top" secondItem="ytw-WH-QRh" secondAttribute="bottom" constant="100" id="ucr-yS-ouH"/>
-                            <constraint firstItem="tfb-zY-W1M" firstAttribute="top" secondItem="hfC-KA-L21" secondAttribute="top" id="xKw-ZV-Rzt"/>
-                            <constraint firstItem="tfb-zY-W1M" firstAttribute="trailing" secondItem="ccS-Ah-dE5" secondAttribute="trailing" id="zMD-Tg-rFB"/>
                         </constraints>
                         <variation key="default">
                             <mask key="subviews">
-                                <exclude reference="tfb-zY-W1M"/>
                                 <exclude reference="9Jm-no-7da"/>
                                 <exclude reference="ytw-WH-QRh"/>
                                 <exclude reference="ccS-Ah-dE5"/>
@@ -133,15 +126,10 @@
                                 <exclude reference="RgQ-a7-pMM"/>
                                 <exclude reference="9ti-p7-Xji"/>
                                 <exclude reference="ASr-G2-0SL"/>
-                                <exclude reference="PCx-VF-78y"/>
-                                <exclude reference="eea-Qt-bxd"/>
-                                <exclude reference="xKw-ZV-Rzt"/>
-                                <exclude reference="zMD-Tg-rFB"/>
                             </mask>
                         </variation>
                         <variation key="widthClass=compact">
                             <mask key="subviews">
-                                <include reference="tfb-zY-W1M"/>
                                 <include reference="9Jm-no-7da"/>
                                 <include reference="ytw-WH-QRh"/>
                                 <include reference="ccS-Ah-dE5"/>
@@ -154,15 +142,10 @@
                                 <include reference="RgQ-a7-pMM"/>
                                 <include reference="9ti-p7-Xji"/>
                                 <include reference="ASr-G2-0SL"/>
-                                <include reference="PCx-VF-78y"/>
-                                <include reference="eea-Qt-bxd"/>
-                                <include reference="xKw-ZV-Rzt"/>
-                                <include reference="zMD-Tg-rFB"/>
                             </mask>
                         </variation>
                     </view>
                     <connections>
-                        <outlet property="backgroundView" destination="tfb-zY-W1M" id="3tN-lM-BGh"/>
                         <outlet property="btnLogin" destination="ytw-WH-QRh" id="HbT-gT-RI0"/>
                         <outlet property="btnReg" destination="9Jm-no-7da" id="34b-Tr-U4q"/>
                         <segue destination="b0c-wE-dOQ" kind="showDetail" identifier="welcomeToRegister" id="31S-bg-HfV"/>
@@ -220,7 +203,7 @@
                                     <constraint firstAttribute="height" constant="40" id="HZP-Rm-fK9"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" returnKeyType="go" secureTextEntry="YES"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" secureTextEntry="YES"/>
                                 <variation key="default">
                                     <mask key="constraints">
                                         <exclude reference="HZP-Rm-fK9"/>
@@ -921,9 +904,6 @@
             <point key="canvasLocation" x="3501" y="-600"/>
         </scene>
     </scenes>
-    <resources>
-        <image name="background" width="375" height="667"/>
-    </resources>
     <inferredMetricsTieBreakers>
         <segue reference="lrS-Ol-FAB"/>
         <segue reference="RRb-qg-6Ga"/>
