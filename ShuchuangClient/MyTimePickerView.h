@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "TimePickerProtocol.h"
 @interface MyTimePickerView : UIView <UIPickerViewDelegate, UIPickerViewDataSource>
-@property (retain, nonatomic) id<TimePickerProtocol> timePickerDelegate;
+@property (weak, nonatomic) id<TimePickerProtocol> timePickerDelegate;
 
 - (instancetype) initWithFrameInView:(UIView *)view;
 - (void)showPicker;

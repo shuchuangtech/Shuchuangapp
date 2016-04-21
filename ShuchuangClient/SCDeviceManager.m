@@ -9,7 +9,7 @@
 #import "SCDeviceManager.h"
 #import "DeviceDAO.h"
 @interface SCDeviceManager()
-@property (retain, nonatomic) NSMutableDictionary *devices;
+@property (strong, nonatomic) NSMutableDictionary *devices;
 @end
 @implementation SCDeviceManager
 static SCDeviceManager* sharedMem = nil;

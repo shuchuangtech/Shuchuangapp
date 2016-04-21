@@ -78,8 +78,7 @@
                                     <action selector="onBtnLogin:" destination="Mee-Hy-5tU" eventType="touchUpInside" id="6HT-Ec-XDE"/>
                                 </connections>
                             </button>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" text="曙创科技 shuchuangtech.com
-Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ccS-Ah-dE5">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" text="曙创科技 shuchuangtech.com Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ccS-Ah-dE5">
                                 <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
                                 <accessibility key="accessibilityConfiguration">
                                     <accessibilityTraits key="traits" notEnabled="YES"/>
@@ -173,7 +172,7 @@ Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selecta
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                                 <color key="tintColor" red="1" green="0.77647058820000003" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
                             </navigationBar>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="请输入手机号或者邮箱" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="toN-xy-tfs">
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="请输入手机号" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="toN-xy-tfs">
                                 <rect key="frame" x="-25" y="-30" width="97" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="IGZ-Ru-qes"/>
@@ -427,7 +426,7 @@ Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selecta
                                     </mask>
                                 </variation>
                             </navigationBar>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="请输入手机号或者邮箱" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="AIi-w7-0oz">
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="请输入手机号" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="AIi-w7-0oz">
                                 <rect key="frame" x="-25" y="-30" width="97" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="rhb-pm-YmC"/>
@@ -503,7 +502,6 @@ Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selecta
                         <outlet property="nextButton" destination="3LL-LA-DJH" id="Jy8-AO-FFu"/>
                         <outlet property="textField" destination="AIi-w7-0oz" id="tuN-xl-iFj"/>
                         <segue destination="I9c-6b-URi" kind="showDetail" identifier="regToMobileVerify" action="showViewController:sender:" id="iOw-bA-F3M"/>
-                        <segue destination="o94-LD-ccD" kind="showDetail" identifier="regToSetPassword" action="showViewController:sender:" id="WM8-ff-J4i"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="7bS-P3-04E" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -892,6 +890,5 @@ Copyright © 2015 Shuchuang Technology Co., Ltd." textAlignment="center" selecta
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="lrS-Ol-FAB"/>
-        <segue reference="WM8-ff-J4i"/>
     </inferredMetricsTieBreakers>
 </document>

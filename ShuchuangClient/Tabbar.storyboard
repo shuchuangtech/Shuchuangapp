@@ -304,7 +304,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="XdB-yF-OPe" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1170" y="1058"/>
+            <point key="canvasLocation" x="1260" y="1134"/>
         </scene>
         <!--设备-->
         <scene sceneID="FDw-OC-qba">
@@ -327,11 +327,11 @@
         </scene>
     </scenes>
     <resources>
-        <image name="keypad_full" width="25" height="25"/>
-        <image name="keypad_line" width="25" height="25"/>
-        <image name="lintern_full" width="25" height="25"/>
-        <image name="lintern_line" width="25" height="25"/>
-        <image name="user_full" width="25" height="25"/>
-        <image name="user_line" width="25" height="25"/>
+        <image name="keypad_full" width="30" height="30"/>
+        <image name="keypad_line" width="30" height="30"/>
+        <image name="lintern_full" width="30" height="30"/>
+        <image name="lintern_line" width="30" height="30"/>
+        <image name="user_full" width="30" height="30"/>
+        <image name="user_line" width="30" height="30"/>
     </resources>
 </document>

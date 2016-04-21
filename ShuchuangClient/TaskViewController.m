@@ -21,10 +21,13 @@ static NSArray *weekday;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic) NSArray* tasks;
 @property (weak, nonatomic) SCDeviceClient *client;
-@property (strong, nonatomic) NSString *uuid;
+@property (weak, nonatomic) NSString *uuid;
 @property NSDictionary *modifyTask;
 @property NSInteger modifyIndex;
 @property (strong, nonatomic) MyActivityIndicatorView *acFrame;
+@property (strong, nonatomic) UIImageView *barBg;
+@property (strong, nonatomic) UIImageView *bgView;
+
 
 - (void)refreshTaskList;
 - (void)onLeftButton;
@@ -35,21 +38,30 @@ static NSArray *weekday;
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    UINavigationItem *naviItem = [[UINavigationItem alloc] initWithTitle:@"定时任务"];
+    UINavigationItem *naviItem = [[UINavigationItem alloc] init];
     UIBarButtonItem *leftButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStylePlain target:self action:@selector(onLeftButton)];
     UIBarButtonItem *rightButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"add"] style:UIBarButtonItemStylePlain target:self action:@selector(onRightButton)];
-    [leftButton setTintColor:[UIColor colorWithRed:1.0 green:129.0 / 255.0 blue:0 alpha:1]];
-    [rightButton setTintColor:[UIColor colorWithRed:1.0 green:129.0 / 255.0 blue:0 alpha:1]];
+    [leftButton setTintColor:[UIColor whiteColor]];
+    [rightButton setTintColor:[UIColor whiteColor]];
     naviItem.leftBarButtonItem = leftButton;
     naviItem.rightBarButtonItem = rightButton;
+    UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.naviBar.frame.size.width - 100, self.naviBar.frame.size.height)];
+    [titleLab setText:@"定时任务"];
+    [titleLab setTextColor:[UIColor whiteColor]];
+    [titleLab setFont:[UIFont systemFontOfSize:17.0]];
+    titleLab.textAlignment = NSTextAlignmentCenter;
+    naviItem.titleView = titleLab;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
+    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
+    
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
-    
+    [self.tableView setBackgroundColor:[UIColor clearColor]];
     [self.tableView registerNib:[UINib nibWithNibName:@"TaskListTableViewCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"taskProtoCellXib"];
     self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
+    __weak TaskViewController *weakSelf = self;
     self.tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-        [self refreshTaskList];
+        [weakSelf refreshTaskList];
     }];
     self.client = [[SCDeviceManager instance] getDevice:self.uuid];
     self.tasks = [self.client getLocalTasks];
@@ -58,6 +70,22 @@ static NSArray *weekday;
     self.modifyIndex = 0;
     
     self.acFrame = [[MyActivityIndicatorView alloc] initWithFrameInView:self.view];
+    
+    self.barBg = [[UIImageView alloc] init];
+    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
+    [self.view addSubview:self.barBg];
+    [self.view bringSubviewToFront:self.naviBar];
+    self.bgView = [[UIImageView alloc] init];
+    [self.bgView setImage:[UIImage imageNamed:@"background"]];
+    [self.view addSubview:self.bgView];
+    [self.view sendSubviewToBack:self.bgView];
+    
+}
+
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, 64.0)];
+    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -76,24 +104,25 @@ static NSArray *weekday;
 
 - (void)refreshTaskList {
     [self.acFrame startAc];
+    __weak TaskViewController *weakSelf = self;
     [self.client getTasksSuccess:^(NSURLSessionDataTask *task, id response) {
-        [self.acFrame stopAc];
-        if ([self.tableView.mj_header isRefreshing]) {
-            [self.tableView.mj_header endRefreshing];
+        [weakSelf.acFrame stopAc];
+        if ([weakSelf.tableView.mj_header isRefreshing]) {
+            [weakSelf.tableView.mj_header endRefreshing];
         }
         if ([response[@"result"] isEqualToString:@"good"]) {
-            self.tasks = [self.client getLocalTasks];
-            [self.tableView reloadData];
+            weakSelf.tasks = [weakSelf.client getLocalTasks];
+            [weakSelf.tableView reloadData];
         }
         else {
-            [SCUtil viewController:self showAlertTitle:@"提示" message:response[@"detail"] action:nil];
+            [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:response[@"detail"] action:nil];
         }
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        [self.acFrame stopAc];
-        if ([self.tableView.mj_header isRefreshing]) {
-            [self.tableView.mj_header endRefreshing];
+        [weakSelf.acFrame stopAc];
+        if ([weakSelf.tableView.mj_header isRefreshing]) {
+            [weakSelf.tableView.mj_header endRefreshing];
         }
-        [SCUtil viewController:self showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
+        [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
     }];
 }
 
@@ -119,18 +148,19 @@ static NSArray *weekday;
         [task setValue:[NSNumber numberWithInteger:0] forKey:@"active"];
     }
     [self.acFrame startAc];
+    __weak TaskViewController *weakSelf = self;
     [self.client updateTask:task atIndex:index success:^(NSURLSessionDataTask *task, id response) {
-        [self.acFrame stopAc];
+        [weakSelf.acFrame stopAc];
         if (![response[@"result"] isEqualToString:@"good"]) {
-            TaskListTableViewCell *cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
+            TaskListTableViewCell *cell = [weakSelf.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
             [cell.taskSwitch setOn:!active];
-            [SCUtil viewController:self showAlertTitle:@"提示" message:response[@"detail"] action:nil];
+            [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:response[@"detail"] action:nil];
         }
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        [self.acFrame stopAc];
-        TaskListTableViewCell *cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
+        [weakSelf.acFrame stopAc];
+        TaskListTableViewCell *cell = [weakSelf.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
         [cell.taskSwitch setOn:!active];
-        [SCUtil viewController:self showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
+        [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
     }];
 }
 
@@ -165,6 +195,7 @@ static NSArray *weekday;
 #pragma mark - Table Delegate
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     TaskListTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"taskProtoCellXib" forIndexPath:indexPath];
+    [cell setBackgroundColor:[UIColor clearColor]];
     NSDictionary *task = [self.tasks objectAtIndex:indexPath.row];
     cell.taskId = [task[@"id"] integerValue];
     if ([task[@"option"] integerValue] == 0) {
@@ -173,7 +204,7 @@ static NSArray *weekday;
     else {
         cell.optionLabel.text = @"开启";
     }
-    cell.excuteTime.text = [NSString stringWithFormat:@"%02ld:%02ld", [task[@"hour"] integerValue], [task[@"minute"] integerValue]];
+    cell.excuteTime.text = [NSString stringWithFormat:@"%02ld:%02ld", (long)[task[@"hour"] integerValue], (long)[task[@"minute"] integerValue]];
     NSInteger mask = 0x40;
     NSInteger taskRepeat = [task[@"weekday"] integerValue];
     NSString *repeatDay = [[NSString alloc] init];
@@ -219,18 +250,19 @@ static NSArray *weekday;
         NSDictionary * task = [self.tasks objectAtIndex:indexPath.row];
         NSInteger taskId = [[task objectForKey:@"id"] integerValue];
         [self.acFrame startAc];
+        __weak TaskViewController *weakSelf = self;
         [self.client removeTask:taskId atIndex:indexPath.row success:^(NSURLSessionDataTask *task, id response) {
-            [self.acFrame stopAc];
+            [weakSelf.acFrame stopAc];
             if ([response[@"result"] isEqualToString:@"good"]) {
-                self.tasks = [self.client getLocalTasks];
+                weakSelf.tasks = [weakSelf.client getLocalTasks];
                 [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
             }
             else {
-                [SCUtil viewController:self showAlertTitle:@"提示" message:response[@"detail"] action:nil];
+                [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:response[@"detail"] action:nil];
             }
         } failure:^(NSURLSessionDataTask *task, NSError *error) {
-            [self.acFrame stopAc];
-            [SCUtil viewController:self showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
+            [weakSelf.acFrame stopAc];
+            [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
         }];
     }
 }

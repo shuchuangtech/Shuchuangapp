@@ -8,10 +8,12 @@
 
 #import "DeviceCollectionViewCell.h"
 #import "UIButton+FillBackgroundImage.h"
-#import "SCUtil.h"
+
 @interface DeviceCollectionViewCell()
-@property BOOL isEditing;
+@property (nonatomic) BOOL isEditing;
 @property (strong, nonatomic) UIButton *deleteButton;
+@property (nonatomic) BOOL small;
+
 - (void)onButtonDelete;
 @end
 
@@ -36,6 +38,7 @@
 
 - (void)startEdit:(BOOL)small {
     if (!self.isEditing) {
+        self.small = small;
         self.deleteButton.hidden = NO;
         [self bringSubviewToFront:self.deleteButton];
         CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
@@ -50,7 +53,8 @@
             animation.fromValue = [NSNumber numberWithFloat:1.02];
             animation.toValue = [NSNumber numberWithFloat:0.98];
         }
-        
+        animation.delegate = self;
+        animation.removedOnCompletion = YES;
         [self.layer addAnimation:animation forKey:@"scale-layer"];
         self.isEditing = YES;
     }
@@ -58,27 +62,42 @@
 
 - (void)stopEdit {
     if (self.isEditing) {
-        [self.layer removeAllAnimations];
         self.deleteButton.hidden = YES;
         self.isEditing = NO;
+        [self sendSubviewToBack:self.deleteButton];
+        [self.layer removeAllAnimations];
     }
 }
 
-- (void) onButtonDelete {
-    UIViewController *vc = nil;
-    for (UIView *next = [self superview]; next; next = [next superview]) {
-        UIResponder *responder = [next nextResponder];
-        if ([responder isKindOfClass:[UIViewController class]]) {
-            vc = (UIViewController *)responder;
-            break;
+- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag {
+    NSLog(@"%@ anima stop", self.uuid);
+    if (self.isEditing == YES && self.deleteButton.hidden == NO) {
+        NSLog(@"self editing YES");
+        /*
+        CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
+        animation.duration = 0.2;
+        animation.repeatCount = HUGE_VALF;
+        animation.autoreverses = YES;
+        if (self.small) {
+            animation.fromValue = [NSNumber numberWithFloat:0.98];
+            animation.toValue = [NSNumber numberWithFloat:1.02];
         }
+        else {
+            animation.fromValue = [NSNumber numberWithFloat:1.02];
+            animation.toValue = [NSNumber numberWithFloat:0.98];
+        }
+        animation.delegate = self;
+        animation.removedOnCompletion = YES;
+        [self.layer addAnimation:animation forKey:@"scale-layer"];
+         */
     }
-    [SCUtil viewController:vc showAlertTitle:@"提示" message:@"确认删除这个设备吗" yesAction:^(UIAlertAction *action) {
-        NSDictionary *dict = @{@"devId":self.uuid};
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"DeleteCompletionNoti" object:nil userInfo:dict];
-    } noAction:^(UIAlertAction *action) {
-        
-    }];
-    
+    else {
+        NSLog(@"self editing NO");
+        [self.layer removeAllAnimations];
+    }
+}
+
+- (void)onButtonDelete {
+    [self.deleteDelegate onDeleteDevice:self.uuid];
 }
 @end

@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9532" systemVersion="15D21" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="Pr7-rI-iHe">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="Pr7-rI-iHe">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9530"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--News Detail View Controller-->
         <scene sceneID="OfH-67-hXA">
             <objects>
-                <viewController storyboardIdentifier="NewsMainVC" id="Pr7-rI-iHe" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="NewsMainVC" id="Pr7-rI-iHe" customClass="NewsDetailViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Bf3-hd-wrN"/>
                         <viewControllerLayoutGuide type="bottom" id="Ni7-Wb-Mzf"/>
@@ -16,8 +17,73 @@
                     <view key="view" contentMode="scaleToFill" id="UkY-dN-O1Y">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cv8-U9-K3f">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="qJR-F0-JFo"/>
+                                </constraints>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="qJR-F0-JFo"/>
+                                    </mask>
+                                </variation>
+                                <variation key="widthClass=compact">
+                                    <mask key="constraints">
+                                        <include reference="qJR-F0-JFo"/>
+                                    </mask>
+                                </variation>
+                            </navigationBar>
+                            <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="izn-hY-le7">
+                                <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
+                                <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="deviceRGB"/>
+                            </webView>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="izn-hY-le7" firstAttribute="top" secondItem="cv8-U9-K3f" secondAttribute="bottom" id="6BP-Dy-O9O"/>
+                            <constraint firstItem="izn-hY-le7" firstAttribute="leading" secondItem="UkY-dN-O1Y" secondAttribute="leadingMargin" constant="-20" id="9h6-4Y-vzA"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="izn-hY-le7" secondAttribute="trailing" constant="-20" id="JI8-0r-6ym"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="cv8-U9-K3f" secondAttribute="trailing" constant="-20" id="P2j-1J-qTm"/>
+                            <constraint firstItem="cv8-U9-K3f" firstAttribute="top" secondItem="Bf3-hd-wrN" secondAttribute="bottom" id="TRJ-Vg-vCw"/>
+                            <constraint firstItem="cv8-U9-K3f" firstAttribute="leading" secondItem="UkY-dN-O1Y" secondAttribute="leadingMargin" constant="-20" id="vrA-uJ-moe"/>
+                            <constraint firstItem="Ni7-Wb-Mzf" firstAttribute="top" secondItem="izn-hY-le7" secondAttribute="bottom" id="wyQ-Ls-KS2"/>
+                        </constraints>
+                        <variation key="default">
+                            <mask key="subviews">
+                                <exclude reference="cv8-U9-K3f"/>
+                                <exclude reference="izn-hY-le7"/>
+                            </mask>
+                            <mask key="constraints">
+                                <exclude reference="P2j-1J-qTm"/>
+                                <exclude reference="TRJ-Vg-vCw"/>
+                                <exclude reference="vrA-uJ-moe"/>
+                                <exclude reference="6BP-Dy-O9O"/>
+                                <exclude reference="9h6-4Y-vzA"/>
+                                <exclude reference="JI8-0r-6ym"/>
+                                <exclude reference="wyQ-Ls-KS2"/>
+                            </mask>
+                        </variation>
+                        <variation key="widthClass=compact">
+                            <mask key="subviews">
+                                <include reference="cv8-U9-K3f"/>
+                                <include reference="izn-hY-le7"/>
+                            </mask>
+                            <mask key="constraints">
+                                <include reference="P2j-1J-qTm"/>
+                                <include reference="TRJ-Vg-vCw"/>
+                                <include reference="vrA-uJ-moe"/>
+                                <include reference="6BP-Dy-O9O"/>
+                                <include reference="9h6-4Y-vzA"/>
+                                <include reference="JI8-0r-6ym"/>
+                                <include reference="wyQ-Ls-KS2"/>
+                            </mask>
+                        </variation>
                     </view>
+                    <connections>
+                        <outlet property="naviBar" destination="cv8-U9-K3f" id="2ql-kx-qgu"/>
+                        <outlet property="webView" destination="izn-hY-le7" id="fck-Ry-BqJ"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lPL-vA-AQx" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

@@ -22,6 +22,10 @@
 @property (strong, nonatomic) MyActivityIndicatorView *acFrame;
 @property (strong, nonatomic) NSString *uuid;
 @property (strong, nonatomic) NSString *devType;
+@property (strong, nonatomic) UIImageView *barBg;
+@property (strong, nonatomic) UIImageView *bgView;
+@property (strong, nonatomic) UIImageView *textFieldBg;
+
 
 - (IBAction)textFieldChanged:(id)sender;
 - (IBAction)onButtonNext:(id)sender;
@@ -33,15 +37,21 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    UINavigationItem *naviItem = [[UINavigationItem alloc] initWithTitle:@"添加新设备"];
+    UINavigationItem *naviItem = [[UINavigationItem alloc] init];
     UIBarButtonItem *leftBarButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStylePlain target:self action:@selector(onLeftButton)];
+    [leftBarButton setTintColor:[UIColor whiteColor]];
     [naviItem setLeftBarButtonItem:leftBarButton];
+    UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.naviBar.frame.size.width - 100, self.naviBar.frame.size.height)];
+    [titleLab setText:@"添加新设备"];
+    [titleLab setTextColor:[UIColor whiteColor]];
+    [titleLab setFont:[UIFont systemFontOfSize:17.0]];
+    titleLab.textAlignment = NSTextAlignmentCenter;
+    naviItem.titleView = titleLab;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
-    [self.naviBar setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:1.0]];
+    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
     //button
-    [self.buttonNext setBackgroundImage:[UIButton imageWithColor:[UIButton getColorFromHex:0xffba73 Alpha:1.0]] forState:UIControlStateNormal];
-    [self.buttonNext setBackgroundImage:[UIButton imageWithColor:[UIButton getColorFromHex:0xc0c0c0 Alpha:1.0]] forState:UIControlStateDisabled];
-    [self.buttonNext setBackgroundImage:[UIButton imageWithColor:[UIButton getColorFromHex:0xff8100 Alpha:1.0]] forState:UIControlStateHighlighted];
+    [self.buttonNext setBackgroundImage:[UIImage imageNamed:@"longButtonActive"] forState:UIControlStateNormal];
+    [self.buttonNext setBackgroundImage:[UIImage imageNamed:@"longButton"] forState:UIControlStateDisabled];
     self.buttonNext.layer.cornerRadius = 5.0;
     self.buttonNext.layer.opaque = NO;
     self.buttonNext.layer.masksToBounds = YES;
@@ -54,10 +64,30 @@
     [button setFrame:CGRectMake(0, 0, self.uuidTextField.frame.size.height, self.uuidTextField.frame.size.height)];
     self.uuidTextField.rightView = button;
     self.uuidTextField.rightViewMode = UITextFieldViewModeUnlessEditing;
+    [self.uuidTextField setBackgroundColor:[UIColor clearColor]];
     
     //ac frame
     self.acFrame = [[MyActivityIndicatorView alloc] initWithFrameInView:self.view];
+    
+    self.barBg = [[UIImageView alloc] init];
+    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
+    [self.view addSubview:self.barBg];
+    [self.view bringSubviewToFront:self.naviBar];
+    self.bgView = [[UIImageView alloc] init];
+    [self.bgView setImage:[UIImage imageNamed:@"background"]];
+    [self.view addSubview:self.bgView];
+    [self.view sendSubviewToBack:self.bgView];
+    
+    self.textFieldBg = [[UIImageView alloc] init];
+    [self.textFieldBg setImage:[UIImage imageNamed:@"textFieldBg"]];
+    [self.uuidTextField addSubview:self.textFieldBg];
+}
 
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, 64.0)];
+    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
+    [self.textFieldBg setFrame:CGRectMake(0, 0, self.uuidTextField.frame.size.width, self.uuidTextField.frame.size.height)];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -94,34 +124,35 @@
     }
     else {
         SCDeviceManager *devManager = [SCDeviceManager instance];
+        __weak DeviceAddViewController *weakSelf = self;
         if (![devManager addDevice:self.uuid]) {
             [SCUtil viewController:self showAlertTitle:@"提示" message:@"设备已经存在" action:^(UIAlertAction *action) {
-                [self dismissViewControllerAnimated:YES completion:nil];
+                [weakSelf dismissViewControllerAnimated:YES completion:nil];
             }];
         }
         else {
             [self.acFrame startAc];
             SCDeviceClient *client = [devManager getDevice:self.uuid];
             [client serverCheckSuccess:^(NSURLSessionDataTask *task, id response) {
-                [self.acFrame stopAc];
+                [weakSelf.acFrame stopAc];
                 if ([response[@"result"]  isEqual: @"good"]) {
                     if ([response[@"state"] isEqualToString:@"online"]) {
-                        [self performSegueWithIdentifier:@"DeviceAddToPassword" sender:self];
+                        [weakSelf performSegueWithIdentifier:@"DeviceAddToPassword" sender:weakSelf];
                     }
                     else {
-                        [devManager removeDevice:self.uuid];
-                        [SCUtil viewController:self showAlertTitle:@"提示" message:@"设备不在线，请确认设备已经接入网络" action:nil];
+                        [devManager removeDevice:weakSelf.uuid];
+                        [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"设备不在线，请确认设备已经接入网络" action:nil];
                     }
                 }
                 else {
-                    [devManager removeDevice:self.uuid];
+                    [devManager removeDevice:weakSelf.uuid];
                     [SCUtil viewController:self showAlertTitle:@"提示" message:response[@"detail"] action:nil];
                 }
             }
             failure:^(NSURLSessionDataTask *task, NSError *error) {
-                [self.acFrame stopAc];
-                [devManager removeDevice:self.uuid];
-                [SCUtil viewController:self showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
+                [weakSelf.acFrame stopAc];
+                [devManager removeDevice:weakSelf.uuid];
+                [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
             }];
         }
     }

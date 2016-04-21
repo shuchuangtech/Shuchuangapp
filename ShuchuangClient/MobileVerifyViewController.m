@@ -21,6 +21,11 @@
 @property (weak, nonatomic) IBOutlet UIButton *btnResend;
 @property (strong, nonatomic) NSTimer *timer;
 @property (nonatomic) NSInteger countdown;
+@property (weak, nonatomic) NSString *phoneNumber;
+@property (nonatomic) BOOL registerNewUser;
+@property (strong, nonatomic) UIImageView *barBg;
+@property (strong, nonatomic) UIImageView *bgView;
+@property (strong, nonatomic) UIImageView *textFieldBg;
 
 
 - (IBAction)textFieldChanged:(id)sender;
@@ -74,21 +79,25 @@
     self.countdown = 60;
     [self.btnResend setTitle:@"60 s" forState:UIControlStateDisabled];
     self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(timerHandler) userInfo:nil repeats:YES];
+    
+    self.barBg = [[UIImageView alloc] init];
+    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
+    [self.view addSubview:self.barBg];
+    [self.view bringSubviewToFront:self.naviBar];
+    self.bgView = [[UIImageView alloc] init];
+    [self.bgView setImage:[UIImage imageNamed:@"background"]];
+    self.textFieldBg = [[UIImageView alloc] init];
+    [self.textFieldBg setImage:[UIImage imageNamed:@"textFieldBg"]];
+    [self.textField addSubview:self.textFieldBg];
+    [self.view addSubview:self.bgView];
+    [self.view sendSubviewToBack:self.bgView];
 }
 
 - (void)viewWillLayoutSubviews {
-    UIImageView *barBg = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.naviBar.frame.size.height + self.naviBar.frame.origin.y)];
-    [barBg setImage:[UIImage imageNamed:@"barBg"]];
-    [self.view addSubview:barBg];
-    [self.view bringSubviewToFront:self.naviBar];
-    UIImageView *bgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - barBg.frame.size.height)];
-    [bgView setImage:[UIImage imageNamed:@"background"]];
-    UIImageView *textFieldBg = [[UIImageView alloc] initWithFrame:self.textField.frame];
-    [textFieldBg setImage:[UIImage imageNamed:@"textFieldBg"]];
-    [self.view addSubview:textFieldBg];
-    [self.view addSubview:bgView];
-    [self.view sendSubviewToBack:bgView];
     [super viewWillLayoutSubviews];
+    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.naviBar.frame.size.height + self.naviBar.frame.origin.y)];
+    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
+    [self.textFieldBg setFrame:CGRectMake(0, 0, self.textField.frame.size.width, self.textField.frame.size.height)];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -150,7 +159,7 @@
 - (void) timerHandler {
     if (self.countdown != 0) {
         self.countdown--;
-        NSString *btnTitle = [[NSString alloc] initWithFormat:@"%ld s", self.countdown];
+        NSString *btnTitle = [[NSString alloc] initWithFormat:@"%ld s", (long)self.countdown];
         [self.btnResend setTitle:btnTitle forState:UIControlStateDisabled];
     }
     else {

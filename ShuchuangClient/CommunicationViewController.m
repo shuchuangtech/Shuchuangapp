@@ -18,7 +18,8 @@
 @property (weak, nonatomic) IBOutlet UINavigationBar *naviBar;
 @property (weak, nonatomic) IBOutlet UILabel *contentPlaceholder;
 @property (strong, nonatomic) MyActivityIndicatorView *acFrame;
-
+@property (strong, nonatomic) UIImageView *barBg;
+@property (strong, nonatomic) UIImageView *bgView;
 
 - (void)onSubmitButton;
 - (void)onLeftButton;
@@ -30,12 +31,18 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     //navigation bar
-    UINavigationItem *naviItem = [[UINavigationItem alloc] initWithTitle:@"意见反馈"];
+    UINavigationItem *naviItem = [[UINavigationItem alloc] init];
     UIBarButtonItem *leftBarButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStylePlain target:self action:@selector(onLeftButton)];
-    [leftBarButton setTintColor:[UIColor colorWithRed:1.0 green:129.0/255.0 blue:0.0 alpha:1.0]];
+    [leftBarButton setTintColor:[UIColor whiteColor]];
+    UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.naviBar.frame.size.width - 100, self.naviBar.frame.size.height)];
+    [titleLab setText:@"意见反馈"];
+    [titleLab setTextColor:[UIColor whiteColor]];
+    [titleLab setFont:[UIFont systemFontOfSize:17.0]];
+    titleLab.textAlignment = NSTextAlignmentCenter;
+    naviItem.titleView = titleLab;
     naviItem.leftBarButtonItem = leftBarButton;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
-    
+    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
     //text field
     self.titleTextField.delegate = self;
     self.connactTextField.delegate = self;
@@ -53,6 +60,21 @@
     [self.submitButton addTarget:self action:@selector(onSubmitButton) forControlEvents:UIControlEventTouchUpInside];
     
     self.acFrame = [[MyActivityIndicatorView alloc] initWithFrameInView:self.view];
+    
+    self.barBg = [[UIImageView alloc] init];
+    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
+    [self.view addSubview:self.barBg];
+    [self.view bringSubviewToFront:self.naviBar];
+    self.bgView = [[UIImageView alloc] init];
+    [self.bgView setImage:[UIImage imageNamed:@"background"]];
+    [self.view addSubview:self.bgView];
+    [self.view sendSubviewToBack:self.bgView];
+}
+
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, 64)];
+    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -77,16 +99,17 @@
         BmobUser *user = [BmobUser getCurrentUser];
         [communication setObject:user forKey:@"user"];
         [self.acFrame startAc];
+        __weak CommunicationViewController *weakSelf = self;
         [communication saveInBackgroundWithResultBlock:^(BOOL isSuccessful, NSError *error) {
-            [self.acFrame stopAc];
+            [weakSelf.acFrame stopAc];
             if (isSuccessful) {
-                [SCUtil viewController:self showAlertTitle:@"提示" message:@"信息提交成功，我们会第一时间处理" action:^(UIAlertAction *action) {
-                    [self dismissViewControllerAnimated:YES completion:nil];
+                [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"信息提交成功，我们会第一时间处理" action:^(UIAlertAction *action) {
+                    [weakSelf dismissViewControllerAnimated:YES completion:nil];
                 }];
             }
             else {
-                [SCUtil viewController:self showAlertTitle:@"提示" message:@"提交出错啦，请稍后再试" action:^(UIAlertAction *action) {
-                    [self dismissViewControllerAnimated:YES completion:nil];
+                [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"提交出错啦，请稍后再试" action:^(UIAlertAction *action) {
+                    [weakSelf dismissViewControllerAnimated:YES completion:nil];
                 }];
             }
         }];

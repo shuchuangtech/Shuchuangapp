@@ -26,9 +26,12 @@
 @property (nonatomic) BOOL stateRefreshFinish;
 @property (nonatomic) BOOL modeRefreshFinish;
 @property (strong, nonatomic) MyActivityIndicatorView* acFrame;
-@property (strong, nonatomic) SCDeviceClient *device;
+@property (weak, nonatomic) SCDeviceClient *device;
 @property (nonatomic) NSInteger selectItem;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *modeSegController;
+@property (strong, nonatomic) UIImageView *barBg;
+@property (strong, nonatomic) UIImageView *bgView;
+
 
 - (void)showDeviceInfo;
 - (void)changeDeviceName;
@@ -53,14 +56,22 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     //navigation bar
-    UINavigationItem *naviItem = [[UINavigationItem alloc] initWithTitle:@"设备"];
+    UINavigationItem *naviItem = [[UINavigationItem alloc] init];
+    UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.naviBar.frame.size.width - 100, self.naviBar.frame.size.height)];
+    [titleLab setText:@"设备"];
+    [titleLab setTextColor:[UIColor whiteColor]];
+    [titleLab setFont:[UIFont systemFontOfSize:17.0]];
+    titleLab.textAlignment = NSTextAlignmentCenter;
+    naviItem.titleView = titleLab;
     UIBarButtonItem *leftBarButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStylePlain target:self action:@selector(onLeftButton)];
     UIBarButtonItem *rightBarButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"list"] style:UIBarButtonItemStylePlain target:self action:@selector(onRightButton)];
-    [leftBarButton setTintColor:[UIColor colorWithRed:1.0 green:129.0/255.0 blue:0.0 alpha:1.0]];
-    [rightBarButton setTintColor:[UIColor colorWithRed:1.0 green:129.0/255.0 blue:0.0 alpha:1.0]];
+    [leftBarButton setTintColor:[UIColor whiteColor]];
+    [rightBarButton setTintColor:[UIColor whiteColor]];
     naviItem.leftBarButtonItem = leftBarButton;
     naviItem.rightBarButtonItem = rightBarButton;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
+    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
+    
     
     //task label
     self.taskView = [[UIView alloc] init];
@@ -68,26 +79,32 @@
     [self.view addSubview:self.taskView];
     self.taskLabel = [[UILabel alloc] init];
     [self.taskLabel setFont:[UIFont systemFontOfSize:13.0]];
-    self.taskLabel.text = @"定时 21:00 开启";
+    self.taskLabel.text = @"";
+    self.taskLabel.textAlignment = NSTextAlignmentCenter;
+    [self.taskView setBackgroundColor:[UIColor clearColor]];
     [self.taskView addSubview:self.taskLabel];
+    
     //middle switch button
     self.swActive = NO;
     [self setDeviceInactive];
     
     //bottom button views
-    CGFloat viewWidth = (self.view.frame.size.width - 40.0) / 3;
-    CGFloat viewHeight = viewWidth;
+    CGFloat viewWidth = (self.view.frame.size.width) / 3;
+    CGFloat viewHeight = viewWidth * 0.65;
     CGFloat viewTop = self.view.frame.size.height - viewHeight;
-    CGFloat viewLeft = 20;
-    DetailBottomView *taskBottomView = [[DetailBottomView alloc] initWithFrame:CGRectMake(viewLeft, viewTop, viewWidth, viewHeight) image:[UIImage imageNamed:@"detail_task"] labelText:@"定时任务" leftLine:NO rightLine:YES];
-    DetailBottomView *listBottomView = [[DetailBottomView alloc] initWithFrame:CGRectMake(viewLeft + viewWidth, viewTop, viewWidth, viewHeight) image:[UIImage imageNamed:@"detail_list"] labelText:@"记录查询" leftLine:YES rightLine:YES];
-    DetailBottomView *userBottomView = [[DetailBottomView alloc] initWithFrame:CGRectMake(viewLeft + 2 * viewWidth, viewTop, viewWidth, viewHeight) image:[UIImage imageNamed:@"detail_user"] labelText:@"查看用户" leftLine:YES rightLine:NO];
+    CGFloat viewLeft = 0;
+    DetailBottomView *taskBottomView = [[DetailBottomView alloc] initWithFrame:CGRectMake(viewLeft, viewTop, viewWidth, viewHeight) image:[UIImage imageNamed:@"detail_task"] activeImage:[UIImage imageNamed:@"detail_task_active"] leftLine:NO rightLine:YES];
+    DetailBottomView *listBottomView = [[DetailBottomView alloc] initWithFrame:CGRectMake(viewLeft + viewWidth, viewTop, viewWidth, viewHeight) image:[UIImage imageNamed:@"detail_list"] activeImage:[UIImage imageNamed:@"detail_list_active"] leftLine:YES rightLine:YES];
+    DetailBottomView *userBottomView = [[DetailBottomView alloc] initWithFrame:CGRectMake(viewLeft + 2 * viewWidth, viewTop, viewWidth, viewHeight) image:[UIImage imageNamed:@"detail_user"] activeImage:[UIImage imageNamed:@"detail_user_active"] leftLine:YES rightLine:NO];
     [taskBottomView setBackgroundColor:[UIColor whiteColor]];
     [listBottomView setBackgroundColor:[UIColor whiteColor]];
     [userBottomView setBackgroundColor:[UIColor whiteColor]];
     [userBottomView.button addTarget:self action:@selector(onUserButton) forControlEvents:UIControlEventTouchUpInside];
     [taskBottomView.button addTarget:self action:@selector(onTaskButton) forControlEvents:UIControlEventTouchUpInside];
     [listBottomView.button addTarget:self action:@selector(onListButton) forControlEvents:UIControlEventTouchUpInside];
+    [taskBottomView setBackgroundColor:[UIColor colorWithRed:235.0 / 255.0 green:235.0 / 255.0 blue:235.0 / 255.0 alpha:1.0]];
+    [userBottomView setBackgroundColor:[UIColor colorWithRed:235.0 / 255.0 green:235.0 / 255.0 blue:235.0 / 255.0 alpha:1.0]];
+    [listBottomView setBackgroundColor:[UIColor colorWithRed:235.0 / 255.0 green:235.0 / 255.0 blue:235.0 / 255.0 alpha:1.0]];
     [self.view addSubview:taskBottomView];
     [self.view addSubview:listBottomView];
     [self.view addSubview:userBottomView];
@@ -103,12 +120,12 @@
     
     //show table
     self.tableContainer = [[UIView alloc] init];
-    CGFloat tc_width = self.view.frame.size.width / 4;
-    CGFloat tc_height = tc_width * TABLE_ITEM_NUM / 3 + 13;
+    CGFloat tc_width = self.view.frame.size.width / 4 ;
+    CGFloat tc_height = tc_width * TABLE_ITEM_NUM / 3 + 25;
     UIImageView *tableBg = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, tc_width, tc_height)];
-    [tableBg setImage:[UIImage imageNamed:@"tablebg"]];
+    [tableBg setImage:[UIImage imageNamed:@"tablebg2"]];
     [self.tableContainer addSubview:tableBg];
-    UITableView *tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 13, tc_width, tc_height - 13)];
+    UITableView *tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 25, tc_width, tc_height - 25)];
     [tableView registerClass:[TableViewCell class] forCellReuseIdentifier:@"PrototypeCell"];
     [[tableView tableHeaderView] setBackgroundColor:[UIColor yellowColor]];
     [self.tableContainer addSubview:tableView];
@@ -126,21 +143,33 @@
     self.selectItem = -1;
     
     [self.modeSegController addTarget:self action:@selector(onModeChange) forControlEvents:UIControlEventValueChanged];
+    
+    self.barBg = [[UIImageView alloc] init];
+    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
+    [self.view addSubview:self.barBg];
+    [self.view bringSubviewToFront:self.naviBar];
+    self.bgView = [[UIImageView alloc] init];
+    [self.bgView setImage:[UIImage imageNamed:@"background"]];
+    [self.view addSubview:self.bgView];
+    [self.view sendSubviewToBack:self.bgView];
 }
 
 - (void)viewWillLayoutSubviews {
+    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.naviBar.frame.size.height + self.naviBar.frame.origin.y)];
+    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
     //task view
     [self.taskView setFrame:CGRectMake(0, self.naviBar.frame.origin.y  + self.naviBar.frame.size.height, self.view.frame.size.width, self.naviBar.frame.size.height)];
-    [self.taskLabel setFrame:CGRectMake(self.taskView.frame.size.width / 2 - 50, self.taskView.frame.size.height / 2 - 15, 100, 30)];
+    [self.taskLabel setFrame:CGRectMake(0, 0, self.taskView.frame.size.width, self.taskView.frame.size.height)];
     
     //table view
     CGFloat tc_width = self.view.frame.size.width / 4;
     CGFloat tc_height = tc_width * TABLE_ITEM_NUM / 3 + 13;
-    [self.tableContainer setFrame:CGRectMake(self.view.frame.size.width * 3 / 4 - 10, self.naviBar.frame.origin.y + self.naviBar.frame.size.height, tc_width, tc_height)];
+    [self.tableContainer setFrame:CGRectMake(self.view.frame.size.width * 3 / 4 - 20, self.naviBar.frame.origin.y + self.naviBar.frame.size.height, tc_width, tc_height)];
     
     if (![self.device.user isEqualToString:@"admin"]) {
         self.modeSegController.hidden = YES;
     }
+    [super viewWillLayoutSubviews];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -149,46 +178,47 @@
         [self.acFrame startAc];
         self.stateRefreshFinish = NO;
         self.modeRefreshFinish = NO;
+        __weak DeviceDetailViewController *weakSelf = self;
         [self.device checkDoorSuccess:^(NSURLSessionDataTask *task, id response) {
-            self.stateRefreshFinish = YES;
-            if (self.stateRefreshFinish && self.modeRefreshFinish) {
-                [self.acFrame stopAc];
+            weakSelf.stateRefreshFinish = YES;
+            if (weakSelf.stateRefreshFinish && weakSelf.modeRefreshFinish) {
+                [weakSelf.acFrame stopAc];
             }
             if ([response[@"result"] isEqualToString:@"good"]) {
-                if (self.device.switchClose) {
-                    [self.swButton setImage:[UIImage imageNamed:@"buttonSw_active"] forState:UIControlStateNormal];
-                    self.swActive = YES;
+                if (weakSelf.device.switchClose) {
+                    [weakSelf.swButton setImage:[UIImage imageNamed:@"buttonSw_active"] forState:UIControlStateNormal];
+                    weakSelf.swActive = YES;
                 }
                 else {
-                    [self.swButton setImage:[UIImage imageNamed:@"buttonSw"] forState:UIControlStateNormal];
-                    self.swActive = NO;
+                    [weakSelf.swButton setImage:[UIImage imageNamed:@"buttonSw"] forState:UIControlStateNormal];
+                    weakSelf.swActive = NO;
                 }
             }
             else {
-                [SCUtil viewController:self showAlertTitle:@"提示" message:response[@"detail"] action:nil];
+                [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:response[@"detail"] action:nil];
             }
             
         }
         failure:^(NSURLSessionDataTask *task, NSError *error) {
-            self.stateRefreshFinish = YES;
-            if (self.stateRefreshFinish && self.modeRefreshFinish) {
-                [self.acFrame stopAc];
+            weakSelf.stateRefreshFinish = YES;
+            if (weakSelf.stateRefreshFinish && weakSelf.modeRefreshFinish) {
+                [weakSelf.acFrame stopAc];
             }
-            [SCUtil viewController:self showAlertTitle:@"提示" message:@"网络错误，获取设备状态失败" action:nil];
+            [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"网络错误，获取设备状态失败" action:nil];
         }];
         if (!self.modeSegController.hidden) {
             [self.device getDeviceModeSuccess:^(NSURLSessionDataTask *task, id response) {
-                self.modeRefreshFinish = YES;
-                if (self.stateRefreshFinish && self.modeRefreshFinish) {
-                    [self.acFrame stopAc];
+                weakSelf.modeRefreshFinish = YES;
+                if (weakSelf.stateRefreshFinish && weakSelf.modeRefreshFinish) {
+                    [weakSelf.acFrame stopAc];
                 }
                 if ([response[@"result"] isEqualToString:@"good"]) {
-                    [self.modeSegController setSelectedSegmentIndex:[[response objectForKey:@"mode"] integerValue]];
+                    [weakSelf.modeSegController setSelectedSegmentIndex:[[response objectForKey:@"mode"] integerValue]];
                 }
             } failure:^(NSURLSessionDataTask *task, NSError *error) {
-                self.modeRefreshFinish = YES;
-                if (self.stateRefreshFinish && self.modeRefreshFinish) {
-                    [self.acFrame stopAc];
+                weakSelf.modeRefreshFinish = YES;
+                if (weakSelf.stateRefreshFinish && weakSelf.modeRefreshFinish) {
+                    [weakSelf.acFrame stopAc];
                 }
             }];
         }
@@ -208,6 +238,58 @@
             [self.swButton setImage:[UIImage imageNamed:@"buttonSw"] forState:UIControlStateNormal];
             self.swActive = NO;
         }
+    }
+    //task label
+    NSCalendar *calender = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+    NSCalendarUnit unitFlasg = NSCalendarUnitHour|NSCalendarUnitMinute|NSCalendarUnitWeekday;
+    NSDate *now = [NSDate date];
+    NSDateComponents *nowDateComp = [calender components:unitFlasg fromDate:now];
+    NSArray *array = [self.device getLocalTasks];
+    NSInteger nearestMinute = 7 * 24 * 60;
+    NSInteger nearestOption = 0;
+    NSInteger w = [nowDateComp weekday];    //today weekday
+    for (int i = 0; i < [array count]; i++) {
+        NSDictionary *task = [array objectAtIndex:i];
+        if ([task[@"active"] integerValue] == 0)
+            continue;
+        NSInteger mask = 0x40 >> (w - 1);
+        NSInteger weekday = [task[@"weekday"] integerValue];
+        NSInteger hour = [task[@"hour"] integerValue];
+        NSInteger minute = [task[@"minute"] integerValue];
+        for (int j = 0; j < 8; j++) {
+            if ((weekday & mask) != 0)
+            {
+                NSInteger minuteDiff = j * 24 * 60 + (hour * 60 + minute - [nowDateComp hour] * 60 - [nowDateComp minute]);
+                if (minuteDiff < 0) {
+                    if (j == 0)
+                        continue;
+                    else
+                        minuteDiff += 7 * 24 * 60;
+                }
+                if (minuteDiff < nearestMinute) {
+                    nearestMinute = minuteDiff;
+                    nearestOption = [task[@"option"] integerValue];
+                }
+                break;
+            }
+            if (mask == 1) {
+                mask = 0x40;
+            }
+            else {
+                mask = mask >> 1;
+            }
+        }
+    }
+    if (nearestMinute < 7 * 24 * 60) {
+        self.taskLabel.hidden = NO;
+        NSInteger minute = nearestMinute % 60;
+        NSInteger hour = ((nearestMinute - minute) / 60) % 24;
+        NSInteger day = (nearestMinute - minute - hour * 60) / (24 * 60);
+        NSString *option = (nearestOption == 1)?@"开启":@"关闭";
+        self.taskLabel.text = [NSString stringWithFormat:@"定时%ld天%ld小时%ld分钟后%@", (long)day, (long)hour, (long)minute, option];
+    }
+    else {
+        self.taskLabel.hidden = YES;
     }
     [super viewDidAppear:animated];
 }
@@ -231,16 +313,17 @@
 
 - (void)onModeChange {
     [self.acFrame startAc];
+    __weak DeviceDetailViewController *weakSelf = self;
     [self.device changeDeviceMode:[self.modeSegController selectedSegmentIndex] success:^(NSURLSessionDataTask *task, id response) {
-        [self.acFrame stopAc];
+        [weakSelf.acFrame stopAc];
         if (![response[@"result"] isEqualToString:@"good"]) {
-            [SCUtil viewController:self showAlertTitle:@"提示" message:response[@"detail"] action:^(UIAlertAction *action) {
-                [self.modeSegController setSelectedSegmentIndex:(1 - [self.modeSegController selectedSegmentIndex])];
+            [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:response[@"detail"] action:^(UIAlertAction *action) {
+                [weakSelf.modeSegController setSelectedSegmentIndex:(1 - [weakSelf.modeSegController selectedSegmentIndex])];
             }];
         }
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        [SCUtil viewController:self showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:^(UIAlertAction *action) {
-            [self.modeSegController setSelectedSegmentIndex:(1 - [self.modeSegController selectedSegmentIndex])];
+        [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:^(UIAlertAction *action) {
+            [weakSelf.modeSegController setSelectedSegmentIndex:(1 - [weakSelf.modeSegController selectedSegmentIndex])];
         }];
     }];
 }
@@ -250,44 +333,45 @@
         [self onRightButton];
     }
     [self.acFrame startAc];
+    __weak DeviceDetailViewController *weakSelf = self;
     if (self.swActive) {
         [self.device openDoorSuccess:^(NSURLSessionDataTask *task, id response) {
-            [self.acFrame stopAc];
+            [weakSelf.acFrame stopAc];
             if ([response[@"result"] isEqualToString:@"good"]) {
-                if (self.swActive) {
-                    [self setDeviceInactive];
+                if (weakSelf.swActive) {
+                    [weakSelf setDeviceInactive];
                 }
                 else {
-                    [self setDeviceActive];
+                    [weakSelf setDeviceActive];
                 }
             }
             else {
-                [SCUtil viewController:self showAlertTitle:@"提示" message:response[@"detail"] action:nil];
+                [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:response[@"detail"] action:nil];
             }
         }
         failure:^(NSURLSessionDataTask *task, NSError *error) {
-            [self.acFrame stopAc];
-            [SCUtil viewController:self showAlertTitle:@"提示" message:@"网络错误，设备操作失败" action:nil];
+            [weakSelf.acFrame stopAc];
+            [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"网络错误，设备操作失败" action:nil];
         }];
     }
     else {
         [self.device closeDoorSuccess:^(NSURLSessionDataTask *task, id response) {
-            [self.acFrame stopAc];
+            [weakSelf.acFrame stopAc];
             if ([response[@"result"] isEqualToString:@"good"]) {
-                if (self.swActive) {
-                    [self setDeviceInactive];
+                if (weakSelf.swActive) {
+                    [weakSelf setDeviceInactive];
                 }
                 else {
-                    [self setDeviceActive];
+                    [weakSelf setDeviceActive];
                 }
             }
             else {
-                [SCUtil viewController:self showAlertTitle:@"提示" message:response[@"detail"] action:nil];
+                [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:response[@"detail"] action:nil];
             }
         }
         failure:^(NSURLSessionDataTask *task, NSError *error) {
-            [self.acFrame stopAc];
-            [SCUtil viewController:self showAlertTitle:@"提示" message:@"网络错误，设备操作失败" action:nil];
+            [weakSelf.acFrame stopAc];
+            [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"网络错误，设备操作失败" action:nil];
         }];
     }
 }
@@ -405,13 +489,14 @@
             [alert.textFields[0] resignFirstResponder];
         }
     }];
+    __weak DeviceDetailViewController *weakSelf = self;
     UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         if ([alert.textFields[0] isFirstResponder]) {
             [alert.textFields[0] resignFirstResponder];
         }
         if ([alert.textFields[0].text length] != 0) {
             NSString *name = alert.textFields[0].text;
-            [self.device updateDeviceName:name];
+            [weakSelf.device updateDeviceName:name];
         }
         
     }];
@@ -438,21 +523,22 @@
             [alert.textFields[0] resignFirstResponder];
         }
     }];
+    __weak DeviceDetailViewController *weakSelf = self;
     UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         if ([alert.textFields[0] isFirstResponder]) {
             [alert.textFields[0] resignFirstResponder];
         }
         if ([alert.textFields[0].text length] != 0) {
             NSString *password = alert.textFields[0].text;
-            [self.device login:@"admin" password:password success:^(NSURLSessionDataTask *task, id response) {
+            [weakSelf.device login:@"admin" password:password success:^(NSURLSessionDataTask *task, id response) {
                 if ([response[@"result"] isEqualToString:@"good"]) {
-                    [SCUtil viewController:self showAlertTitle:@"提示" message:@"密码重新验证成功" action:nil];
+                    [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"密码重新验证成功" action:nil];
                 }
                 else {
-                    [SCUtil viewController:self showAlertTitle:@"提示" message:response[@"detail"] action:nil];
+                    [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:response[@"detail"] action:nil];
                 }
             }failure:^(NSURLSessionDataTask *task, NSError *error) {
-                [SCUtil viewController:self showAlertTitle:@"提示" message:@"网络错误，验证密码失败" action:nil];
+                [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"网络错误，验证密码失败" action:nil];
             }];
         }
         
@@ -470,20 +556,21 @@
 
 - (void)resetDeviceConfig {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"提示" message:@"恢复设备出厂设置会还原设备的管理密码，删除设备上的所有自定义用户、定时任务。\n是否要继续？" preferredStyle:UIAlertControllerStyleAlert];
+    __weak DeviceDetailViewController *weakSelf = self;
     UIAlertAction* okAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDestructive handler:^(UIAlertAction* action) {
-        [self.acFrame startAc];
-        [self.device resetDeviceSuccess:^(NSURLSessionDataTask* task, id response) {
-            [self.acFrame stopAc];
+        [weakSelf.acFrame startAc];
+        [weakSelf.device resetDeviceSuccess:^(NSURLSessionDataTask* task, id response) {
+            [weakSelf.acFrame stopAc];
             if ([response[@"result"] isEqualToString:@"good"]) {
-                [self.device clearLocalTasks];
-                [self reVerifyPassword];
+                [weakSelf.device clearLocalTasks];
+                [weakSelf reVerifyPassword];
             }
             else {
-                [SCUtil viewController:self showAlertTitle:@"提示" message:response[@"detail"] action:nil];
+                [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:response[@"detail"] action:nil];
             }
         } failure:^(NSURLSessionDataTask* task, NSError* error) {
-            [self.acFrame stopAc];
-            [SCUtil viewController:self showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
+            [weakSelf.acFrame stopAc];
+            [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
         }];
     }];
     UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil];
@@ -549,7 +636,7 @@
             [cell setImage:[UIImage imageNamed:@"table_share"] labelText:@"分享设备"];
             break;
         case 5:
-            [cell setImage:[UIImage imageNamed:@"table_info"] labelText:@"恢复设置"];
+            [cell setImage:[UIImage imageNamed:@"table_reset"] labelText:@"恢复设置"];
             break;
         case 6:
             [cell setImage:[UIImage imageNamed:@"table_update"] labelText:@"检查更新"];

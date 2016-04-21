@@ -17,10 +17,13 @@
 @property (weak, nonatomic) IBOutlet UITextField *passTextField;
 @property (weak, nonatomic) IBOutlet UIButton *buttonNext;
 @property (strong, nonatomic) MyActivityIndicatorView *acFrame;
-@property (strong, nonatomic) NSString *devId;
+@property (weak, nonatomic) NSString *devId;
 @property (weak, nonatomic) IBOutlet UILabel *authLabel;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *authSeg;
-@property NSInteger userAuth;
+@property (nonatomic) NSInteger userAuth;
+@property (strong, nonatomic) UIImageView *barBg;
+@property (strong, nonatomic) UIImageView *bgView;
+@property (strong, nonatomic) UIImageView *textFieldBg;
 
 - (IBAction)textFieldChanged:(id)sender;
 - (IBAction)onButtonNext:(id)sender;
@@ -45,16 +48,24 @@
     [button setFrame:CGRectMake(0, 0, self.passTextField.frame.size.height, self.passTextField.frame.size.height)];
     self.passTextField.rightView = button;
     self.passTextField.rightViewMode = UITextFieldViewModeUnlessEditing;
+    [self.passTextField setBackgroundColor:[UIColor clearColor]];
+    
     //navi bar
-    UINavigationItem *naviItem = [[UINavigationItem alloc] initWithTitle:@"验证设备密码"];
+    UINavigationItem *naviItem = [[UINavigationItem alloc] init];
     UIBarButtonItem *leftBarButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"cancel"] style:UIBarButtonItemStylePlain target:self action:@selector(onLeftButton)];
+    [leftBarButton setTintColor:[UIColor whiteColor]];
     [naviItem setLeftBarButtonItem:leftBarButton];
+    UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.naviBar.frame.size.width - 100, self.naviBar.frame.size.height)];
+    [titleLab setText:@"验证设备密码"];
+    [titleLab setTextColor:[UIColor whiteColor]];
+    [titleLab setFont:[UIFont systemFontOfSize:17.0]];
+    titleLab.textAlignment = NSTextAlignmentCenter;
+    naviItem.titleView = titleLab;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
-    [self.naviBar setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:1.0]];
+    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
     //button
-    [self.buttonNext setBackgroundImage:[UIButton imageWithColor:[UIButton getColorFromHex:0xffba73 Alpha:1.0]] forState:UIControlStateNormal];
-    [self.buttonNext setBackgroundImage:[UIButton imageWithColor:[UIButton getColorFromHex:0xc0c0c0 Alpha:1.0]] forState:UIControlStateDisabled];
-    [self.buttonNext setBackgroundImage:[UIButton imageWithColor:[UIButton getColorFromHex:0xff8100 Alpha:1.0]] forState:UIControlStateHighlighted];
+    [self.buttonNext setBackgroundImage:[UIImage imageNamed:@"longButtonActive"] forState:UIControlStateNormal];
+    [self.buttonNext setBackgroundImage:[UIImage imageNamed:@"longButton"] forState:UIControlStateDisabled];
     self.buttonNext.layer.cornerRadius = 5.0;
     self.buttonNext.layer.opaque = NO;
     self.buttonNext.layer.masksToBounds = YES;
@@ -63,10 +74,26 @@
     [self.authSeg addTarget:self action:@selector(onSegValueChanged) forControlEvents:UIControlEventValueChanged];
     self.userAuth = 9;
     [self.buttonNext setTitle:@"添加完成" forState:UIControlStateNormal];
-
+    
+    self.barBg = [[UIImageView alloc] init];
+    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
+    [self.view addSubview:self.barBg];
+    [self.view bringSubviewToFront:self.naviBar];
+    self.bgView = [[UIImageView alloc] init];
+    [self.bgView setImage:[UIImage imageNamed:@"background"]];
+    [self.view addSubview:self.bgView];
+    [self.view sendSubviewToBack:self.bgView];
+    
+    self.textFieldBg = [[UIImageView alloc] init];
+    [self.textFieldBg setImage:[UIImage imageNamed:@"textFieldBg"]];
+    [self.passTextField addSubview:self.textFieldBg];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, 64.0)];
+    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
+    [self.textFieldBg setFrame:CGRectMake(0, 0, self.passTextField.frame.size.width, self.passTextField.frame.size.height)];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -88,9 +115,10 @@
 }
 
 - (void)onLeftButton {
+    __weak DevicePasswordViewController *weakSelf = self;
     [SCUtil viewController:self showAlertTitle:@"提示" message:@"确认放弃添加新设备吗？" yesAction:^(UIAlertAction *action) {
-            [[SCDeviceManager instance] removeDevice:self.devId];
-            [self.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+            [[SCDeviceManager instance] removeDevice:weakSelf.devId];
+            [weakSelf.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     } noAction:nil];
 }
 
@@ -132,9 +160,10 @@
         BmobUser *user = [BmobUser getCurrentUser];
         loginUser = [user username];
     }
+    __weak DevicePasswordViewController *weakSelf = self;
     [client login:loginUser password:self.passTextField.text
     success:^(NSURLSessionDataTask *task, id response) {
-        [self.acFrame stopAc];
+        [weakSelf.acFrame stopAc];
         if ([response[@"result"] isEqualToString:@"good"]) {
             UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"提示" message:@"设备绑定成功" preferredStyle:UIAlertControllerStyleAlert];
             UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
@@ -143,7 +172,7 @@
                 }
                 NSString *devName = @"默认设备";
                 [client updateDeviceName:devName];
-                [self.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                [weakSelf.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
             }];
             UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
                 if ([alert.textFields[0] isFirstResponder]) {
@@ -158,21 +187,21 @@
                 }
                 [client updateDeviceName:devName];
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"AddCompletionNoti" object:nil];
-                [self.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                [weakSelf.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
             }];
             [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
                 textField.placeholder = @"给设备起个名字吧";
             }];
             [alert addAction:cancelAction];
             [alert addAction:defaultAction];
-            [self presentViewController:alert animated:YES completion:nil];
+            [weakSelf presentViewController:alert animated:YES completion:nil];
         }
         else {
-            [SCUtil viewController:self showAlertTitle:@"提示" message:response[@"detail"] action:nil];
+            [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:response[@"detail"] action:nil];
         }
     }failure:^(NSURLSessionDataTask *task, NSError *error) {
-        [self.acFrame stopAc];
-        [SCUtil viewController:self showAlertTitle:@"提示" message:@"网络错误" action:nil];
+        [weakSelf.acFrame stopAc];
+        [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"网络错误" action:nil];
     }];
 }
 @end

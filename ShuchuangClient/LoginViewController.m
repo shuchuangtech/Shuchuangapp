@@ -21,6 +21,11 @@
 @property (strong, nonatomic) NSString *loginId;
 @property (strong, nonatomic) NSString *loginPass;
 @property (weak, nonatomic) IBOutlet UIButton *buttonLogin;
+@property (strong, nonatomic) UIImageView *barBg;
+@property (strong, nonatomic) UIImageView *bgView;
+@property (strong, nonatomic) UIImageView *idFieldBg;
+@property (strong, nonatomic) UIImageView *passwordFieldBg;
+
 
 - (IBAction)onBtnForget:(id)sender;
 - (IBAction)onBtnRegister:(id)sender;
@@ -66,25 +71,30 @@
     naviItem.leftBarButtonItem = leftBarBtn;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
     [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
+    
+    self.barBg = [[UIImageView alloc] init];
+    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
+    [self.view addSubview:self.barBg];
+    [self.view bringSubviewToFront:self.naviBar];
+    self.bgView = [[UIImageView alloc] init];
+    [self.bgView setImage:[UIImage imageNamed:@"background"]];
+    self.idFieldBg = [[UIImageView alloc] init];
+    [self.idFieldBg setImage:[UIImage imageNamed:@"textFieldBg"]];
+    [self.idField addSubview:self.idFieldBg];
+    self.passwordFieldBg = [[UIImageView alloc] init];
+    [self.passwordFieldBg setImage:[UIImage imageNamed:@"textFieldBg"]];
+    [self.passwordField addSubview:self.passwordFieldBg];
+    
+    [self.view addSubview:self.bgView];
+    [self.view sendSubviewToBack:self.bgView];
 }
 
 - (void)viewWillLayoutSubviews {
-    UIImageView *barBg = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.naviBar.frame.size.height + self.naviBar.frame.origin.y)];
-    [barBg setImage:[UIImage imageNamed:@"barBg"]];
-    [self.view addSubview:barBg];
-    [self.view bringSubviewToFront:self.naviBar];
-    UIImageView *bgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - barBg.frame.size.height)];
-    [bgView setImage:[UIImage imageNamed:@"background"]];
-    UIImageView *idFieldBg = [[UIImageView alloc] initWithFrame:self.idField.frame];
-    [idFieldBg setImage:[UIImage imageNamed:@"textFieldBg"]];
-    [self.view addSubview:idFieldBg];
-    UIImageView *passwordFieldBg = [[UIImageView alloc] initWithFrame:self.passwordField.frame];
-    [passwordFieldBg setImage:[UIImage imageNamed:@"textFieldBg"]];
-    [self.view addSubview:passwordFieldBg];
-    
-    [self.view addSubview:bgView];
-    [self.view sendSubviewToBack:bgView];
     [super viewWillLayoutSubviews];
+    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.naviBar.frame.size.height + self.naviBar.frame.origin.y)];
+    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
+    [self.idFieldBg setFrame:CGRectMake(0, 0, self.idField.frame.size.width, self.idField.frame.size.height)];
+    [self.passwordFieldBg setFrame:CGRectMake(0, 0, self.passwordField.frame.size.width, self.passwordField.frame.size.height)];
 }
 
 - (void)didReceiveMemoryWarning {

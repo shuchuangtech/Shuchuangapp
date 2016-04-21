@@ -9,7 +9,6 @@
 #import "DetailBottomView.h"
 @interface DetailBottomView ()
 
-@property (strong, nonatomic) UILabel *label;
 @property (nonatomic) BOOL leftLine;
 @property (nonatomic) BOOL rightLine;
 
@@ -25,9 +24,17 @@
     CGContextSetLineCap(context, kCGLineCapSquare);
     CGContextSetLineWidth(context, 1.0);
     CGContextSetAllowsAntialiasing(context, true);
-    CGContextSetRGBStrokeColor(context, 1.0, 129.0 / 255.0, 0, 1.0);
-    CGFloat lineTop = self.frame.size.height / 6;
-    CGFloat lineBottom = 5 * self.frame.size.height / 6;
+    UIColor *lineColor = [UIColor darkGrayColor];
+    CGFloat red;
+    CGFloat green;
+    CGFloat blue;
+    CGFloat alpha;
+    [lineColor getRed:&red green:&green blue:&blue alpha:&alpha];
+    CGContextSetRGBStrokeColor(context, red, blue, green, alpha);
+//    CGFloat lineTop = self.frame.size.height / 6;
+//    CGFloat lineBottom = 5 * self.frame.size.height / 6;
+    CGFloat lineTop = 0;
+    CGFloat lineBottom = self.frame.size.height;
     if (self.leftLine) {
         CGContextBeginPath(context);
         CGContextMoveToPoint(context, 0, lineTop);
@@ -40,26 +47,24 @@
         CGContextAddLineToPoint(context, self.frame.size.width, lineBottom);
         CGContextStrokePath(context);
     }
+    CGContextBeginPath(context);
+    CGContextMoveToPoint(context, 0, 0);
+    CGContextAddLineToPoint(context, self.frame.size.width, 0);
+    CGContextStrokePath(context);
 }
 
-- (instancetype)initWithFrame:(CGRect)frame image:(UIImage *)img labelText:(NSString *)text leftLine:(BOOL)leftLine rightLine:(BOOL)rightLine{
+- (instancetype)initWithFrame:(CGRect)frame image:(UIImage *)img activeImage:(UIImage *)activeImg leftLine:(BOOL)leftLine rightLine:(BOOL)rightLine{
     self = [super initWithFrame:frame];
     CGFloat buttonWidth = frame.size.width / 2;
-    CGFloat buttonHeight = buttonWidth;
-    CGFloat buttonTop = 3 * frame.size.height / 16;
+    CGFloat buttonHeight = 1.36 * buttonWidth;
+    CGFloat buttonTop = 0;
     CGFloat buttonLeft = frame.size.width / 4;
     self.button = [[UIButton alloc] initWithFrame:CGRectMake(buttonLeft, buttonTop, buttonWidth, buttonHeight)];
     [self.button setImage:img forState:UIControlStateNormal];
-
-    self.label = [[UILabel alloc] initWithFrame:CGRectMake(0, buttonTop + buttonHeight, frame.size.width, frame.size.height/ 8)];
-    self.label.text = text;
-    self.label.textAlignment = NSTextAlignmentCenter;
-    [self.label setFont:[UIFont systemFontOfSize:12.0]];
-    [self.label setTextColor:[UIColor colorWithRed:1.0 green:129.0 / 255.0 blue:0 alpha:1.0]];
+    [self.button setImage:activeImg forState:UIControlStateHighlighted];
     self.leftLine = leftLine;
     self.rightLine = rightLine;
     [self addSubview:self.button];
-    [self addSubview:self.label];
     return self;
 }
 

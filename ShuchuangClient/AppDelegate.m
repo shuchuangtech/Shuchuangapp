@@ -18,11 +18,15 @@
 
 @end
 
+static void uncaughtExceptionHandler(NSException *exception) {
+    NSLog(@"CRASH: %@", exception);
+    NSLog(@"Stack trace: %@", [exception callStackSymbols]);
+}
+
 @implementation AppDelegate
-
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
     //Bmob
     [Bmob registerWithAppKey:@"27f1f3599a223cfa40bb5c5e5daedd7a"];
     UIMutableUserNotificationCategory *categorys = [[UIMutableUserNotificationCategory alloc] init];
@@ -89,6 +93,7 @@
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
-    NSLog(@"userinfo:%@", userInfo);
+
 }
+
 @end

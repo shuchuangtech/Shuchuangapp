@@ -9,8 +9,5 @@
 #import <UIKit/UIKit.h>
 
 @interface SetPasswordViewController : UIViewController <UITextFieldDelegate>
-@property (weak, nonatomic) NSString *phoneNumber;
-@property (weak, nonatomic) NSString *email;
-@property (weak, nonatomic) NSString *SMSCode;
-@property (nonatomic) BOOL registerNewUser;
+
 @end

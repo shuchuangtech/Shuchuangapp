@@ -16,6 +16,7 @@
 - (void)awakeFromNib {
     // Initialization code
     [self.taskSwitch addTarget:self action:@selector(onSwitchTouchInsideUp:) forControlEvents:UIControlEventTouchUpInside];
+    [self.taskSwitch setTintColor:[UIColor darkGrayColor]];
 }
 
 - (void)onSwitchTouchInsideUp:(id)sender {

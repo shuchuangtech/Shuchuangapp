@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "DatePickerProtocol.h"
 @interface MyDatePickerView : UIView
-@property (retain, nonatomic) id<DatePickerProtocol> datePickerDelegate;
+@property (weak, nonatomic) id<DatePickerProtocol> datePickerDelegate;
 - (instancetype) initWithFrameInView:(UIView *)view;
 - (void)showPicker;
 - (void)hidePicker;

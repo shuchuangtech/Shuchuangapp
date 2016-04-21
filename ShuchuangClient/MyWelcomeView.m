@@ -92,6 +92,10 @@
     opAnima.fromValue = [NSNumber numberWithDouble:1.0];
     opAnima.toValue = [NSNumber numberWithDouble:0];
     opAnima.duration = 8.0;
+    anima.removedOnCompletion = NO;
+    opAnima.removedOnCompletion = NO;
+    anima.fillMode = kCAFillModeForwards;
+    opAnima.fillMode = kCAFillModeForwards;
     CGFloat width = self.frame.size.width;
     anima.delegate = self;
     anima.duration = 8.0;
@@ -145,15 +149,19 @@
     switch (self.animaStep) {
         case 0:
             [self sendSubviewToBack:self.bg1];
+            [self.bg1.layer removeAllAnimations];
             break;
         case 1:
             [self sendSubviewToBack:self.bg2];
+            [self.bg2.layer removeAllAnimations];
             break;
         case 2:
             [self sendSubviewToBack:self.bg3];
+            [self.bg3.layer removeAllAnimations];
             break;
         case 3:
             [self sendSubviewToBack:self.bg4];
+            [self.bg4.layer removeAllAnimations];
             break;
         default:
             break;

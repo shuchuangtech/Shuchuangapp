@@ -17,7 +17,12 @@
 @property (nonatomic) BOOL lastResult;
 @property (weak, nonatomic) IBOutlet UIView *bgView;
 @property (weak, nonatomic) id<ScanQRCodeProtocol> scanDelegate;
-
+@property (strong, nonatomic) UIImageView *barBg;
+@property (strong, nonatomic) UIImageView *boundsView;
+@property (strong, nonatomic) UIView *topView;
+@property (strong, nonatomic) UIView *bottomView;
+@property (strong, nonatomic) UIView *leftView;
+@property (strong, nonatomic) UIView *rightView;
 
 - (void)onLeftButton;
 @end
@@ -27,32 +32,63 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    UINavigationItem *naviItem = [[UINavigationItem alloc] initWithTitle:@"扫描二维码"];
+    UINavigationItem *naviItem = [[UINavigationItem alloc] init];
     UIBarButtonItem *leftBarButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStylePlain target:self action:@selector(onLeftButton)];
+    [leftBarButton setTintColor:[UIColor whiteColor]];
     [naviItem setLeftBarButtonItem:leftBarButton];
+    UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.naviBar.frame.size.width - 100, self.naviBar.frame.size.height)];
+    [titleLab setText:@"扫描二维码"];
+    [titleLab setTextColor:[UIColor whiteColor]];
+    [titleLab setFont:[UIFont systemFontOfSize:17.0]];
+    titleLab.textAlignment = NSTextAlignmentCenter;
+    naviItem.titleView = titleLab;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
-    [self.naviBar setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:1.0]];
+    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
     
+    
+    self.topView = [[UIView alloc] init];
+    self.bottomView = [[UIView alloc] init];
+    self.leftView = [[UIView alloc] init];
+    self.rightView = [[UIView alloc] init];
+    [self.topView setBackgroundColor:[UIColor colorWithRed:239.0/255.0 green:239.0/255.0 blue:239.0/255.0 alpha:239.0/255.0]];
+    self.topView.alpha = 0.85;
+    [self.bottomView setBackgroundColor:[UIColor colorWithRed:239.0/255.0 green:239.0/255.0 blue:239.0/255.0 alpha:239.0/255.0]];
+    self.bottomView.alpha = 0.85;
+    [self.leftView setBackgroundColor:[UIColor colorWithRed:239.0/255.0 green:239.0/255.0 blue:239.0/255.0 alpha:239.0/255.0]];
+    self.leftView.alpha = 0.85;
+    [self.rightView setBackgroundColor:[UIColor colorWithRed:239.0/255.0 green:239.0/255.0 blue:239.0/255.0 alpha:239.0/255.0]];
+    self.rightView.alpha = 0.85;
+    
+    self.boundsView = [[UIImageView alloc] init];
+    [self.boundsView setImage:[UIImage imageNamed:@"qrbounds"]];
+    [self.boundsView setBackgroundColor:[UIColor clearColor]];
+    [self.bgView addSubview:self.boundsView];
+    
+    [self.bgView addSubview:self.topView];
+    [self.bgView addSubview:self.bottomView];
+    [self.bgView addSubview:self.leftView];
+    [self.bgView addSubview:self.rightView];
+    
+    self.barBg = [[UIImageView alloc] init];
+    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
+    [self.view addSubview:self.barBg];
+    [self.view bringSubviewToFront:self.naviBar];
 }
+
 - (void)viewDidLayoutSubviews {
+    [super viewWillLayoutSubviews];
     CGFloat width = self.bgView.frame.size.width / 2;
     CGFloat height = width;
-    UIView *topView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 2.0 * width, height)];
-    UIView *bottomView = [[UIView alloc] initWithFrame:CGRectMake(0, 2.0 * height, 2.0 * width, self.bgView.frame.size.height - 2 * height)];
-    UIView *leftView = [[UIView alloc] initWithFrame:CGRectMake(0, height, width / 2, height)];
-    UIView *rightView = [[UIView alloc] initWithFrame:CGRectMake(3.0 * width / 2.0, height, width / 2, height)];
-    [topView setBackgroundColor:[UIColor darkGrayColor]];
-    topView.alpha = 0.85;
-    [bottomView setBackgroundColor:[UIColor darkGrayColor]];
-    bottomView.alpha = 0.85;
-    [leftView setBackgroundColor:[UIColor darkGrayColor]];
-    leftView.alpha = 0.85;
-    [rightView setBackgroundColor:[UIColor darkGrayColor]];
-    rightView.alpha = 0.85;
-    [self.bgView addSubview:topView];
-    [self.bgView addSubview:bottomView];
-    [self.bgView addSubview:leftView];
-    [self.bgView addSubview:rightView];
+    [self.topView setFrame:CGRectMake(0, 0, 2.0 * width, height)];
+    [self.bottomView setFrame:CGRectMake(0, 2.0 * height, 2.0 * width, self.bgView.frame.size.height - 2 * height)];
+    [self.leftView setFrame:CGRectMake(0, height, width / 2, height)];
+    [self.rightView setFrame:CGRectMake(3.0 * width / 2.0, height, width / 2, height)];
+    [self.boundsView setFrame:CGRectMake(width / 2,  height, width, width)];
+    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, 64.0)];
+}
+
+- (void)dealloc {
+    NSLog(@"qrcode vc dealloc");
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -115,8 +151,9 @@
         NSString *regex = @"SC[0-9]{10,}";
         NSPredicate *test = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
         if (![test evaluateWithObject:stringValue]) {
+            __weak QRCodeViewController *weakSelf = self;
             [SCUtil viewController:self showAlertTitle:@"提示" message:@"请扫描设备对应的序列号二维码" action:^(UIAlertAction *action) {
-                [self.captureSession startRunning];
+                [weakSelf.captureSession startRunning];
             }];
         }
         else {

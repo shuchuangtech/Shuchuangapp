@@ -34,6 +34,9 @@
 @property NSInteger timePickerTag;
 @property (strong, nonatomic) NSMutableArray *records;
 @property (strong, nonatomic) MyActivityIndicatorView *acFrame;
+@property (strong, nonatomic) UIImageView *barBg;
+@property (strong, nonatomic) UIImageView *bgView;
+
 
 - (IBAction)onButtonSearch:(id)sender;
 - (void)onDateLabelBegin:(id)sender;
@@ -50,11 +53,18 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     //navi bar
-    UINavigationItem *naviItem = [[UINavigationItem alloc] initWithTitle:@"记录查询"];
+    UINavigationItem *naviItem = [[UINavigationItem alloc] init];
     UIBarButtonItem *leftButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStylePlain target:self action:@selector(onLeftButton)];
-    [leftButton setTintColor:[UIColor colorWithRed:1.0 green:129.0 / 255.0 blue:0 alpha:1]];
+    [leftButton setTintColor:[UIColor whiteColor]];
+    UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.naviBar.frame.size.width - 100, self.naviBar.frame.size.height)];
+    [titleLab setText:@"记录查询"];
+    [titleLab setTextColor:[UIColor whiteColor]];
+    [titleLab setFont:[UIFont systemFontOfSize:17.0]];
+    titleLab.textAlignment = NSTextAlignmentCenter;
+    naviItem.titleView = titleLab;
     naviItem.leftBarButtonItem = leftButton;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
+    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
     
     //picker view
     self.datePicker = [[MyDatePickerView alloc] initWithFrameInView:self.view];
@@ -93,8 +103,8 @@
     UITapGestureRecognizer *gesture2 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onDateLabelEnd:)];
     [self.beginDate addGestureRecognizer:gesture1];
     [self.endDate addGestureRecognizer:gesture2];
-    [self.beginDate setText:[NSString stringWithFormat:@"%04ld-%02ld-%02ld", year, month, day]];
-    [self.endDate setText:[NSString stringWithFormat:@"%04ld-%02ld-%02ld", year, month, day]];
+    [self.beginDate setText:[NSString stringWithFormat:@"%04ld-%02ld-%02ld", (long)year, (long)month, (long)day]];
+    [self.endDate setText:[NSString stringWithFormat:@"%04ld-%02ld-%02ld", (long)year, (long)month, (long)day]];
     
     //time
     self.beginTime.userInteractionEnabled = YES;
@@ -103,8 +113,8 @@
     UITapGestureRecognizer *gesture4 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTimeLabelEnd:)];
     [self.beginTime addGestureRecognizer:gesture3];
     [self.endTime addGestureRecognizer:gesture4];
-    [self.beginTime setText:[NSString stringWithFormat:@"%02ld:%02ld", hour, minute]];
-    [self.endTime setText:[NSString stringWithFormat:@"%02ld:%02ld", hour, minute]];
+    [self.beginTime setText:[NSString stringWithFormat:@"%02ld:%02ld", (long)hour, (long)minute]];
+    [self.endTime setText:[NSString stringWithFormat:@"%02ld:%02ld", (long)hour, (long)minute]];
     
     //client
     self.client = [[SCDeviceManager instance] getDevice:self.uuid];
@@ -124,7 +134,22 @@
     if ([self.records count] == 0) {
         self.tableView.scrollEnabled = NO;
     }
+    [self.tableView setBackgroundColor:[UIColor clearColor]];
     
+    self.barBg = [[UIImageView alloc] init];
+    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
+    [self.view addSubview:self.barBg];
+    [self.view bringSubviewToFront:self.naviBar];
+    self.bgView = [[UIImageView alloc] init];
+    [self.bgView setImage:[UIImage imageNamed:@"background"]];
+    [self.view addSubview:self.bgView];
+    [self.view sendSubviewToBack:self.bgView];
+}
+
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, 64.0)];
+    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -139,13 +164,14 @@
     NSInteger tt1 = [beginDate timeIntervalSince1970] * 1000000;
     NSInteger tt2 = [endDate timeIntervalSince1970] * 1000000;
     NSDictionary *condition = @{RECORD_STARTTIME_STR:[NSNumber numberWithInteger:tt1], RECORD_ENDTIME_STR:[NSNumber numberWithInteger:tt2], RECORD_LIMIT_STR:[NSNumber numberWithInteger:10], RECORD_OFFSET_STR:[NSNumber numberWithInteger:[self.records count]]};
+    __weak RecordViewController *weakSelf = self;
     [self.client getRecord:condition success:^(NSURLSessionDataTask *task, id response) {
         if ([response[@"result"] isEqualToString:@"good"]) {
             NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
             NSUInteger unitFlag = NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay|NSCalendarUnitHour|NSCalendarUnitMinute|NSCalendarUnitSecond;
             NSArray *responseRecords = response[@"records"];
             if ([responseRecords count] == 0) {
-                [self.tableView.mj_footer endRefreshingWithNoMoreData];
+                [weakSelf.tableView.mj_footer endRefreshingWithNoMoreData];
             }
             else {
                 for (int i = 0; i < [responseRecords count]; i++) {
@@ -153,21 +179,21 @@
                     NSInteger timestamp = [record[@"Timestamp"] integerValue];
                     NSTimeInterval timeInterval = timestamp / 1000000.0;
                     NSDateComponents *comp = [calendar components:unitFlag fromDate:[NSDate dateWithTimeIntervalSince1970:timeInterval]];
-                    NSString *timeStr = [NSString stringWithFormat:@"%04ld-%02ld-%02ld %02ld:%02ld:%02ld", [comp year], [comp month], [comp day], [comp hour], [comp minute], [comp second]];
+                    NSString *timeStr = [NSString stringWithFormat:@"%04ld-%02ld-%02ld %02ld:%02ld:%02ld", (long)[comp year], (long)[comp month], (long)[comp day], (long)[comp hour], (long)[comp minute], (long)[comp second]];
                     [record setObject:timeStr forKey:@"Timestamp"];
-                    [self.records addObject:record];
+                    [weakSelf.records addObject:record];
                 }
-                [self.tableView reloadData];
-                [self.tableView.mj_footer endRefreshing];
+                [weakSelf.tableView reloadData];
+                [weakSelf.tableView.mj_footer endRefreshing];
             }
         }
         else {
-            [self.tableView.mj_footer endRefreshing];
-            [SCUtil viewController:self showAlertTitle:@"提示" message:response[@"detail"] action:nil];
+            [weakSelf.tableView.mj_footer endRefreshing];
+            [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:response[@"detail"] action:nil];
         }
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        [self.tableView.mj_footer endRefreshing];
-        [SCUtil viewController:self showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
+        [weakSelf.tableView.mj_footer endRefreshing];
+        [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
     }];
 }
 
@@ -183,13 +209,13 @@
         [self.beginComp setYear:[dateComponent year]];
         [self.beginComp setMonth:[dateComponent month]];
         [self.beginComp setDay:[dateComponent day]];
-        [self.beginDate setText:[NSString stringWithFormat:@"%04ld-%02ld-%02ld", [dateComponent year], [dateComponent month], [dateComponent day]]];
+        [self.beginDate setText:[NSString stringWithFormat:@"%04ld-%02ld-%02ld", (long)[dateComponent year], (long)[dateComponent month], (long)[dateComponent day]]];
     }
     else {
         [self.endComp setYear:[dateComponent year]];
         [self.endComp setMonth:[dateComponent month]];
         [self.endComp setDay:[dateComponent day]];
-        [self.endDate setText:[NSString stringWithFormat:@"%04ld-%02ld-%02ld", [dateComponent year], [dateComponent month], [dateComponent day]]];
+        [self.endDate setText:[NSString stringWithFormat:@"%04ld-%02ld-%02ld", (long)[dateComponent year], (long)[dateComponent month], (long)[dateComponent day]]];
     }
     [self.datePicker hidePicker];
 }
@@ -202,12 +228,12 @@
     if (self.timePickerTag == 0) {
         [self.beginComp setHour:hour];
         [self.beginComp setMinute:minute];
-        [self.beginTime setText:[NSString stringWithFormat:@"%02ld:%02ld", hour, minute]];
+        [self.beginTime setText:[NSString stringWithFormat:@"%02ld:%02ld", (long)hour, (long)minute]];
     }
     else {
         [self.endComp setHour:hour];
         [self.endComp setMinute:minute];
-        [self.endTime setText:[NSString stringWithFormat:@"%02ld:%02ld", hour, minute]];
+        [self.endTime setText:[NSString stringWithFormat:@"%02ld:%02ld", (long)hour, (long)minute]];
     }
     [self.timePicker hidePicker];
 }
@@ -225,6 +251,7 @@
     NSInteger tt2 = [endDate timeIntervalSince1970] * 1000000;
     NSDictionary *condition = @{RECORD_STARTTIME_STR:[NSNumber numberWithInteger:tt1], RECORD_ENDTIME_STR:[NSNumber numberWithInteger:tt2], RECORD_LIMIT_STR:[NSNumber numberWithInteger:10], RECORD_OFFSET_STR:[NSNumber numberWithInteger:0]};
     [self.acFrame startAc];
+    __weak RecordViewController *weakSelf = self;
     [self.client getRecord:condition success:^(NSURLSessionDataTask *task, id response) {
         if ([response[@"result"] isEqualToString:@"good"]) {
             NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
@@ -235,27 +262,27 @@
                 NSInteger timestamp = [record[@"Timestamp"] integerValue];
                 NSTimeInterval timeInterval = timestamp / 1000000.0;
                 NSDateComponents *comp = [calendar components:unitFlag fromDate:[NSDate dateWithTimeIntervalSince1970:timeInterval]];
-                NSString *timeStr = [NSString stringWithFormat:@"%04ld-%02ld-%02ld %02ld:%02ld:%02ld", [comp year], [comp month], [comp day], [comp hour], [comp minute], [comp second]];
+                NSString *timeStr = [NSString stringWithFormat:@"%04ld-%02ld-%02ld %02ld:%02ld:%02ld", (long)[comp year], (long)[comp month], (long)[comp day], (long)[comp hour], (long)[comp minute], (long)[comp second]];
                 [record setObject:timeStr forKey:@"Timestamp"];
-                [self.records addObject:record];
+                [weakSelf.records addObject:record];
             }
-            if ([self.records count] > 0) {
-                self.tableView.scrollEnabled = YES;
-                [self.tableView reloadData];
+            if ([weakSelf.records count] > 0) {
+                weakSelf.tableView.scrollEnabled = YES;
+                [weakSelf.tableView reloadData];
             }
             else {
-                self.tableView.scrollEnabled = NO;
+                weakSelf.tableView.scrollEnabled = NO;
             }
-            [self.acFrame stopAc];
-            [self.tableView reloadData];
+            [weakSelf.acFrame stopAc];
+            [weakSelf.tableView reloadData];
         }
         else {
-            [self.acFrame stopAc];
-            [SCUtil viewController:self showAlertTitle:@"提示" message:response[@"detail"] action:nil];
+            [weakSelf.acFrame stopAc];
+            [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:response[@"detail"] action:nil];
         }
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        [self.acFrame stopAc];
-        [SCUtil viewController:self showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
+        [weakSelf.acFrame stopAc];
+        [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
     }];
 }
 
@@ -291,6 +318,7 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     RecordTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"RecordTableViewCell"];
+    [cell setBackgroundColor:[UIColor clearColor]];
     NSDictionary *record = [self.records objectAtIndex:indexPath.row];
     if ([[record objectForKey:@"Operation"] integerValue] == 0) {
         cell.optionLabel.text = @"关闭";

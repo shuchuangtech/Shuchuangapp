@@ -50,6 +50,7 @@
 - (void)serverCheckSuccess:(void (^)(NSURLSessionDataTask * _Nullable, id _Nonnull))success failure:(void (^)(NSURLSessionDataTask * _Nullable, NSError * _Nonnull))failure {
     SCHTTPManager *http = [SCHTTPManager instance];
     NSDictionary *dict = @{KEY_TYPE_STR:@"request", KEY_ACTION_STR:@"server.check", KEY_PARAM_STR:@{@"uuid":self.uuid}};
+    __weak SCDeviceClient *weakSelf = self;
     [http sendMessage:dict
               success:^(NSURLSessionDataTask *task, id serverResponse) {
                   NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
@@ -59,8 +60,8 @@
                       [response setValue:param[DEVICE_STATE_STR] forKey:DEVICE_STATE_STR];
                       if (param[REG_DEV_TYPE_STR] != nil) {
                           [response setValue:param[REG_DEV_TYPE_STR] forKey:REG_DEV_TYPE_STR];
-                          self.type = param[REG_DEV_TYPE_STR];
-                          [self updateDeviceInfo];
+                          weakSelf.type = param[REG_DEV_TYPE_STR];
+                          [weakSelf updateDeviceInfo];
                       }
                   }
                   else {
@@ -80,18 +81,22 @@
     SCHTTPManager *http = [SCHTTPManager instance];
     NSString *action = [NSString stringWithFormat:@"%@.%@", COMPONENT_USER_STR, USER_METHOD_LOGIN];
     NSDictionary *dict = @{KEY_TYPE_STR:TYPE_REQUEST_STR, KEY_ACTION_STR:action, KEY_PARAM_STR:@{USER_USERNAME_STR:username, USER_UUID_STR:self.uuid, USER_BINDUSER_STR:binduser}};
+    __weak SCDeviceClient *weakSelf = self;
     [http sendMessage:dict
                  success:^(NSURLSessionDataTask *task, id responseObject_step1) {
                      NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
                      if ([responseObject_step1[KEY_RESULT_STR] isEqualToString:RESULT_GOOD_STR]) {
                          NSDictionary * responseParam = responseObject_step1[KEY_PARAM_STR];
-                         self.token = responseParam[REG_TOKEN_STR];
+                         weakSelf.token = responseParam[REG_TOKEN_STR];
                          NSString * challenge = responseParam[USER_CHALLENGE_STR];
                          NSMutableString * passwordmd5 = [SCUtil generateMD5Password:password withChallenge:challenge andPrefix:@"login"];
                          NSUserDefaults *userDef = [NSUserDefaults standardUserDefaults];
                          NSString *mobile_token;
                          if(userDef != nil) {
                              mobile_token = [userDef objectForKey:@"MobileToken"];
+                             if (mobile_token == nil) {
+                                 mobile_token = @"";
+                             }
                          }
                          else {
                              mobile_token = @"";
@@ -100,7 +105,7 @@
                          [http sendMessage:parameter2 success:^(NSURLSessionDataTask *task, id responseObject_step2) {
                              if([responseObject_step2[@"result"] isEqualToString:@"good"]) {
                                  [response setValue:@"good" forKey:@"result"];
-                                 [self updateDeviceInfo];
+                                 [weakSelf updateDeviceInfo];
                              }
                              else {
                                  NSString *detail = [SCErrorString errorString:responseObject_step2[@"detail"]];
@@ -123,7 +128,7 @@
 
 - (void)logoutSuccess:(void (^)(NSURLSessionDataTask * _Nullable, id _Nonnull))success failure:(void (^)(NSURLSessionDataTask * _Nullable, NSError * _Nonnull))failure {
     SCHTTPManager *http = [SCHTTPManager instance];
-    NSDictionary *dict = @{@"type":@"request", @"action":@"user.logout", @"param":@{@"token":self.token, @"username":self.user}};
+    NSDictionary *dict = @{@"type":@"request", @"action":@"user.logout", @"param":@{@"uuid":self.uuid, @"token":self.token}};
     [http sendMessage:dict success:^(NSURLSessionDataTask* task, id serverResponse) {
         NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
         if ([serverResponse[@"result"] isEqualToString:@"good"]) {
@@ -141,13 +146,14 @@
 - (void)changeOldPassword:(NSString *)oldPassword newPassword:(NSString *)newpassword success:(void (^)(NSURLSessionDataTask * _Nullable, id _Nonnull))success failure:(void (^)(NSURLSessionDataTask * _Nullable, NSError * _Nonnull))failure {
     NSDictionary *dict_step1 = @{@"type":@"request", @"action":@"user.passwd", @"param":@{@"uuid":self.uuid, @"token":self.token}};
     SCHTTPManager *http = [SCHTTPManager instance];
+    __weak SCDeviceClient *weakSelf = self;
     [http sendMessage:dict_step1 success:^(NSURLSessionDataTask *task, id response_step1) {
         NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
         if ([response_step1[@"result"] isEqualToString:@"good"]) {
             NSDictionary *param_response = [response_step1 objectForKey:@"param"];
             NSString *challenge = param_response[@"challenge"];
             NSMutableString *challengemd5pass = [SCUtil generateMD5Password:oldPassword withChallenge:challenge andPrefix:@"passwd"];
-            NSDictionary *dict_step2 = @{@"type":@"request", @"action":@"user.passwd", @"param":@{@"uuid":self.uuid, @"token":self.token, @"password":challengemd5pass, @"newpassword":[SCUtil generateSHA1String:newpassword]}};
+            NSDictionary *dict_step2 = @{@"type":@"request", @"action":@"user.passwd", @"param":@{@"uuid":weakSelf.uuid, @"token":weakSelf.token, @"password":challengemd5pass, @"newpassword":[SCUtil generateSHA1String:newpassword]}};
             [http sendMessage:dict_step2
                       success:^(NSURLSessionDataTask *task, id response_step2) {
                           if ([response_step2[@"result"] isEqualToString:@"good"]) {
@@ -258,6 +264,7 @@
 - (void)checkDoorSuccess:(void (^)(NSURLSessionDataTask * _Nullable, id _Nonnull))success failure:(void (^)(NSURLSessionDataTask * _Nullable, NSError * _Nonnull))failure {
     SCHTTPManager *http = [SCHTTPManager instance];
     NSDictionary *dict = @{@"type":@"request", @"action":@"device.check", @"param":@{@"uuid":self.uuid, @"token":self.token}};
+    __weak SCDeviceClient *weakSelf = self;
     [http sendMessage:dict
               success:^(NSURLSessionDataTask *task, id serverResponse) {
                   NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
@@ -265,26 +272,28 @@
                       NSDictionary *param = [serverResponse objectForKey:@"param"];
                       [response setValue:param[@"state"] forKey:@"state"];
                       if ([response[@"state"] isEqualToString:@"close"]) {
-                          self.doorClose = YES;
+                          weakSelf.doorClose = YES;
                       }
                       else {
-                          self.doorClose = NO;
+                          weakSelf.doorClose = NO;
                       }
                       [response setValue:param[@"switch"] forKey:@"switch"];
                       if ([response[@"switch"] isEqualToString:@"close"]) {
-                          self.switchClose = YES;
+                          weakSelf.switchClose = YES;
                       }
                       else {
-                          self.switchClose = NO;
+                          weakSelf.switchClose = NO;
                       }
                       [response setValue:@"good" forKey:@"result"];
+                      weakSelf.online = YES;
                   }
                   else {
                       NSString *detail = [SCErrorString errorString:serverResponse[@"detail"]];
                       [response setValue:@"fail" forKey:@"result"];
                       [response setValue:detail forKey:@"detail"];
-                      self.switchClose = NO;
-                      self.doorClose = NO;
+                      weakSelf.online = NO;
+                      weakSelf.switchClose = NO;
+                      weakSelf.doorClose = NO;
                   }
                   success(task, response);
               }
@@ -372,6 +381,7 @@
     SCHTTPManager *http = [SCHTTPManager instance];
     NSString *action = [NSString stringWithFormat:@"%@.%@", COMPONENT_TASK_STR, TASK_METHOD_LIST];
     NSDictionary *dict = @{KEY_TYPE_STR:TYPE_REQUEST_STR, KEY_ACTION_STR:action, KEY_PARAM_STR:@{@"uuid":self.uuid, @"token":self.token}};
+    __weak SCDeviceClient *weakSelf = self;
     [http sendMessage:dict
               success:^(NSURLSessionDataTask *task, id serverResponse) {
                   NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
@@ -381,7 +391,7 @@
                       NSArray *taskArr = param[@"tasks"];
                       if (taskArr != nil) {
                           [response setObject:taskArr forKey:@"tasks"];
-                          [self.devDao setTasks:taskArr forDevice:self.uuid];
+                          [weakSelf.devDao setTasks:taskArr forDevice:weakSelf.uuid];
                       }
                   }
                   else {
@@ -398,6 +408,7 @@
     SCHTTPManager *http = [SCHTTPManager instance];
     NSString *action = [NSString stringWithFormat:@"%@.%@", COMPONENT_TASK_STR, TASK_METHOD_ADD];
     NSDictionary *dict = @{KEY_TYPE_STR:TYPE_REQUEST_STR, KEY_ACTION_STR:action, KEY_PARAM_STR:@{REG_TOKEN_STR:self.token, REG_UUID_STR:self.uuid, @"task":task}};
+    __weak SCDeviceClient *weakSelf = self;
     [http sendMessage:dict success:^(NSURLSessionDataTask *dataTask, id serverResponse){
         NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
         if ([serverResponse[KEY_RESULT_STR] isEqualToString:RESULT_GOOD_STR]) {
@@ -405,7 +416,7 @@
             [response setValue:serverResponse[@"param"][@"task"][@"id"] forKey:@"id"];
             NSMutableDictionary *setTask = [[NSMutableDictionary alloc] initWithDictionary:task];
             [setTask setValue:serverResponse[@"param"][@"task"][@"id"] forKey:@"id"];
-            [self.devDao addTask:setTask forDevice:self.uuid];
+            [weakSelf.devDao addTask:setTask forDevice:weakSelf.uuid];
         }
         else {
             NSString *detail = [SCErrorString errorString:serverResponse[@"detail"]];
@@ -420,11 +431,12 @@
     SCHTTPManager *http = [SCHTTPManager instance];
     NSString *action = [NSString stringWithFormat:@"%@.%@", COMPONENT_TASK_STR, TASK_METHOD_REMOVE];
     NSDictionary *dict = @{KEY_TYPE_STR:TYPE_REQUEST_STR, KEY_ACTION_STR:action, KEY_PARAM_STR:@{REG_TOKEN_STR:self.token, REG_UUID_STR:self.uuid, @"task":@{@"id":[NSNumber numberWithInteger:taskId]}}};
+    __weak SCDeviceClient *weakSelf = self;
     [http sendMessage:dict success:^(NSURLSessionDataTask *dataTask, id serverResponse){
         NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
         if ([serverResponse[KEY_RESULT_STR] isEqualToString:RESULT_GOOD_STR]) {
             [response setValue:@"good" forKey:@"result"];
-            [self.devDao removeTask:index forDevice:self.uuid];
+            [weakSelf.devDao removeTask:index forDevice:weakSelf.uuid];
         }
         else {
             NSString *detail = [SCErrorString errorString:serverResponse[@"detail"]];
@@ -439,11 +451,12 @@
     SCHTTPManager *http = [SCHTTPManager instance];
     NSString *action = [NSString stringWithFormat:@"%@.%@", COMPONENT_TASK_STR, TASK_METHOD_MODIFY];
     NSDictionary *dict = @{KEY_TYPE_STR:TYPE_REQUEST_STR, KEY_ACTION_STR:action, KEY_PARAM_STR:@{REG_TOKEN_STR:self.token, REG_UUID_STR:self.uuid, @"task":task}};
+    __weak SCDeviceClient *weakSelf = self;
     [http sendMessage:dict success:^(NSURLSessionDataTask *dataTask, id serverResponse){
         NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
         if ([serverResponse[KEY_RESULT_STR] isEqualToString:RESULT_GOOD_STR]) {
             [response setValue:@"good" forKey:@"result"];
-            [self.devDao updateTask:task forDevice:self.uuid atIndex:index];
+            [weakSelf.devDao updateTask:task forDevice:weakSelf.uuid atIndex:index];
         }
         else {
             NSString *detail = [SCErrorString errorString:serverResponse[@"detail"]];

@@ -25,7 +25,8 @@
 @property (nonatomic) BOOL isSelected;
 @property (nonatomic) BOOL canOpen;
 @property (strong, nonatomic) UILabel* featureLabel;
-
+@property (strong, nonatomic) UIImageView *barBg;
+@property (strong, nonatomic) UIImageView *bgView;
 - (void)onLeftButton;
 - (void)checkDeviceVersion;
 - (void)checkServerVersion;
@@ -37,11 +38,19 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    UINavigationItem *naviItem = [[UINavigationItem alloc] initWithTitle:@"检查更新"];
+    UINavigationItem *naviItem = [[UINavigationItem alloc] init];
     UIBarButtonItem *leftButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStylePlain target:self action:@selector(onLeftButton)];
-    [leftButton setTintColor:[UIColor colorWithRed:1.0 green:129.0 / 255.0 blue:0 alpha:1]];
+    [leftButton setTintColor:[UIColor whiteColor]];
     naviItem.leftBarButtonItem = leftButton;
+    UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.naviBar.frame.size.width - 100, self.naviBar.frame.size.height)];
+    [titleLab setText:@"检查更新"];
+    [titleLab setTextColor:[UIColor whiteColor]];
+    [titleLab setFont:[UIFont systemFontOfSize:17.0]];
+    titleLab.textAlignment = NSTextAlignmentCenter;
+    naviItem.titleView = titleLab;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
+    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
+    
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     [self.tableView setBackgroundColor:[UIColor clearColor]];
@@ -50,6 +59,21 @@
     self.isSelected = NO;
     self.featureLabel = [[UILabel alloc] init];
     [self.tableView registerNib:[UINib nibWithNibName:@"UpdateTableViewCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"UpdateTableViewCell"];
+    
+    self.barBg = [[UIImageView alloc] init];
+    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
+    [self.view addSubview:self.barBg];
+    [self.view bringSubviewToFront:self.naviBar];
+    self.bgView = [[UIImageView alloc] init];
+    [self.bgView setImage:[UIImage imageNamed:@"background"]];
+    [self.view addSubview:self.bgView];
+    [self.view sendSubviewToBack:self.bgView];
+}
+
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, 64)];
+    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -64,17 +88,18 @@
 
 - (void)onButtonUpdate {
     [self.acFrame startAc];
+    __weak DeviceUpdateViewController *weakSelf = self;
     [self.client updateDeviceTo:self.serverVersion[@"version"] success:^(NSURLSessionDataTask* task, id response) {
-        [self.acFrame stopAc];
+        [weakSelf.acFrame stopAc];
         if ([response[@"result"] isEqualToString:@"good"]) {
-            [SCUtil viewController:self showAlertTitle:@"提示" message:@"设备正在升级，升级成功后设备会重新启动" action:nil];
+            [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"设备正在升级，升级成功后设备会重新启动" action:nil];
         }
         else {
-            [SCUtil viewController:self showAlertTitle:@"提示" message:response[@"detail"] action:nil];
+            [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:response[@"detail"] action:nil];
         }
     } failure:^(NSURLSessionDataTask* taskk, NSError* error) {
-        [self.acFrame stopAc];
-        [SCUtil viewController:self showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
+        [weakSelf.acFrame stopAc];
+        [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
     }];
 }
 
@@ -88,67 +113,69 @@
 }
 
 - (void)checkDeviceVersion {
+    __weak DeviceUpdateViewController *weakSelf = self;
     [self.client checkDeviceVersionSuccess:^(NSURLSessionDataTask* task, id response) {
-        self.deviceCheckFinish = YES;
-        if (self.deviceCheckFinish && self.serverCheckFinish) {
-            if ([self.acFrame isAnimating]) {
-                [self.acFrame stopAc];
-                [self.tableView reloadData];
+        weakSelf.deviceCheckFinish = YES;
+        if (weakSelf.deviceCheckFinish && weakSelf.serverCheckFinish) {
+            if ([weakSelf.acFrame isAnimating]) {
+                [weakSelf.acFrame stopAc];
+                [weakSelf.tableView reloadData];
             }
         }
         if ([response[@"result"] isEqualToString:@"good"]) {
-            self.deviceVersion = [[NSDictionary alloc] initWithDictionary:response[@"param"]];
+            weakSelf.deviceVersion = [[NSDictionary alloc] initWithDictionary:response[@"param"]];
         }
         else {
-            self.deviceVersion = @{@"buildtime" : @"unkown", @"version" : @"unkown"};
+            weakSelf.deviceVersion = @{@"buildtime" : @"unkown", @"version" : @"unkown"};
         }
     } failure:^(NSURLSessionDataTask* task, NSError* error) {
-        self.deviceCheckFinish = YES;
-        if (self.deviceCheckFinish && self.serverCheckFinish) {
-            if ([self.acFrame isAnimating]) {
-                [self.acFrame stopAc];
-                [self.tableView reloadData];
+        weakSelf.deviceCheckFinish = YES;
+        if (weakSelf.deviceCheckFinish && weakSelf.serverCheckFinish) {
+            if ([weakSelf.acFrame isAnimating]) {
+                [weakSelf.acFrame stopAc];
+                [weakSelf.tableView reloadData];
             }
         }
-        self.deviceVersion = @{@"buildtime" : @"unkown", @"version" : @"unkown"};
+        weakSelf.deviceVersion = @{@"buildtime" : @"unkown", @"version" : @"unkown"};
     }];
 }
 
 - (void)checkServerVersion {
+    __weak DeviceUpdateViewController *weakSelf = self;
     [self.client checkServerVersionSuccess:^(NSURLSessionDataTask* task, id response) {
-        self.serverCheckFinish = YES;
-        if (self.deviceCheckFinish && self.serverCheckFinish) {
-            if ([self.acFrame isAnimating]) {
-                [self.acFrame stopAc];
-                [self.tableView reloadData];
+        weakSelf.serverCheckFinish = YES;
+        if (weakSelf.deviceCheckFinish && weakSelf.serverCheckFinish) {
+            if ([weakSelf.acFrame isAnimating]) {
+                [weakSelf.acFrame stopAc];
+                [weakSelf.tableView reloadData];
             }
         }
         if ([response[@"result"] isEqualToString:@"good"]) {
-            self.serverVersion = [[NSDictionary alloc] initWithDictionary:response[@"param"][@"update"]];
+            weakSelf.serverVersion = [[NSDictionary alloc] initWithDictionary:response[@"param"][@"update"]];
             NSString* featureString = [[NSString alloc] init];
-            NSArray* featureArray = self.serverVersion[@"newfeature"];
+            NSArray* featureArray = weakSelf.serverVersion[@"newfeature"];
             for (NSUInteger i = 0; i < [featureArray count] - 1; i ++) {
                 featureString = [featureString stringByAppendingFormat:@"%@\n", [featureArray objectAtIndex:i]];
             }
             featureString = [featureString stringByAppendingFormat:@"%@", [featureArray objectAtIndex:([featureArray count] - 1)]];
-            CGSize featureSize = [featureString boundingRectWithSize:CGSizeMake(self.view.frame.size.width, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:14.0]} context:nil].size;
-            self.featureLabel.numberOfLines = [featureArray count];
-            self.featureLabel.text = featureString;
-            self.featureLabel.font = [UIFont systemFontOfSize:14.0];
-            [self.featureLabel setFrame:CGRectMake(5.0, 48.0, self.view.frame.size.width, featureSize.height)];
+            CGSize featureSize = [featureString boundingRectWithSize:CGSizeMake(weakSelf.view.frame.size.width, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:14.0]} context:nil].size;
+            weakSelf.featureLabel.numberOfLines = [featureArray count];
+            weakSelf.featureLabel.text = featureString;
+            weakSelf.featureLabel.font = [UIFont systemFontOfSize:14.0];
+            [weakSelf.featureLabel setFrame:CGRectMake(5.0, 48.0, weakSelf.view.frame.size.width, featureSize.height)];
         }
         else {
-            self.serverVersion = @{@"version" : @"unkown", @"buildtime" : @"unkown"};
+            weakSelf.serverVersion = @{@"version" : @"unkown", @"buildtime" : @"unkown"};
         }
     } failure:^(NSURLSessionDataTask* task, NSError* error) {
-        self.serverCheckFinish = YES;
-        if (self.deviceCheckFinish && self.serverCheckFinish) {
-            if ([self.acFrame isAnimating]) {
-                [self.acFrame stopAc];
-                [self.tableView reloadData];
+        weakSelf.serverCheckFinish = YES;
+        if (weakSelf.deviceCheckFinish && weakSelf.serverCheckFinish) {
+            if ([weakSelf.acFrame isAnimating]) {
+                [weakSelf.acFrame stopAc];
+                [weakSelf.tableView reloadData];
             }
         }
-        self.serverVersion = @{@"version" : @"unkown", @"buildtime" : @"unkown"};
+        weakSelf.serverVersion = @{@"version" : @"unkown", @"buildtime" : @"unkown"};
     }];
 }
 /*
@@ -197,6 +224,7 @@
         cell.textLabel.text = @"当前版本";
         NSString* buildTime = self.deviceVersion[@"buildtime"];
         cell.detailTextLabel.text = [NSString stringWithFormat:@"%@(%@)", self.deviceVersion[@"version"], [buildTime substringToIndex:[buildTime length] - 6]];
+        [cell setBackgroundColor:[UIColor clearColor]];
         return cell;
     }
     else {
@@ -223,6 +251,7 @@
             cell.buttonUpdate.hidden = NO;
         }
         [cell.buttonUpdate addTarget:self action:@selector(onButtonUpdate) forControlEvents:UIControlEventTouchUpInside];
+        [cell setBackgroundColor:[UIColor clearColor]];
         return cell;
     }
 }

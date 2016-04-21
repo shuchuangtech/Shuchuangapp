@@ -10,5 +10,5 @@
 
 @interface DetailBottomView : UIView
 @property (strong, nonatomic) UIButton *button;
-- (instancetype)initWithFrame:(CGRect)frame image:(UIImage *)img labelText:(NSString *)text leftLine:(BOOL)leftLine rightLine:(BOOL)rightLine;
+- (instancetype)initWithFrame:(CGRect)frame image:(UIImage *)img activeImage:(UIImage *)activeImg leftLine:(BOOL)leftLine rightLine:(BOOL)rightLine;
 @end

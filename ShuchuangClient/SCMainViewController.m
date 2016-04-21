@@ -27,6 +27,7 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [self performSelectorOnMainThread:@selector(nextView) withObject:nil waitUntilDone:NO];
+    [super viewDidAppear:animated];
 }
 
 - (void)nextView {

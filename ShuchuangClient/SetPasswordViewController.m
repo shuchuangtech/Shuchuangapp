@@ -19,6 +19,14 @@
 @property (weak, nonatomic) IBOutlet UITextField *textFieldPassRepeat;
 @property (weak, nonatomic) IBOutlet UIButton *btnRegister;
 @property (strong, nonatomic) MyActivityIndicatorView *acFrame;
+@property (weak, nonatomic) NSString *phoneNumber;
+@property (weak, nonatomic) NSString *SMSCode;
+@property (nonatomic) BOOL registerNewUser;
+@property (strong, nonatomic) UIImageView *barBg;
+@property (strong, nonatomic) UIImageView *bgView;
+@property (strong, nonatomic) UIImageView *textFieldBg1;
+@property (strong, nonatomic) UIImageView *textFieldBg2;
+
 
 - (IBAction)passwordChanged:(id)sender;
 - (IBAction)passwordRepeatChanged:(id)sender;
@@ -52,9 +60,9 @@
     naviItem.titleView = titleLab;
     if (self.registerNewUser) {
         [titleLab setText:@"注册"];
-        [self.btnRegister setTitle:@"注册成功" forState:UIControlStateNormal];
-        [self.btnRegister setTitle:@"注册成功" forState:UIControlStateDisabled];
-        [self.btnRegister setTitle:@"注册成功" forState:UIControlStateHighlighted];
+        [self.btnRegister setTitle:@"注册" forState:UIControlStateNormal];
+        [self.btnRegister setTitle:@"注册" forState:UIControlStateDisabled];
+        [self.btnRegister setTitle:@"注册" forState:UIControlStateHighlighted];
     }
     else {
         [titleLab setText:@"设置新密码"];
@@ -73,25 +81,29 @@
     self.btnRegister.layer.opaque = NO;
     self.btnRegister.layer.masksToBounds = YES;
     self.btnRegister.enabled = NO;
+    
+    self.barBg = [[UIImageView alloc] init];
+    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
+    [self.view addSubview:self.barBg];
+    [self.view bringSubviewToFront:self.naviBar];
+    self.bgView = [[UIImageView alloc] init];
+    [self.bgView setImage:[UIImage imageNamed:@"background"]];
+    self.textFieldBg1 = [[UIImageView alloc] init];
+    [self.textFieldBg1 setImage:[UIImage imageNamed:@"textFieldBg"]];
+    [self.textFieldPass addSubview:self.textFieldBg1];
+    self.textFieldBg2 = [[UIImageView alloc] init];
+    [self.textFieldBg2 setImage:[UIImage imageNamed:@"textFieldBg"]];
+    [self.textFieldPassRepeat addSubview:self.textFieldBg2];
+    [self.view addSubview:self.bgView];
+    [self.view sendSubviewToBack:self.bgView];
 }
 
 - (void)viewWillLayoutSubviews {
-    UIImageView *barBg = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.naviBar.frame.size.height + self.naviBar.frame.origin.y)];
-    [barBg setImage:[UIImage imageNamed:@"barBg"]];
-    [self.view addSubview:barBg];
-    [self.view bringSubviewToFront:self.naviBar];
-    UIImageView *bgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - barBg.frame.size.height)];
-    [bgView setImage:[UIImage imageNamed:@"background"]];
-    UIImageView *textFieldBg1 = [[UIImageView alloc] initWithFrame:self.textFieldPass.frame];
-    [textFieldBg1 setImage:[UIImage imageNamed:@"textFieldBg"]];
-    [self.view addSubview:textFieldBg1];
-    UIImageView *textFieldBg2 = [[UIImageView alloc] initWithFrame:self.textFieldPassRepeat.frame];
-    [textFieldBg2 setImage:[UIImage imageNamed:@"textFieldBg"]];
-    [self.view addSubview:textFieldBg2];
-
-    [self.view addSubview:bgView];
-    [self.view sendSubviewToBack:bgView];
     [super viewWillLayoutSubviews];
+    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.naviBar.frame.size.height + self.naviBar.frame.origin.y)];
+    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
+    [self.textFieldBg1 setFrame:CGRectMake(0, 0, self.textFieldPass.frame.size.width, self.textFieldPass.frame.size.height)];
+    [self.textFieldBg2 setFrame:CGRectMake(0, 0, self.textFieldPassRepeat.frame.size.width, self.textFieldPassRepeat.frame.size.height)];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -152,14 +164,8 @@
         if (self.registerNewUser) {
             BmobUser *buser = [[BmobUser alloc] init];
             buser.password = self.textFieldPass.text;
-            if (self.email.length == 0) {
-                buser.username = self.phoneNumber;
-                buser.mobilePhoneNumber = self.phoneNumber;
-            }
-            else {
-                buser.username = self.email;
-                buser.email = self.email;
-            }
+            buser.username = self.phoneNumber;
+            buser.mobilePhoneNumber = self.phoneNumber;
             __weak SetPasswordViewController *weakSelf = self;
             [buser signUpInBackgroundWithBlock:^(BOOL isSuccessful, NSError *error) {
                 [weakSelf.acFrame stopAc];
@@ -176,12 +182,9 @@
                 }
                 else {
                     [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"注册成功" action:^(UIAlertAction * action) {
-                        if ([weakSelf.presentingViewController isKindOfClass:[MobileVerifyViewController class]]) {
+                        [BmobUser loginWithUsernameInBackground:weakSelf.phoneNumber password:weakSelf.textFieldPass.text block:^(BmobUser *user, NSError *error) {
                             [weakSelf.presentingViewController.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-                        }
-                        else {
-                            [weakSelf.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-                        }
+                        }];
                     }];
                 }
             }];
@@ -194,33 +197,25 @@
                 [weakSelf.acFrame stopAc];
                 if (error) {
                     [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"密码重设失败" action:^(UIAlertAction * action) {
-                        if ([weakSelf.presentingViewController isKindOfClass:[MobileVerifyViewController class]]) {
-                            [weakSelf.presentingViewController.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-                        }
-                        else {
-                            [weakSelf.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-                        }
+                        [weakSelf.presentingViewController.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
                     }];
                 }
                 else {
                     NSString *result = (NSString *)object;
                     if ([result isEqualToString:@"good"]) {
                         [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"密码重设成功" action:^(UIAlertAction * action) {
-                                if ([weakSelf.presentingViewController isKindOfClass:[MobileVerifyViewController class]]) {
+                                [BmobUser loginWithUsernameInBackground:weakSelf.phoneNumber password:weakSelf.textFieldPass.text block:^(BmobUser *user, NSError *error) {
                                     [weakSelf.presentingViewController.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-                                }
+                                }];
                             }];
                     }
                     else {
                         [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"密码重设失败" action:^(UIAlertAction * action) {
-                            if ([weakSelf.presentingViewController isKindOfClass:[MobileVerifyViewController class]]) {
-                                [weakSelf.presentingViewController.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-                            }
+                            [weakSelf.presentingViewController.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
                         }];
                     }
                 }
             }];
-            
         }
     }
 }

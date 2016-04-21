@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "ModifyTaskProtocol.h"
 @interface TaskListTableViewCell : UITableViewCell
-@property (retain, nonatomic) id<ModifyTaskProtocol> modifyDelegate;
+@property (weak, nonatomic) id<ModifyTaskProtocol> modifyDelegate;
 @property (weak, nonatomic) IBOutlet UILabel *excuteTime;
 @property (weak, nonatomic) IBOutlet UILabel *optionLabel;
 @property NSInteger taskId;

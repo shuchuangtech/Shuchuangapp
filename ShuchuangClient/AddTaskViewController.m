@@ -34,7 +34,9 @@
 @property (strong, nonatomic) MyActivityIndicatorView *acFrame;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *taskSegControl;
 @property (strong, nonnull) MyTimePickerView* timePicker;
-
+@property (strong, nonatomic) UIImageView *barBg;
+@property (strong, nonatomic) UIImageView *bgView;
+- (void)setWeekdayButton:(UIButton *)button selected:(BOOL)selected;
 - (void)onWeekdayButton:(id)sender;
 - (IBAction)onSegamentChanged:(id)sender;
 - (void)onLeftButton;
@@ -48,21 +50,27 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     //navi bar
-    UINavigationItem *naviItem;
+    
+    UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.naviBar.frame.size.width - 100, self.naviBar.frame.size.height)];
+    [titleLab setTextColor:[UIColor whiteColor]];
+    [titleLab setFont:[UIFont systemFontOfSize:17.0]];
+    titleLab.textAlignment = NSTextAlignmentCenter;
     if (self.modifyTask == nil) {
-        naviItem = [[UINavigationItem alloc] initWithTitle:@"添加任务"];
+        [titleLab setText:@"添加任务"];
     }
     else {
-        naviItem = [[UINavigationItem alloc] initWithTitle:@"修改任务"];
+        [titleLab setText:@"修改任务"];
     }
+    UINavigationItem *naviItem = [[UINavigationItem alloc] init];
+    naviItem.titleView = titleLab;
     UIBarButtonItem *leftButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStylePlain target:self action:@selector(onLeftButton)];
     UIBarButtonItem *rightButton = [[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStylePlain target:self action:@selector(onRightButton)];
-    [leftButton setTintColor:[UIColor colorWithRed:1.0 green:129.0 / 255.0 blue:0 alpha:1]];
-    [rightButton setTintColor:[UIColor colorWithRed:1.0 green:129.0 / 255.0 blue:0 alpha:1]];
+    [leftButton setTintColor:[UIColor whiteColor]];
+    [rightButton setTintColor:[UIColor whiteColor]];
     naviItem.leftBarButtonItem = leftButton;
     naviItem.rightBarButtonItem = rightButton;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
-    
+    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
     //task info variables
     if (self.modifyTask) {
         self.option = [self.modifyTask[@"option"] integerValue];
@@ -82,7 +90,7 @@
     self.timeLabel.userInteractionEnabled = YES;
     UITapGestureRecognizer *labelTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onButtonSetTime:)];
     [self.timeLabel addGestureRecognizer:labelTapGestureRecognizer];
-    self.timeLabel.text = [NSString stringWithFormat:@"%02ld:%02ld", self.pickerHour, self.pickerMinute];
+    self.timeLabel.text = [NSString stringWithFormat:@"%02ld:%02ld", (long)self.pickerHour, (long)self.pickerMinute];
     
     //picker view
     self.timePicker = [[MyTimePickerView alloc] initWithFrameInView:self.view];
@@ -90,46 +98,46 @@
     
     //weekday button
     if ((self.weekday & 0x40) == 0) {
-        [self.buttonSunday setBackgroundImage:[UIImage imageNamed:@"repeatday2"] forState:UIControlStateNormal];
+        [self setWeekdayButton:self.buttonSunday selected:NO];
     }
     else {
-        [self.buttonSunday setBackgroundImage:[UIImage imageNamed:@"repeatday1"] forState:UIControlStateNormal];
+        [self setWeekdayButton:self.buttonSunday selected:YES];
     }
     if ((self.weekday & 0x20) == 0) {
-        [self.buttonMonday setBackgroundImage:[UIImage imageNamed:@"repeatday2"] forState:UIControlStateNormal];
+        [self setWeekdayButton:self.buttonMonday selected:NO];
     }
     else {
-        [self.buttonMonday setBackgroundImage:[UIImage imageNamed:@"repeatday1"] forState:UIControlStateNormal];
+        [self setWeekdayButton:self.buttonMonday selected:YES];
     }
     if ((self.weekday & 0x10) == 0) {
-        [self.buttonTuesday setBackgroundImage:[UIImage imageNamed:@"repeatday2"] forState:UIControlStateNormal];
+        [self setWeekdayButton:self.buttonTuesday selected:NO];
     }
     else {
-        [self.buttonTuesday setBackgroundImage:[UIImage imageNamed:@"repeatday1"] forState:UIControlStateNormal];
+        [self setWeekdayButton:self.buttonTuesday selected:YES];
     }
     if ((self.weekday & 0x08) == 0) {
-        [self.buttonWednesday setBackgroundImage:[UIImage imageNamed:@"repeatday2"] forState:UIControlStateNormal];
+        [self setWeekdayButton:self.buttonWednesday selected:NO];
     }
     else {
-        [self.buttonWednesday setBackgroundImage:[UIImage imageNamed:@"repeatday1"] forState:UIControlStateNormal];
+        [self setWeekdayButton:self.buttonWednesday selected:YES];
     }
     if ((self.weekday & 0x04) == 0) {
-        [self.buttonThursday setBackgroundImage:[UIImage imageNamed:@"repeatday2"] forState:UIControlStateNormal];
+        [self setWeekdayButton:self.buttonThursday selected:NO];
     }
     else {
-        [self.buttonThursday setBackgroundImage:[UIImage imageNamed:@"repeatday1"] forState:UIControlStateNormal];
+        [self setWeekdayButton:self.buttonThursday selected:YES];
     }
     if ((self.weekday & 0x02) == 0) {
-        [self.buttonFriday setBackgroundImage:[UIImage imageNamed:@"repeatday2"] forState:UIControlStateNormal];
+        [self setWeekdayButton:self.buttonFriday selected:NO];
     }
     else {
-        [self.buttonFriday setBackgroundImage:[UIImage imageNamed:@"repeatday1"] forState:UIControlStateNormal];
+        [self setWeekdayButton:self.buttonFriday selected:YES];
     }
     if ((self.weekday & 0x01) == 0) {
-        [self.buttonSaturday setBackgroundImage:[UIImage imageNamed:@"repeatday2"] forState:UIControlStateNormal];
+        [self setWeekdayButton:self.buttonSaturday selected:NO];
     }
     else {
-        [self.buttonSaturday setBackgroundImage:[UIImage imageNamed:@"repeatday1"] forState:UIControlStateNormal];
+        [self setWeekdayButton:self.buttonSaturday selected:YES];
     }
     [self.buttonSunday addTarget:self action:@selector(onWeekdayButton:) forControlEvents:UIControlEventTouchUpInside];
     [self.buttonMonday addTarget:self action:@selector(onWeekdayButton:) forControlEvents:UIControlEventTouchUpInside];
@@ -144,7 +152,22 @@
     
     //ac frame
     self.acFrame = [[MyActivityIndicatorView alloc] initWithFrameInView:self.view];
+    
+    self.barBg = [[UIImageView alloc] init];
+    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
+    [self.view addSubview:self.barBg];
+    [self.view bringSubviewToFront:self.naviBar];
+    self.bgView = [[UIImageView alloc] init];
+    [self.bgView setImage:[UIImage imageNamed:@"background"]];
+    [self.view addSubview:self.bgView];
+    [self.view sendSubviewToBack:self.bgView];
 
+}
+
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, 64.0)];
+    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -165,7 +188,7 @@
     if (self.modifyTask == nil) {
         NSDictionary *task = @{@"option" : [NSNumber numberWithInteger:self.option], @"hour" : [NSNumber numberWithInteger:self.pickerHour], @"minute" : [NSNumber numberWithInteger:self.pickerMinute], @"weekday" : [NSNumber numberWithInteger:self.weekday], @"active" : [NSNumber numberWithInt:0]};
         [self.acFrame startAc];
-        __block AddTaskViewController *blockSelf = self;
+        __weak AddTaskViewController *blockSelf = self;
         [self.client addTask:task success:^(NSURLSessionDataTask *task, id response) {
             [blockSelf.acFrame stopAc];
             if (![response[@"result"] isEqualToString:@"good"]) {
@@ -187,7 +210,7 @@
     else {
         NSDictionary *task = @{@"id":self.modifyTask[@"id"], @"option" : [NSNumber numberWithInteger:self.option], @"hour" : [NSNumber numberWithInteger:self.pickerHour], @"minute" : [NSNumber numberWithInteger:self.pickerMinute], @"weekday" : [NSNumber numberWithInteger:self.weekday], @"active" : [NSNumber numberWithInt:0]};
         [self.acFrame startAc];
-        __block AddTaskViewController *blockSelf = self;
+        __weak AddTaskViewController *blockSelf = self;
         [self.client updateTask:task atIndex:self.modifyIndex success:^(NSURLSessionDataTask *task, id response) {
             [blockSelf.acFrame stopAc];
             if (![response[@"result"] isEqualToString:@"good"]) {
@@ -212,71 +235,71 @@
     if ([sender isEqual:self.buttonSunday]) {
         if ((self.weekday & 0x40) != 0) {
             self.weekday &= (~0x40);
-            [self.buttonSunday setBackgroundImage:[UIImage imageNamed:@"repeatday2"] forState:UIControlStateNormal];
+            [self setWeekdayButton:self.buttonSunday selected:NO];
         }
         else {
             self.weekday |= 0x40;
-            [self.buttonSunday setBackgroundImage:[UIImage imageNamed:@"repeatday1"] forState:UIControlStateNormal];
+            [self setWeekdayButton:self.buttonSunday selected:YES];
         }
     }
     else if ([sender isEqual:self.buttonMonday]) {
         if ((self.weekday & 0x20) != 0) {
             self.weekday &= (~0x20);
-            [self.buttonMonday setBackgroundImage:[UIImage imageNamed:@"repeatday2"] forState:UIControlStateNormal];
+            [self setWeekdayButton:self.buttonMonday selected:NO];
         }
         else {
             self.weekday |= 0x20;
-            [self.buttonMonday setBackgroundImage:[UIImage imageNamed:@"repeatday1"] forState:UIControlStateNormal];
+            [self setWeekdayButton:self.buttonMonday selected:YES];
         }
     }
     else if ([sender isEqual:self.buttonTuesday]) {
         if ((self.weekday & 0x10) != 0) {
             self.weekday &= (~0x10);
-            [self.buttonTuesday setBackgroundImage:[UIImage imageNamed:@"repeatday2"] forState:UIControlStateNormal];
+            [self setWeekdayButton:self.buttonTuesday selected:NO];
         }
         else {
             self.weekday |= 0x10;
-            [self.buttonTuesday setBackgroundImage:[UIImage imageNamed:@"repeatday1"] forState:UIControlStateNormal];
+            [self setWeekdayButton:self.buttonTuesday selected:YES];
         }
     }
     else if ([sender isEqual:self.buttonWednesday]) {
         if ((self.weekday & 0x08) != 0) {
             self.weekday &= (~0x08);
-            [self.buttonWednesday setBackgroundImage:[UIImage imageNamed:@"repeatday2"] forState:UIControlStateNormal];
+            [self setWeekdayButton:self.buttonWednesday selected:NO];
         }
         else {
             self.weekday |= 0x08;
-            [self.buttonWednesday setBackgroundImage:[UIImage imageNamed:@"repeatday1"] forState:UIControlStateNormal];
+            [self setWeekdayButton:self.buttonWednesday selected:YES];
         }
     }
     else if ([sender isEqual:self.buttonThursday]) {
         if ((self.weekday & 0x04) != 0) {
             self.weekday &= (~0x04);
-            [self.buttonThursday setBackgroundImage:[UIImage imageNamed:@"repeatday2"] forState:UIControlStateNormal];
+            [self setWeekdayButton:self.buttonThursday selected:NO];
         }
         else {
             self.weekday |= 0x04;
-            [self.buttonThursday setBackgroundImage:[UIImage imageNamed:@"repeatday1"] forState:UIControlStateNormal];
+            [self setWeekdayButton:self.buttonThursday selected:YES];
         }
     }
     else if ([sender isEqual:self.buttonFriday]) {
         if ((self.weekday & 0x02) != 0) {
             self.weekday &= (~0x02);
-            [self.buttonFriday setBackgroundImage:[UIImage imageNamed:@"repeatday2"] forState:UIControlStateNormal];
+            [self setWeekdayButton:self.buttonFriday selected:NO];
         }
         else {
             self.weekday |= 0x02;
-            [self.buttonFriday setBackgroundImage:[UIImage imageNamed:@"repeatday1"] forState:UIControlStateNormal];
+            [self setWeekdayButton:self.buttonFriday selected:YES];
         }
     }
     else if ([sender isEqual:self.buttonSaturday]) {
         if ((self.weekday & 0x01) != 0) {
             self.weekday &= (~0x01);
-            [self.buttonSaturday setBackgroundImage:[UIImage imageNamed:@"repeatday2"] forState:UIControlStateNormal];
+            [self setWeekdayButton:self.buttonSaturday selected:NO];
         }
         else {
             self.weekday |= 0x01;
-            [self.buttonSaturday setBackgroundImage:[UIImage imageNamed:@"repeatday1"] forState:UIControlStateNormal];
+            [self setWeekdayButton:self.buttonSaturday selected:YES];
         }
     }
 }
@@ -292,8 +315,20 @@
 - (void)onTimePickerOKHour:(NSInteger)hour minute:(NSInteger)minute {
     self.pickerHour = hour;
     self.pickerMinute = minute;
-    self.timeLabel.text = [NSString stringWithFormat:@"%02ld:%02ld", hour, minute];
+    self.timeLabel.text = [NSString stringWithFormat:@"%02ld:%02ld", (long)hour, (long)minute];
     [self.timePicker hidePicker];
+}
+
+- (void)setWeekdayButton:(UIButton *)button selected:(BOOL)selected {
+    if (selected) {
+        [button setBackgroundImage:[UIImage imageNamed:@"repeatday1"] forState:UIControlStateNormal];
+        [button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+
+    }
+    else {
+        [button setBackgroundImage:[UIImage imageNamed:@"repeatday2"] forState:UIControlStateNormal];
+        [button setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
+    }
 }
 
 #pragma mark - picker datasource
@@ -312,7 +347,7 @@
 }
 
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
-    return [NSString stringWithFormat:@"%02ld", row];
+    return [NSString stringWithFormat:@"%02ld", (long)row];
 }
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {

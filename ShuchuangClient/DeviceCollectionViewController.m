@@ -11,19 +11,20 @@
 #import "DeviceDetailViewController.h"
 #import "DeviceAddViewController.h"
 #import "SCDeviceManager.h"
-#import "MyActivityIndicatorView.h"
 #import "MJRefresh.h"
+#import "DeleteDeviceProtocol.h"
+#import "SCUtil.h"
 
-@interface DeviceCollectionViewController ()
+@interface DeviceCollectionViewController () <DeleteDeviceProtocol>
 @property (strong, nonatomic) NSArray *devices;
 @property BOOL isEditing;
 @property BOOL needRefresh;
-@property (strong, nonatomic) MyActivityIndicatorView *acFrame;
 @property (weak, nonatomic) SCDeviceManager *devManager;
 @property (weak, nonatomic) IBOutlet UINavigationItem *naviItem;
+@property (strong, nonatomic) UIImageView *barBg;
+@property (strong, nonatomic) UIImageView *bgView;
 
 - (void)refreshDevicesState;
-- (void)deleteCompletion:(NSNotification *)noti;
 - (void)addCompletion:(NSNotification *)noti;
 @end
 
@@ -38,30 +39,41 @@ static NSString * const reuseIdentifier = @"CollectionCell";
     // self.clearsSelectionOnViewWillAppear = NO;
     
     // Register cell classes
-    //[self.collectionView registerClass:[DeviceCollectionViewCell class] forCellWithReuseIdentifier:reuseIdentifier];
-    [self.navigationController.navigationBar setBarTintColor:[UIColor colorWithWhite:1.0 alpha:1.0]];
-    [self.naviItem setTitle:@"设备"];
+    [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
+    UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.navigationController.navigationBar.frame.size.width - 100, self.navigationController.navigationBar.frame.size.height)];
+    [titleLab setText:@"设备"];
+    [titleLab setTextColor:[UIColor whiteColor]];
+    [titleLab setFont:[UIFont systemFontOfSize:17.0]];
+    titleLab.textAlignment = NSTextAlignmentCenter;
+    self.naviItem.titleView = titleLab;
     
     UIBarButtonItem *leftButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"add"] style:UIBarButtonItemStylePlain target:self action:@selector(onLeftButton)];
     UIBarButtonItem *rightButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"edit"] style:UIBarButtonItemStylePlain target:self action:@selector(onRightButton)];
-    [leftButton setTintColor:[UIColor colorWithRed:1.0 green:129.0/255.0 blue:0.0 alpha:1.0]];
-    [rightButton setTintColor:[UIColor colorWithRed:1.0 green:129.0/255.0 blue:0.0 alpha:1.0]];
+    [leftButton setTintColor:[UIColor whiteColor]];
+    [rightButton setTintColor:[UIColor whiteColor]];
     [self.naviItem setLeftBarButtonItem:leftButton];
     [self.naviItem setRightBarButtonItem:rightButton];
    
 
     // Do any additional setup after loading the view.
     self.isEditing = NO;
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deleteCompletion:) name:@"DeleteCompletionNoti" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addCompletion:) name:@"AddCompletionNoti" object:nil];
     self.devManager = [SCDeviceManager instance];
     self.devices = [self.devManager allDevices];
     self.needRefresh = YES;
-    self.acFrame = [[MyActivityIndicatorView alloc] initWithFrameInView:self.view];
+    __weak DeviceCollectionViewController *weakSelf = self;
     self.collectionView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-        self.needRefresh = YES;
-        [self refreshDevicesState];
+        weakSelf.needRefresh = YES;
+        [weakSelf refreshDevicesState];
     }];
+    
+    self.barBg = [[UIImageView alloc] init];
+    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
+    [self.view addSubview:self.barBg];
+    [self.view bringSubviewToFront:self.navigationController.navigationBar];
+    self.bgView = [[UIImageView alloc] init];
+    [self.bgView setImage:[UIImage imageNamed:@"background"]];
+    [self.collectionView setBackgroundView:self.bgView];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -69,12 +81,24 @@ static NSString * const reuseIdentifier = @"CollectionCell";
     // Dispose of any resources that can be recreated.
 }
 
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.navigationController.navigationBar.frame.size.height + self.navigationController.navigationBar.frame.origin.y)];
+    [self.bgView setFrame:CGRectMake(0, 0, self.collectionView.frame.size.width, self.collectionView.frame.size.height)];
+}
+
 - (void)viewWillAppear:(BOOL)animated {
     //self.needRefresh = YES;
     [self refreshDevicesState];
+    [super viewWillAppear:animated];
 }
+
 //add
 - (void)onLeftButton {
+    if (self.isEditing) {
+        self.isEditing = NO;
+        [self.collectionView reloadData];
+    }
     UIStoryboard *story = [UIStoryboard storyboardWithName:@"Device" bundle:[NSBundle mainBundle]];
     UIViewController *next = [story instantiateViewControllerWithIdentifier:@"DeviceAddVC"];
     [self presentViewController:next animated:YES completion:nil];
@@ -86,12 +110,20 @@ static NSString * const reuseIdentifier = @"CollectionCell";
     [self.collectionView reloadData];
 }
 
-- (void)deleteCompletion:(NSNotification *)noti {
-    NSDictionary *dict = [noti userInfo];
-    NSString *uuid = dict[@"devId"];
-    [[SCDeviceManager instance] removeDevice:uuid];
-    self.devices = [[SCDeviceManager instance] allDevices];
-    [self.collectionView reloadData];
+- (void)onDeleteDevice:(NSString *)uuid {
+    __weak DeviceCollectionViewController *weakSelf = self;
+    [SCUtil viewController:self showAlertTitle:@"提示" message:@"确认删除这个设备吗" yesAction:^(UIAlertAction *action) {
+        SCDeviceClient *client = [[SCDeviceManager instance] getDevice:uuid];
+        [client logoutSuccess:^(NSURLSessionDataTask *task, id response) {
+            [[SCDeviceManager instance] removeDevice:uuid];
+            weakSelf.devices = [[SCDeviceManager instance] allDevices];
+            [weakSelf.collectionView reloadData];
+        } failure:^(NSURLSessionDataTask *task, NSError *error) {
+
+        }];
+    } noAction:^(UIAlertAction *action) {
+
+    }];
 }
 
 - (void)addCompletion:(NSNotification *)noti {
@@ -100,35 +132,35 @@ static NSString * const reuseIdentifier = @"CollectionCell";
 }
 
 - (void)refreshDevicesState {
+    if (self.isEditing) {
+        self.isEditing = NO;
+        [self.collectionView reloadData];
+    }
     NSInteger num = [self.devices count];
-    if (num > 0 && self.needRefresh) {
-        [self.acFrame startAc];
+    if (num == 0) {
+        [self.collectionView.mj_header endRefreshing];
+        self.needRefresh = NO;
+    }
+    else if (num > 0 && self.needRefresh) {
         __block NSInteger finished = 0;
         for (int i = 0; i < num; i++) {
             NSString *key = [self.devices objectAtIndex:i];
             SCDeviceClient* client = [[SCDeviceManager instance] getDevice:key];
+            __weak DeviceCollectionViewController *weakSelf = self;
             [client checkDoorSuccess:^(NSURLSessionDataTask *task, id response) {
                 finished++;
                 if (finished == num ) {
-                    if ([self.acFrame isAnimating]) {
-                        [self.acFrame stopAc];
+                    if ([weakSelf.collectionView.mj_header isRefreshing]) {
+                        [weakSelf.collectionView.mj_header endRefreshing];
                     }
-                    if ([self.collectionView.mj_header isRefreshing]) {
-                        [self.collectionView.mj_header endRefreshing];
-                    }
-                    [self.collectionView reloadData];
+                    [weakSelf.collectionView reloadData];
                 }
             } failure:^(NSURLSessionDataTask *task, NSError* error) {
                 finished++;
-                if (finished == num) {
-                    if ([self.acFrame isAnimating]) {
-                        [self.acFrame stopAc];
-                    }
+                if ([weakSelf.collectionView.mj_header isRefreshing]) {
+                    [weakSelf.collectionView.mj_header endRefreshing];
                 }
-                if ([self.collectionView.mj_header isRefreshing]) {
-                    [self.collectionView.mj_header endRefreshing];
-                }
-                [self.collectionView reloadData];
+                [weakSelf.collectionView reloadData];
             }];
         }
         self.needRefresh = NO;
@@ -174,16 +206,21 @@ static NSString * const reuseIdentifier = @"CollectionCell";
     SCDeviceClient *client = [self.devManager getDevice:[self.devices objectAtIndex:indexPath.row]];
     cell.label.text = client.name;
     cell.uuid = client.uuid;
-    cell.imageView.image = [UIImage imageNamed:@"browser"];
+    cell.deleteDelegate = self;
     if (client.doorClose) {
-        //NSLog(@"%@, doorClose yes", client.uuid);
-        cell.lockImg.image = [UIImage imageNamed:@"lock"];
+        cell.imageView.image = [UIImage imageNamed:@"deviceLock"];
     }
     else {
-        //NSLog(@"%@, doorClose no", client.uuid);
-        cell.lockImg.image = [UIImage imageNamed:@"unlock"];
+        cell.imageView.image = [UIImage imageNamed:@"deviceUnlock"];
+    }
+    if (client.online) {
+        cell.lockImg.image = [UIImage imageNamed:@"online"];
+    }
+    else {
+        cell.lockImg.image = [UIImage imageNamed:@"offline"];
     }
     if (self.isEditing) {
+        [cell stopEdit];
         [cell startEdit:(indexPath.row%2 == 0)?YES:NO];
     }
     else {
@@ -194,6 +231,11 @@ static NSString * const reuseIdentifier = @"CollectionCell";
 
 #pragma mark <UICollectionViewDelegate>
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    if (self.isEditing) {
+        self.isEditing = NO;
+        [collectionView reloadData];
+    }
+    [collectionView deselectItemAtIndexPath:indexPath animated:YES];
     SCDeviceClient *client = [self.devManager getDevice:[self.devices objectAtIndex:indexPath.row]];
     UIStoryboard *story = [UIStoryboard storyboardWithName:@"Device" bundle:[NSBundle mainBundle]];
     UIViewController *next = [story instantiateViewControllerWithIdentifier:@"DeviceDetailVC"];

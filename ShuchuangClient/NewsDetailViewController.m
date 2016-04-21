@@ -1,46 +1,40 @@
 //
-//  AboutViewController.m
+//  NewsDetailViewController.m
 //  ShuchuangClient
 //
-//  Created by 黄建 on 4/7/16.
+//  Created by 黄建 on 4/12/16.
 //  Copyright © 2016 Shuchuang Tech. All rights reserved.
 //
 
-#import "AboutViewController.h"
-#import "MyActivityIndicatorView.h"
-#import "SCUtil.h"
-@interface AboutViewController () <UIWebViewDelegate>
+#import "NewsDetailViewController.h"
+
+@interface NewsDetailViewController ()
 @property (weak, nonatomic) IBOutlet UINavigationBar *naviBar;
 @property (weak, nonatomic) IBOutlet UIWebView *webView;
-@property (strong, nonatomic) MyActivityIndicatorView *acFrame;
+@property (weak, nonatomic) NSString *newsTitle;
 @property (strong, nonatomic) UIImageView *barBg;
 
 - (void)onLeftButton;
 @end
 
-@implementation AboutViewController
+@implementation NewsDetailViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    //navigation bar
     UINavigationItem *naviItem = [[UINavigationItem alloc] init];
     UIBarButtonItem *leftBarButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStylePlain target:self action:@selector(onLeftButton)];
     [leftBarButton setTintColor:[UIColor whiteColor]];
-    naviItem.leftBarButtonItem = leftBarButton;
     UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.naviBar.frame.size.width - 100, self.naviBar.frame.size.height)];
-    [titleLab setText:@"关于我们"];
+    [titleLab setText:@"活动详情"];
     [titleLab setTextColor:[UIColor whiteColor]];
     [titleLab setFont:[UIFont systemFontOfSize:17.0]];
     titleLab.textAlignment = NSTextAlignmentCenter;
     naviItem.titleView = titleLab;
-    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
+    naviItem.leftBarButtonItem = leftBarButton;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
-    
-    self.webView.delegate = self;
-    [self.webView setBackgroundColor:[UIColor clearColor]];
-    self.acFrame = [[MyActivityIndicatorView alloc] initWithFrameInView:self.view];
-    
+    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
+    [self.view addSubview:self.naviBar];
     self.barBg = [[UIImageView alloc] init];
     [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
     [self.view addSubview:self.barBg];
@@ -53,10 +47,14 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    NSURL *url = [NSURL URLWithString:@"https://www.shuchuangtech.com/m/about.php"];
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.shuchuangtech.com/m/new/%@/detail.html", self.newsTitle]];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     [self.webView loadRequest:request];
     [super viewWillAppear:animated];
+}
+
+- (void)onLeftButton {
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -64,22 +62,6 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)onLeftButton {
-    [self dismissViewControllerAnimated:YES completion:nil];
-}
-
-- (void)webViewDidStartLoad:(UIWebView *)webView {
-    [self.acFrame startAc];
-}
-
-- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
-    [self.acFrame stopAc];
-    [SCUtil viewController:self showAlertTitle:@"提示" message:@"页面加载失败，请稍后再试" action:nil];
-}
-
-- (void)webViewDidFinishLoad:(UIWebView *)webView {
-    [self.acFrame stopAc];
-}
 /*
 #pragma mark - Navigation
 

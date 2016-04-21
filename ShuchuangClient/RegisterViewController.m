@@ -17,6 +17,9 @@
 @property (weak, nonatomic) IBOutlet UIButton *nextButton;
 @property (strong, nonatomic) MyActivityIndicatorView *acFrame;
 @property (strong, nonatomic) NSString *registerId;
+@property (strong, nonatomic) UIImageView *barBg;
+@property (strong, nonatomic) UIImageView *bgView;
+@property (strong, nonatomic) UIImageView *textFieldBg;
 
 - (IBAction)onNextBtn:(id)sender;
 - (IBAction)textFieldChanged:(id)sender;
@@ -61,21 +64,25 @@
     //textField
     self.textField.delegate = self;
     [self.textField setBackgroundColor:[UIColor clearColor]];
+    
+    self.barBg = [[UIImageView alloc] init];
+    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
+    [self.view addSubview:self.barBg];
+    [self.view bringSubviewToFront:self.naviBar];
+    self.bgView = [[UIImageView alloc] init];
+    [self.bgView setImage:[UIImage imageNamed:@"background"]];
+    self.textFieldBg = [[UIImageView alloc] init];
+    [self.textFieldBg setImage:[UIImage imageNamed:@"textFieldBg"]];
+    [self.textField addSubview:self.textFieldBg];
+    [self.view addSubview:self.bgView];
+    [self.view sendSubviewToBack:self.bgView];
 }
 
 - (void)viewWillLayoutSubviews {
-    UIImageView *barBg = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.naviBar.frame.size.height + self.naviBar.frame.origin.y)];
-    [barBg setImage:[UIImage imageNamed:@"barBg"]];
-    [self.view addSubview:barBg];
-    [self.view bringSubviewToFront:self.naviBar];
-    UIImageView *bgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - barBg.frame.size.height)];
-    [bgView setImage:[UIImage imageNamed:@"background"]];
-    UIImageView *textFieldBg = [[UIImageView alloc] initWithFrame:self.textField.frame];
-    [textFieldBg setImage:[UIImage imageNamed:@"textFieldBg"]];
-    [self.view addSubview:textFieldBg];
-    [self.view addSubview:bgView];
-    [self.view sendSubviewToBack:bgView];
     [super viewWillLayoutSubviews];
+    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.naviBar.frame.size.height + self.naviBar.frame.origin.y)];
+    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
+    [self.textFieldBg setFrame:CGRectMake(0, 0, self.textField.frame.size.width, self.textField.frame.size.height)];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -88,19 +95,13 @@
         [self.textField resignFirstResponder];
     }
     BOOL isMobile = [SCUtil validateMobile:self.registerId];
-    BOOL isEmail = [SCUtil validateEmail:self.registerId];
-    if (!isMobile && !isEmail) {
-        [SCUtil viewController:self showAlertTitle:@"提示" message:@"请输入正确的手机号码或电子邮箱" action:nil];
+    if (!isMobile) {
+        [SCUtil viewController:self showAlertTitle:@"提示" message:@"请输入正确的手机号码" action:nil];
         self.textField.text = @"";
     }
     else {
         BmobQuery *query = [BmobUser query];
-        if (isMobile) {
-            [query whereKey:@"mobilePhoneNumber" equalTo:self.registerId];
-        }
-        else {
-            [query whereKey:@"email" equalTo:self.registerId];
-        }
+        [query whereKey:@"mobilePhoneNumber" equalTo:self.registerId];
         [self.acFrame startAc];
         __weak RegisterViewController *weakSelf = self;
         [query findObjectsInBackgroundWithBlock:^(NSArray *array, NSError *error) {
@@ -112,29 +113,14 @@
                 [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"用户不存在" action:nil];
             }
             else {
-                if (isMobile) {
-                    [BmobSMS requestSMSCodeInBackgroundWithPhoneNumber:weakSelf.registerId andTemplate:@"验证码" resultBlock:^(int number, NSError *error) {
-                        if (error != nil) {
-                            [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"获取短信验证码失败，请稍后再试" action:nil];
-                        }
-                        else {
-                            [weakSelf performSegueWithIdentifier:@"regToMobileVerify" sender:weakSelf];
-                        }
-                    }];
-                }
-                else {
-                    if ([array count] != 0) {
-                        [weakSelf.acFrame startAc];
-                        [BmobUser requestPasswordResetInBackgroundWithEmail:weakSelf.registerId];
-                        [weakSelf.acFrame stopAc];
-                        [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"一封邮件已经发往您注册邮箱，请前往查收" action:^(UIAlertAction * action) {
-                            [weakSelf dismissViewControllerAnimated:YES completion:nil];
-                        }];
+                [BmobSMS requestSMSCodeInBackgroundWithPhoneNumber:weakSelf.registerId andTemplate:@"验证码" resultBlock:^(int number, NSError *error) {
+                    if (error != nil) {
+                        [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"获取短信验证码失败，请稍后再试" action:nil];
                     }
                     else {
-                        [weakSelf performSegueWithIdentifier:@"regToSetPassword" sender:weakSelf];
+                        [weakSelf performSegueWithIdentifier:@"regToMobileVerify" sender:weakSelf];
                     }
-                }
+                }];
             }
         }];
     }
@@ -173,11 +159,6 @@
     if ([segue.identifier isEqualToString:@"regToMobileVerify"]) {
         id desVC = segue.destinationViewController;
         [desVC setValue:self.registerId forKey:@"phoneNumber"];
-        [desVC setValue:@(self.registerNewUser) forKey:@"registerNewUser"];
-    }
-    else if ([segue.identifier isEqualToString:@"regToSetPassword"]) {
-        id desVC = segue.destinationViewController;
-        [desVC setValue:self.registerId forKey:@"email"];
         [desVC setValue:@(self.registerNewUser) forKey:@"registerNewUser"];
     }
 }

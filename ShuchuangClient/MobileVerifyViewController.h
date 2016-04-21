@@ -9,6 +9,5 @@
 #import <UIKit/UIKit.h>
 
 @interface MobileVerifyViewController : UIViewController <UITextFieldDelegate>
-@property (weak, nonatomic) NSString *phoneNumber;
-@property (nonatomic) BOOL registerNewUser;
+
 @end
