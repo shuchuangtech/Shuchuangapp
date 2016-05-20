@@ -17,7 +17,6 @@
 @property (nonatomic) BOOL lastResult;
 @property (weak, nonatomic) IBOutlet UIView *bgView;
 @property (weak, nonatomic) id<ScanQRCodeProtocol> scanDelegate;
-@property (strong, nonatomic) UIImageView *barBg;
 @property (strong, nonatomic) UIImageView *boundsView;
 @property (strong, nonatomic) UIView *topView;
 @property (strong, nonatomic) UIView *bottomView;
@@ -34,17 +33,15 @@
     // Do any additional setup after loading the view.
     UINavigationItem *naviItem = [[UINavigationItem alloc] init];
     UIBarButtonItem *leftBarButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStylePlain target:self action:@selector(onLeftButton)];
-    [leftBarButton setTintColor:[UIColor whiteColor]];
+    [leftBarButton setTintColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]];
     [naviItem setLeftBarButtonItem:leftBarButton];
     UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.naviBar.frame.size.width - 100, self.naviBar.frame.size.height)];
     [titleLab setText:@"扫描二维码"];
-    [titleLab setTextColor:[UIColor whiteColor]];
+    [titleLab setTextColor:[UIColor colorWithRed:21.0 / 255.0 green:37.0 / 255.0 blue:50.0 / 255.0 alpha:1.0]];
     [titleLab setFont:[UIFont systemFontOfSize:17.0]];
     titleLab.textAlignment = NSTextAlignmentCenter;
     naviItem.titleView = titleLab;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
-    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
-    
     
     self.topView = [[UIView alloc] init];
     self.bottomView = [[UIView alloc] init];
@@ -62,6 +59,7 @@
     self.boundsView = [[UIImageView alloc] init];
     [self.boundsView setImage:[UIImage imageNamed:@"qrbounds"]];
     [self.boundsView setBackgroundColor:[UIColor clearColor]];
+    [self.boundsView setTintColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]];
     [self.bgView addSubview:self.boundsView];
     
     [self.bgView addSubview:self.topView];
@@ -69,10 +67,6 @@
     [self.bgView addSubview:self.leftView];
     [self.bgView addSubview:self.rightView];
     
-    self.barBg = [[UIImageView alloc] init];
-    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
-    [self.view addSubview:self.barBg];
-    [self.view bringSubviewToFront:self.naviBar];
 }
 
 - (void)viewDidLayoutSubviews {
@@ -84,11 +78,6 @@
     [self.leftView setFrame:CGRectMake(0, height, width / 2, height)];
     [self.rightView setFrame:CGRectMake(3.0 * width / 2.0, height, width / 2, height)];
     [self.boundsView setFrame:CGRectMake(width / 2,  height, width, width)];
-    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, 64.0)];
-}
-
-- (void)dealloc {
-    NSLog(@"qrcode vc dealloc");
 }
 
 - (void)viewDidAppear:(BOOL)animated {

@@ -11,15 +11,15 @@
 #import "MyActivityIndicatorView.h"
 #import "SCUtil.h"
 #import "Bmob.h"
+#import "SCTextField.h"
 @interface RegisterViewController ()
 @property (weak, nonatomic) IBOutlet UINavigationBar *naviBar;
-@property (weak, nonatomic) IBOutlet UITextField *textField;
+@property (weak, nonatomic) IBOutlet SCTextField *textField;
 @property (weak, nonatomic) IBOutlet UIButton *nextButton;
 @property (strong, nonatomic) MyActivityIndicatorView *acFrame;
 @property (strong, nonatomic) NSString *registerId;
-@property (strong, nonatomic) UIImageView *barBg;
 @property (strong, nonatomic) UIImageView *bgView;
-@property (strong, nonatomic) UIImageView *textFieldBg;
+
 
 - (IBAction)onNextBtn:(id)sender;
 - (IBAction)textFieldChanged:(id)sender;
@@ -35,7 +35,7 @@
     self.acFrame = [[MyActivityIndicatorView alloc] initWithFrameInView:self.view];
 
     //navigation bar and navigation item
-    UIBarButtonItem * leftBarBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStyleDone target:self action:@selector(leftBarBtnClicked)];
+    UIBarButtonItem * leftBarBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back_white"] style:UIBarButtonItemStyleDone target:self action:@selector(leftBarBtnClicked)];
     [leftBarBtn setTintColor:[UIColor whiteColor]];
     UINavigationItem *naviItem = [[UINavigationItem alloc] init];
     naviItem.leftBarButtonItem = leftBarBtn;
@@ -51,38 +51,32 @@
     titleLab.textAlignment = NSTextAlignmentCenter;
     naviItem.titleView = titleLab;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
-    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
+    [self.naviBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsCompact];
+    self.naviBar.clipsToBounds = YES;
     
     //next button
-    [self.nextButton setBackgroundImage:[UIImage imageNamed:@"longButtonActive"] forState:UIControlStateNormal];
-    [self.nextButton setBackgroundImage:[UIImage imageNamed:@"longButton"] forState:UIControlStateDisabled];
-    self.nextButton.layer.cornerRadius = 5.0;
+    [self.nextButton setBackgroundColor:[UIColor whiteColor]];
+    [self.nextButton setAlpha:0.3];
+    self.nextButton.layer.cornerRadius = 18.0;
     self.nextButton.layer.opaque = NO;
     self.nextButton.layer.masksToBounds = YES;
     self.nextButton.enabled = NO;
-    
+        
     //textField
+    self.textField.leftView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"tel"]];
+    self.textField.leftViewMode = UITextFieldViewModeAlways;
     self.textField.delegate = self;
+    
     [self.textField setBackgroundColor:[UIColor clearColor]];
     
-    self.barBg = [[UIImageView alloc] init];
-    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
-    [self.view addSubview:self.barBg];
-    [self.view bringSubviewToFront:self.naviBar];
-    self.bgView = [[UIImageView alloc] init];
+    self.bgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
     [self.bgView setImage:[UIImage imageNamed:@"background"]];
-    self.textFieldBg = [[UIImageView alloc] init];
-    [self.textFieldBg setImage:[UIImage imageNamed:@"textFieldBg"]];
-    [self.textField addSubview:self.textFieldBg];
     [self.view addSubview:self.bgView];
     [self.view sendSubviewToBack:self.bgView];
 }
 
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
-    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.naviBar.frame.size.height + self.naviBar.frame.origin.y)];
-    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
-    [self.textFieldBg setFrame:CGRectMake(0, 0, self.textField.frame.size.width, self.textField.frame.size.height)];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -129,9 +123,11 @@
 - (IBAction)textFieldChanged:(id)sender {
     UITextField *textField = (UITextField *)sender;
     if ([textField.text length] == 0) {
+        [self.nextButton setAlpha:0.3];
         self.nextButton.enabled = NO;
     }
     else {
+        [self.nextButton setAlpha:1.0];
         self.nextButton.enabled = YES;
     }
 }

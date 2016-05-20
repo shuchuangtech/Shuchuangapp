@@ -13,7 +13,6 @@
 @property (weak, nonatomic) IBOutlet UINavigationBar *naviBar;
 @property (weak, nonatomic) IBOutlet UIWebView *webView;
 @property (strong, nonatomic) MyActivityIndicatorView *acFrame;
-@property (strong, nonatomic) UIImageView *barBg;
 
 - (void)onLeftButton;
 @end
@@ -26,30 +25,20 @@
     //navigation bar
     UINavigationItem *naviItem = [[UINavigationItem alloc] init];
     UIBarButtonItem *leftBarButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStylePlain target:self action:@selector(onLeftButton)];
-    [leftBarButton setTintColor:[UIColor whiteColor]];
+    [leftBarButton setTintColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]];
     naviItem.leftBarButtonItem = leftBarButton;
     UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.naviBar.frame.size.width - 100, self.naviBar.frame.size.height)];
     [titleLab setText:@"关于我们"];
-    [titleLab setTextColor:[UIColor whiteColor]];
+    [titleLab setTextColor:[UIColor colorWithRed:21.0 / 255.0 green:37.0 / 255.0 blue:50.0 / 255.0 alpha:1.0]];
     [titleLab setFont:[UIFont systemFontOfSize:17.0]];
     titleLab.textAlignment = NSTextAlignmentCenter;
     naviItem.titleView = titleLab;
-    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
     [self.naviBar pushNavigationItem:naviItem animated:NO];
     
     self.webView.delegate = self;
     [self.webView setBackgroundColor:[UIColor clearColor]];
     self.acFrame = [[MyActivityIndicatorView alloc] initWithFrameInView:self.view];
     
-    self.barBg = [[UIImageView alloc] init];
-    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
-    [self.view addSubview:self.barBg];
-    [self.view bringSubviewToFront:self.naviBar];
-}
-
-- (void)viewWillLayoutSubviews {
-    [super viewWillLayoutSubviews];
-    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, 64)];
 }
 
 - (void)viewWillAppear:(BOOL)animated {

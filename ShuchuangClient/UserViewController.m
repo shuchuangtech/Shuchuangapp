@@ -15,19 +15,23 @@
 #import "MJRefresh.h"
 @interface UserViewController ()
 @property (weak, nonatomic) IBOutlet UINavigationBar *naviBar;
+@property (strong, nonatomic) UINavigationItem *naviItem;
+@property (strong, nonatomic) UIBarButtonItem *rightEditButton;
+@property (strong, nonatomic) UIBarButtonItem *rightFinishButton;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentController;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet UIButton *addButton;
+
 @property (strong, nonatomic) NSMutableArray *usersArray;
 @property (strong, nonatomic) NSMutableArray *invalidArray;
 @property (strong, nonatomic) NSMutableArray *normalIndex;
 @property (weak, nonatomic) SCDeviceClient *client;
 @property (strong, nonatomic) MyActivityIndicatorView *acFrame;
-@property (weak, nonatomic) NSString *uuid;
+@property (copy, nonatomic) NSString *uuid;
 @property (nonatomic) NSInteger selectedIndex;
-@property (strong, nonatomic) UIImageView *barBg;
-@property (strong ,nonatomic) UIImageView *bgView;
 
 - (void)onSegValueChanged;
+- (void)onButtonAdd;
 - (void)onLeftButton;
 - (void)onRightButton;
 - (void)loadMoreData;
@@ -38,17 +42,20 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    UINavigationItem *naviItem = [[UINavigationItem alloc] init];
+    self.naviItem = [[UINavigationItem alloc] init];
     UIBarButtonItem *leftButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStylePlain target:self action:@selector(onLeftButton)];
-    [leftButton setTintColor:[UIColor whiteColor]];
-    UIBarButtonItem *rightButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"add"] style:UIBarButtonItemStylePlain target:self action:@selector(onRightButton)];
-    [rightButton setTintColor:[UIColor whiteColor]];
-    naviItem.leftBarButtonItem = leftButton;
-    naviItem.rightBarButtonItem = rightButton;
-    [self.naviBar pushNavigationItem:naviItem animated:NO];
-    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
+    [leftButton setTintColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]];
+    self.rightEditButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"edit"] style:UIBarButtonItemStylePlain target:self action:@selector(onRightButton)];
+    [self.rightEditButton setTintColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]];
+    self.rightFinishButton = [[UIBarButtonItem alloc] initWithTitle:@"完成  " style:UIBarButtonItemStylePlain target:self action:@selector(onRightButton)];
+    [self.rightFinishButton setTintColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]];
+    self.naviItem.leftBarButtonItem = leftButton;
+    self.naviItem.rightBarButtonItem = self.rightEditButton;
+    [self.naviBar pushNavigationItem:self.naviItem animated:NO];
     
     [self.segmentController addTarget:self action:@selector(onSegValueChanged) forControlEvents:UIControlEventValueChanged];
+    [self.segmentController setTintColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]];
+    
     //tableview
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
@@ -61,21 +68,22 @@
     self.normalIndex = [[NSMutableArray alloc] init];
     self.client = [[SCDeviceManager instance] getDevice:self.uuid];
     self.acFrame = [[MyActivityIndicatorView alloc] initWithFrameInView:self.view];
-    self.barBg = [[UIImageView alloc] init];
-    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
-    [self.view addSubview:self.barBg];
-    [self.view bringSubviewToFront:self.naviBar];
+
     [self.view bringSubviewToFront:self.segmentController];
-    self.bgView = [[UIImageView alloc] init];
-    [self.bgView setImage:[UIImage imageNamed:@"background"]];
-    [self.view addSubview:self.bgView];
-    [self.view sendSubviewToBack:self.bgView];
+    
+    [self.addButton addTarget:self action:@selector(onButtonAdd) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
-    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, 64.0)];
-    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    if (self.tableView.editing) {
+        [self.tableView setEditing:NO animated:YES];
+        self.naviItem.rightBarButtonItem = self.rightEditButton;
+    }
+    [super viewWillDisappear:animated];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -98,11 +106,11 @@
             NSUInteger unitFlag = NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay;
             for (int i = 0; i < [array count]; i++) {
                 NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithDictionary:[array objectAtIndex:i]];
-                NSInteger timestamp = [dict[@"timeofvalidity"] integerValue];
+                long long timestamp = [dict[@"timeofvalidity"] longLongValue];
                 NSTimeInterval timeInterval = timestamp / 1000000.0;
                 NSDate *date = [NSDate dateWithTimeIntervalSince1970:timeInterval];
                 NSDateComponents *comp = [calendar components:unitFlag fromDate:date];
-                NSString *timeStr = [NSString stringWithFormat:@"%04ld-%02ld-%02ld", (long)[comp year], (long)[comp month], (long)[comp day]];
+                NSString *timeStr = [NSString stringWithFormat:@"%02ld/%02ld/%04ld", (long)[comp day], (long)[comp month], (long)[comp year]];
                 [dict setObject:timeStr forKey:@"timestring"];
                 if ([dict[@"remainopen"] integerValue] == 0) {
                     [dict setObject:[NSNumber numberWithBool:YES] forKey:@"openInvalid"];
@@ -150,6 +158,10 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void)onButtonAdd {
+    [self performSegueWithIdentifier:@"UserToAddSegue" sender:self];
+}
+
 - (void)onSegValueChanged {
     if ([self.segmentController selectedSegmentIndex] == 0) {
         //all users
@@ -166,7 +178,14 @@
 }
 
 - (void)onRightButton {
-    [self performSegueWithIdentifier:@"UserToAddSegue" sender:self];
+    if (self.tableView.editing) {
+        [self.tableView setEditing:NO animated:YES];
+        self.naviItem.rightBarButtonItem = self.rightEditButton;
+    }
+    else {
+        [self.tableView setEditing:YES animated:YES];
+        self.naviItem.rightBarButtonItem = self.rightFinishButton;
+    }
 }
 
 
@@ -192,67 +211,41 @@
 #pragma mark - TableView DataSource
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UserTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"UserTableViewCell" forIndexPath:indexPath];
-    [cell setBackgroundColor:[UIColor clearColor]];
+    NSDictionary *dict;
     if ([self.segmentController selectedSegmentIndex] == 0) {
-        NSDictionary *dict = [self.usersArray objectAtIndex:indexPath.row];
-        NSInteger remainOpen = [[dict objectForKey:@"remainopen"] integerValue];
-        cell.usernameLabel.text = [dict objectForKey:@"binduser"];
-        [cell.usernameLabel setTextColor:[UIColor blackColor]];
-        cell.timeOfValidityLabel.text = [dict objectForKey:@"timestring"];
-        [cell.timeOfValidityLabel setTextColor:[UIColor blackColor]];
-        [cell.remainOpenLabel setTextColor:[UIColor blackColor]];
-        if ([[dict objectForKey:@"openInvalid"] boolValue]) {
-            [cell.remainOpenLabel setTextColor:[UIColor redColor]];
-            [cell.usernameLabel setTextColor:[UIColor redColor]];
-        }
-        else if ([[dict objectForKey:@"timeInvalid"] boolValue]) {
-            [cell.timeOfValidityLabel setTextColor:[UIColor redColor]];
-            [cell.usernameLabel setTextColor:[UIColor redColor]];
-        }
-        if ( remainOpen < 0) {
-            cell.remainOpenLabel.text = @"无限制";
-        }
-        else {
-            cell.remainOpenLabel.text = [NSString stringWithFormat:@"%ld", (long)[[dict objectForKey:@"remainopen"] integerValue]];
-        }
-        if ([[dict objectForKey:@"authority"] integerValue] == 9) {
-            cell.authLabel.text = @"管理者";
-        }
-        else {
-            cell.authLabel.text = @"普通用户";
-        }
-        return cell;
+        dict = [self.usersArray objectAtIndex:indexPath.row];
     }
     else {
-        NSDictionary *dict = [self.usersArray objectAtIndex:indexPath.row];
-        NSInteger remainOpen = [[dict objectForKey:@"remainopen"] integerValue];
-        cell.usernameLabel.text = [dict objectForKey:@"binduser"];
-        cell.timeOfValidityLabel.text = [dict objectForKey:@"timestring"];
-        if ([[dict objectForKey:@"openInvalid"] boolValue]) {
-            [cell.remainOpenLabel setTextColor:[UIColor redColor]];
-            [cell.usernameLabel setTextColor:[UIColor redColor]];
-        }
-        else if ([[dict objectForKey:@"timeInvalid"] boolValue]) {
-            [cell.timeOfValidityLabel setTextColor:[UIColor redColor]];
-            [cell.usernameLabel setTextColor:[UIColor redColor]];
-        }
-        if ( remainOpen < 0) {
-            cell.remainOpenLabel.text = @"无限制";
-        }
-        else {
-            cell.remainOpenLabel.text = [NSString stringWithFormat:@"%ld", (long)[[dict objectForKey:@"remainopen"] integerValue]];
-        }
-        if ([[dict objectForKey:@"authority"] integerValue] == 9) {
-            cell.authLabel.text = @"管理者";
-        }
-        else {
-            cell.authLabel.text = @"普通用户";
-        }
-        return cell;
+        dict = [self.usersArray objectAtIndex:indexPath.row];
     }
+    NSInteger remainOpen = [[dict objectForKey:@"remainopen"] integerValue];
+    NSString *username = [dict objectForKey:@"binduser"];
+    NSString *time = [dict objectForKey:@"timestring"];
+    BOOL openInvalid = [[dict objectForKey:@"openInvalid"] boolValue];
+    BOOL timeInvalid = [[dict objectForKey:@"timeInvalid"] boolValue];
+    NSInteger auth = [[dict objectForKey:@"authority"] integerValue];
+    [cell setUsername:username authority:auth remainOpen:remainOpen timeOfValidity:time remainOpenInvalid:openInvalid timeInvalid:timeInvalid];
+    return cell;
 }
 
 #pragma mark - TableView Delegate
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.row == 0 && [self.segmentController selectedSegmentIndex] == 0) {
+        return NO;
+    }
+    else {
+        return YES;
+    }
+}
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (!tableView.editing) {
+        return UITableViewCellEditingStyleNone;
+    }
+    else {
+        return UITableViewCellEditingStyleDelete;
+    }
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if ([self.segmentController selectedSegmentIndex] == 0) {
         return [self.usersArray count];

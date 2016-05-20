@@ -8,18 +8,20 @@
 
 #import "UserinfoViewController.h"
 #import "Bmob.h"
-#import "MeHeaderTableViewCell.h"
-#import "MeTableViewCell.h"
+#import "MeHeadTableViewCell.h"
 #import "SCMainViewController.h"
 #import "ShareSDK/ShareSDK.h"
 #import "ShareSDKUI/ShareSDK+SSUI.h"
 #import "SCUtil.h"
+#import "MyActivityIndicatorView.h"
+#import "AFNetworking.h"
 @interface UserinfoViewController ()
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UINavigationBar *naviBar;
-@property (strong, nonatomic) UIImageView *barBg;
-@property (strong, nonatomic) UIImageView *bgView;
+@property (weak, nonatomic) IBOutlet UIButton *logoutButton;
+@property (strong ,nonatomic) MyActivityIndicatorView *acFrame;
 
+- (void)shareMe;
 @end
 
 @implementation UserinfoViewController
@@ -34,28 +36,26 @@
     UINavigationItem *naviItem = [[UINavigationItem alloc] init];
     UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.naviBar.frame.size.width - 100, self.naviBar.frame.size.height)];
     [titleLab setText:@"我"];
-    [titleLab setTextColor:[UIColor whiteColor]];
+    [titleLab setTextColor:[UIColor colorWithRed:21.0 / 255.0 green:37.0 / 255.0 blue:50.0 / 255.0 alpha:1.0]];
     [titleLab setFont:[UIFont systemFontOfSize:17.0]];
     titleLab.textAlignment = NSTextAlignmentCenter;
     naviItem.titleView = titleLab;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
-    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
+    
     [self.view addSubview:self.naviBar];
     
-    self.barBg = [[UIImageView alloc] init];
-    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
-    [self.view addSubview:self.barBg];
-    [self.view bringSubviewToFront:self.naviBar];
-    self.bgView = [[UIImageView alloc] init];
-    [self.bgView setImage:[UIImage imageNamed:@"background"]];
-    [self.view addSubview:self.bgView];
-    [self.view sendSubviewToBack:self.bgView];
+    [self.tableView registerNib:[UINib nibWithNibName:@"MeHeadTableViewCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"MeHeadCell"];
+    
+    self.logoutButton.layer.cornerRadius = 18.0;
+    [self.logoutButton setBackgroundColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]];
+    [self.logoutButton setAlpha:0.8];
+    [self.logoutButton addTarget:self action:@selector(onLogoutButton) forControlEvents:UIControlEventTouchUpInside];
+    
+    self.acFrame = [[MyActivityIndicatorView alloc] initWithFrameInView:self.view];
 }
 
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
-    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, 64)];
-    [self.bgView  setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -66,7 +66,7 @@
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 3;
+    return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -77,21 +77,70 @@
         case 1:
             return 3;
             break;
-        case 2:
-            return 1;
-            break;
         default:
             return 0;
             break;
     }
 }
 
+- (void)shareMe {
+    AFHTTPSessionManager *http;
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    http = [[AFHTTPSessionManager alloc] initWithSessionConfiguration:configuration];
+    //init certificate
+    NSString * cerPath = [[NSBundle mainBundle] pathForResource:@"server" ofType:@"cer"];
+    NSData * cerData = [NSData dataWithContentsOfFile:cerPath];
+    http.securityPolicy = [AFSecurityPolicy policyWithPinningMode:AFSSLPinningModeCertificate withPinnedCertificates:[[NSArray alloc] initWithObjects:cerData, nil]];
+    //serializer
+    http.requestSerializer = [AFHTTPRequestSerializer serializer];
+    http.responseSerializer = [AFJSONResponseSerializer serializer];
+    NSString *baseURL = @"https://www.shuchuangtech.com/m/share/info.php";
+    __block NSString *logoURL;
+    __block NSString *shareTitle;
+    __block NSString *shareText;
+    __block NSString *shareURL;
+    [self.acFrame startAc];
+    [http GET:baseURL parameters:nil success:^(NSURLSessionDataTask *task, id response) {
+        logoURL = response[@"logo"];
+        shareURL = response[@"url"];
+        shareTitle = response[@"title"];
+        shareText = response[@"text"];
+        [self.acFrame stopAc];
+        if (shareTitle == nil) {
+            [SCUtil viewController:self showAlertTitle:@"提示" message:@"分享失败， 请稍后再试" action:nil];
+        }
+        else {
+            NSArray *imageArray = @[logoURL];
+            if (imageArray) {
+                NSMutableDictionary *shareParams = [NSMutableDictionary dictionary];
+                [shareParams SSDKSetupShareParamsByText:shareText images:imageArray url:[NSURL URLWithString:shareURL] title:shareTitle type:SSDKContentTypeAuto];
+                [ShareSDK showShareActionSheet:nil items:nil shareParams:shareParams onShareStateChanged:^(SSDKResponseState state, SSDKPlatformType platformType, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error, BOOL end) {
+                    switch (state) {
+                        case SSDKResponseStateSuccess: {
+                            [SCUtil viewController:self showAlertTitle:@"提示" message:@"分享成功" action:nil];
+                            break;
+                        }
+                        case SSDKResponseStateFail: {
+                            [SCUtil viewController:self showAlertTitle:@"提示" message:@"分享失败" action:nil];
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                }];
+            }
+        }
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        [self.acFrame stopAc];
+    }];
+}
+
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == 0) {
-        return self.view.frame.size.width / 6 + 40;
+        return 80.0;
     }
     else {
-        return 44;
+        return 35.0;
         
     }
 }
@@ -105,40 +154,41 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell;
     if (indexPath.section == 0) {
-        cell = [tableView dequeueReusableCellWithIdentifier:@"HeaderCell" forIndexPath:indexPath];
+        MeHeadTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"MeHeadCell" forIndexPath:indexPath];
         BmobUser *user = [BmobUser getCurrentUser];
-        [(MeHeaderTableViewCell *)cell setUserName:[user username]];
+        cell.usernameLabel.text = [user username];
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        return cell;
     }
     else if (indexPath.section == 1) {
-        cell = [tableView dequeueReusableCellWithIdentifier:@"MiddleCell" forIndexPath:indexPath];
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"MeTableCell" forIndexPath:indexPath];
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        cell.detailTextLabel.text = @"";
+        [cell.textLabel setTextColor:[UIColor colorWithRed:21.0 / 255.0 green:37.0 / 255.0 blue:50.0 / 255.0 alpha:1.0]];
+        [cell.textLabel setFont:[UIFont systemFontOfSize:14.0]];
         switch (indexPath.row) {
             case 0: {
-                [(MeTableViewCell *)cell setLabelText:@"社交分享"];
-                [(MeTableViewCell *)cell setLeftImage:[UIImage imageNamed:@"tableShare"]];
+                cell.textLabel.text = @"社交分享";
+                [cell.imageView setImage:[UIImage imageNamed:@"userShare"]];
                 break;
             }
             case 1: {
-                [(MeTableViewCell *)cell setLabelText:@"意见反馈"];
-                [(MeTableViewCell *)cell setLeftImage:[UIImage imageNamed:@"tableCommu"]];
+                cell.textLabel.text = @"意见反馈";
+                [cell.imageView setImage:[UIImage imageNamed:@"userMail"]];
                 break;
             }
             case 2: {
-                [(MeTableViewCell *)cell setLabelText:@"关于我们"];
-                [(MeTableViewCell *)cell setLeftImage:[UIImage imageNamed:@"tableAbout"]];
+                cell.textLabel.text =  @"关于我们";
+                [cell.imageView setImage:[UIImage imageNamed:@"userInfo"]];
                 break;
             }
         }
-    }
-    else if (indexPath.section == 2) {
-        cell = [tableView dequeueReusableCellWithIdentifier:@"FooterCell" forIndexPath:indexPath];
-        [(MeTableViewCell *)cell setLabelText:@"退出登录"];
-        [(MeTableViewCell *)cell setLeftImage:[UIImage imageNamed:@"melogout"]];
+        return cell;
     }
     // Configure the cell...
 
-    return cell;
+    return nil;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -150,26 +200,7 @@
     }
     else if (indexPath.section == 1) {
         if (indexPath.row == 0) {
-            NSArray *imageArray = @[@"http://mob.com/Assets/images/logo.png?v=20150320"];
-            if (imageArray) {
-                NSMutableDictionary *shareParams = [NSMutableDictionary dictionary];
-                [shareParams SSDKSetupShareParamsByText:@"分享内容" images:imageArray url:[NSURL URLWithString:@"http://mob.com"] title:@"测试分享" type:SSDKContentTypeAuto];
-                __weak UserinfoViewController *weakSelf = self;
-                [ShareSDK showShareActionSheet:nil items:nil shareParams:shareParams onShareStateChanged:^(SSDKResponseState state, SSDKPlatformType platformType, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error, BOOL end) {
-                    switch (state) {
-                        case SSDKResponseStateSuccess: {
-                            [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"分享成功" action:nil];
-                            break;
-                        }
-                        case SSDKResponseStateFail: {
-                            [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"分享失败" action:nil];
-                            break;
-                        }
-                        default:
-                            break;
-                    }
-                }];
-            }
+            [self shareMe];
         }
         else if (indexPath.row == 1) {
             UIStoryboard *story = [UIStoryboard storyboardWithName:@"UserInfo" bundle:[NSBundle mainBundle]];
@@ -182,15 +213,12 @@
             [self presentViewController:vc animated:YES completion:nil];
         }
     }
-    if (indexPath.section == 2 && indexPath.row == 0) {
-        if ([self.presentingViewController isKindOfClass:[SCMainViewController class]]) {
-            [BmobUser logout];
-            [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-        }
-        //
-    }
 }
 
+- (void)onLogoutButton {
+    [BmobUser logout];
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+}
 /*
 #pragma mark - Navigation
 

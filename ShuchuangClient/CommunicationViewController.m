@@ -18,8 +18,6 @@
 @property (weak, nonatomic) IBOutlet UINavigationBar *naviBar;
 @property (weak, nonatomic) IBOutlet UILabel *contentPlaceholder;
 @property (strong, nonatomic) MyActivityIndicatorView *acFrame;
-@property (strong, nonatomic) UIImageView *barBg;
-@property (strong, nonatomic) UIImageView *bgView;
 
 - (void)onSubmitButton;
 - (void)onLeftButton;
@@ -33,16 +31,15 @@
     //navigation bar
     UINavigationItem *naviItem = [[UINavigationItem alloc] init];
     UIBarButtonItem *leftBarButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStylePlain target:self action:@selector(onLeftButton)];
-    [leftBarButton setTintColor:[UIColor whiteColor]];
+    [leftBarButton setTintColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]];
     UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.naviBar.frame.size.width - 100, self.naviBar.frame.size.height)];
     [titleLab setText:@"意见反馈"];
-    [titleLab setTextColor:[UIColor whiteColor]];
+    [titleLab setTextColor:[UIColor colorWithRed:21.0 / 255.0 green:37.0 / 255.0 blue:50.0 / 255.0 alpha:1.0]];
     [titleLab setFont:[UIFont systemFontOfSize:17.0]];
     titleLab.textAlignment = NSTextAlignmentCenter;
     naviItem.titleView = titleLab;
     naviItem.leftBarButtonItem = leftBarButton;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
-    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
     //text field
     self.titleTextField.delegate = self;
     self.connactTextField.delegate = self;
@@ -53,7 +50,7 @@
     self.contentTextView.layer.borderWidth = 0.6f;
     self.contentTextView.layer.cornerRadius = 6.0f;
     
-    [self.submitButton setBackgroundColor:[UIColor colorWithRed:0.0 green:162.0 / 255.0 blue:232.0 / 255.0 alpha:1]];
+    [self.submitButton setBackgroundColor:[UIColor colorWithRed:227.0 / 255.0 green:93.0 / 255.0 blue:93.0 / 255.0 alpha:1.0]];
     [self.submitButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [self.submitButton setTitle:@"提交" forState:UIControlStateNormal];
     self.submitButton.layer.cornerRadius = 5.0;
@@ -61,20 +58,6 @@
     
     self.acFrame = [[MyActivityIndicatorView alloc] initWithFrameInView:self.view];
     
-    self.barBg = [[UIImageView alloc] init];
-    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
-    [self.view addSubview:self.barBg];
-    [self.view bringSubviewToFront:self.naviBar];
-    self.bgView = [[UIImageView alloc] init];
-    [self.bgView setImage:[UIImage imageNamed:@"background"]];
-    [self.view addSubview:self.bgView];
-    [self.view sendSubviewToBack:self.bgView];
-}
-
-- (void)viewWillLayoutSubviews {
-    [super viewWillLayoutSubviews];
-    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, 64)];
-    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
 }
 
 - (void)didReceiveMemoryWarning {

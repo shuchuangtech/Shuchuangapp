@@ -7,9 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "DatePickerProtocol.h"
-#import "TimePickerProtocol.h"
 
-@interface RecordViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, DatePickerProtocol, TimePickerProtocol>
+@interface RecordViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
 @end

@@ -13,5 +13,10 @@
 @property (weak, nonatomic) IBOutlet UILabel *timeOfValidityLabel;
 @property (weak, nonatomic) IBOutlet UILabel *remainOpenLabel;
 @property (weak, nonatomic) IBOutlet UILabel *authLabel;
+@property (weak, nonatomic) IBOutlet UILabel *remainOpenTag;
+@property (weak, nonatomic) IBOutlet UILabel *remainOpenTag2;
+@property (weak, nonatomic) IBOutlet UILabel *timeTag;
 
+
+- (void)setUsername:(NSString *)username authority:(NSInteger)auth remainOpen:(NSInteger)remainOpen timeOfValidity:(NSString *)time remainOpenInvalid:(BOOL)openInvalid timeInvalid:(BOOL)timeInvalid;
 @end

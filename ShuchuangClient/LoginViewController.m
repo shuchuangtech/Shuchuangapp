@@ -11,24 +11,21 @@
 #import "MyActivityIndicatorView.h"
 #import "Bmob.h"
 #import "SCUtil.h"
-
+#import "SCTextField.h"
 @interface LoginViewController ()
 @property (weak, nonatomic) IBOutlet UINavigationBar *naviBar;
-@property (weak, nonatomic) IBOutlet UITextField *idField;
-@property (weak, nonatomic) IBOutlet UITextField *passwordField;
+@property (weak, nonatomic) IBOutlet SCTextField *idField;
+@property (weak, nonatomic) IBOutlet SCTextField *passwordField;
 @property (strong, nonatomic) MyActivityIndicatorView *acFrame;
 @property (nonatomic) BOOL registerNewUser;
 @property (strong, nonatomic) NSString *loginId;
 @property (strong, nonatomic) NSString *loginPass;
 @property (weak, nonatomic) IBOutlet UIButton *buttonLogin;
-@property (strong, nonatomic) UIImageView *barBg;
 @property (strong, nonatomic) UIImageView *bgView;
-@property (strong, nonatomic) UIImageView *idFieldBg;
-@property (strong, nonatomic) UIImageView *passwordFieldBg;
+@property (weak, nonatomic) IBOutlet UIButton *buttonForget;
 
 
 - (IBAction)onBtnForget:(id)sender;
-- (IBAction)onBtnRegister:(id)sender;
 - (IBAction)onBtnLogin:(id)sender;
 - (void) leftBarBtnClicked;
 - (IBAction)idFieldChanged:(id)sender;
@@ -46,20 +43,31 @@
     
     //text field
     self.idField.delegate = self;
+    UIImageView *idFieldIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"tel"]];
+    self.idField.leftView = idFieldIcon;
+    self.idField.leftViewMode = UITextFieldViewModeAlways;
+    UIImageView *passFieldIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"password"]];
+    self.passwordField.leftView = passFieldIcon;
+    self.passwordField.leftViewMode = UITextFieldViewModeAlways;
     self.passwordField.delegate = self;
     [self.idField setBackgroundColor:[UIColor clearColor]];
     [self.passwordField setBackgroundColor:[UIColor clearColor]];
     
+    //button reg forget
+    NSDictionary *attrDic = @{NSUnderlineStyleAttributeName:[NSNumber numberWithInteger:NSUnderlineStyleSingle]};
+    NSMutableAttributedString *forgetStr = [[NSMutableAttributedString alloc] initWithString:@"密码忘记了？找回密码" attributes:attrDic];
+    self.buttonForget.titleLabel.attributedText = forgetStr;
+    
     //login button
-    [self.buttonLogin setBackgroundImage:[UIImage imageNamed:@"longButtonActive"] forState:UIControlStateNormal];
-    [self.buttonLogin setBackgroundImage:[UIImage imageNamed:@"longButton"] forState:UIControlStateDisabled];
-    self.buttonLogin.layer.cornerRadius = 5.0;
+    [self.buttonLogin setBackgroundColor:[UIColor whiteColor]];
+    [self.buttonLogin setAlpha:0.3];
+    self.buttonLogin.layer.cornerRadius = 18.0;
     self.buttonLogin.layer.opaque = NO;
     self.buttonLogin.layer.masksToBounds = YES;
     self.buttonLogin.enabled = NO;
     
     //navigation bar and navigation item
-    UIBarButtonItem * leftBarBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStyleDone target:self action:@selector(leftBarBtnClicked)];
+    UIBarButtonItem * leftBarBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back_white"] style:UIBarButtonItemStyleDone target:self action:@selector(leftBarBtnClicked)];
     UINavigationItem *naviItem = [[UINavigationItem alloc] init];
     [leftBarBtn setTintColor:[UIColor whiteColor]];
     UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.naviBar.frame.size.width - 100, self.naviBar.frame.size.height)];
@@ -70,31 +78,23 @@
     naviItem.titleView = titleLab;
     naviItem.leftBarButtonItem = leftBarBtn;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
-    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
+    self.naviBar.clipsToBounds = YES;
+    [self.naviBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsCompact];
     
-    self.barBg = [[UIImageView alloc] init];
-    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
-    [self.view addSubview:self.barBg];
-    [self.view bringSubviewToFront:self.naviBar];
     self.bgView = [[UIImageView alloc] init];
     [self.bgView setImage:[UIImage imageNamed:@"background"]];
-    self.idFieldBg = [[UIImageView alloc] init];
-    [self.idFieldBg setImage:[UIImage imageNamed:@"textFieldBg"]];
-    [self.idField addSubview:self.idFieldBg];
-    self.passwordFieldBg = [[UIImageView alloc] init];
-    [self.passwordFieldBg setImage:[UIImage imageNamed:@"textFieldBg"]];
-    [self.passwordField addSubview:self.passwordFieldBg];
     
     [self.view addSubview:self.bgView];
     [self.view sendSubviewToBack:self.bgView];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+}
+
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
-    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.naviBar.frame.size.height + self.naviBar.frame.origin.y)];
-    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
-    [self.idFieldBg setFrame:CGRectMake(0, 0, self.idField.frame.size.width, self.idField.frame.size.height)];
-    [self.passwordFieldBg setFrame:CGRectMake(0, 0, self.passwordField.frame.size.width, self.passwordField.frame.size.height)];
+    [self.bgView setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -128,17 +128,6 @@
         [self.passwordField resignFirstResponder];
     }
     self.registerNewUser = NO;
-    [self performSegueWithIdentifier:@"loginToRegister" sender:self];
-}
-
-- (IBAction)onBtnRegister:(id)sender {
-    if ([self.idField isFirstResponder]) {
-        [self.idField resignFirstResponder];
-    }
-    if ([self.passwordField isFirstResponder]) {
-        [self.passwordField resignFirstResponder];
-    }
-    self.registerNewUser = YES;
     [self performSegueWithIdentifier:@"loginToRegister" sender:self];
 }
 
@@ -177,18 +166,22 @@
 - (IBAction)idFieldChanged:(id)sender {
     if (self.idField.text.length > 0 && self.passwordField.text.length > 0) {
         self.buttonLogin.enabled = YES;
+        [self.buttonLogin setAlpha:1.0];
     }
     else {
         self.buttonLogin.enabled = NO;
+        [self.buttonLogin setAlpha:0.3];
     }
 }
 
 - (IBAction)passFieldChanged:(id)sender {
     if (self.idField.text.length > 0 && self.passwordField.text.length > 0) {
         self.buttonLogin.enabled = YES;
+        [self.buttonLogin setAlpha:1.0];
     }
     else {
         self.buttonLogin.enabled = NO;
+        [self.buttonLogin setAlpha:0.3];
     }
 }
 

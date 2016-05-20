@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="Pr7-rI-iHe">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10117" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="Pr7-rI-iHe">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
@@ -18,11 +19,16 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="izn-hY-le7">
+                                <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
+                                <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="deviceRGB"/>
+                            </webView>
                             <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cv8-U9-K3f">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="44" id="qJR-F0-JFo"/>
                                 </constraints>
+                                <color key="barTintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <variation key="default">
                                     <mask key="constraints">
                                         <exclude reference="qJR-F0-JFo"/>
@@ -34,10 +40,6 @@
                                     </mask>
                                 </variation>
                             </navigationBar>
-                            <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="izn-hY-le7">
-                                <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
-                                <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="deviceRGB"/>
-                            </webView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -51,32 +53,32 @@
                         </constraints>
                         <variation key="default">
                             <mask key="subviews">
-                                <exclude reference="cv8-U9-K3f"/>
                                 <exclude reference="izn-hY-le7"/>
+                                <exclude reference="cv8-U9-K3f"/>
                             </mask>
                             <mask key="constraints">
+                                <exclude reference="wyQ-Ls-KS2"/>
                                 <exclude reference="P2j-1J-qTm"/>
                                 <exclude reference="TRJ-Vg-vCw"/>
                                 <exclude reference="vrA-uJ-moe"/>
                                 <exclude reference="6BP-Dy-O9O"/>
                                 <exclude reference="9h6-4Y-vzA"/>
                                 <exclude reference="JI8-0r-6ym"/>
-                                <exclude reference="wyQ-Ls-KS2"/>
                             </mask>
                         </variation>
                         <variation key="widthClass=compact">
                             <mask key="subviews">
-                                <include reference="cv8-U9-K3f"/>
                                 <include reference="izn-hY-le7"/>
+                                <include reference="cv8-U9-K3f"/>
                             </mask>
                             <mask key="constraints">
+                                <include reference="wyQ-Ls-KS2"/>
                                 <include reference="P2j-1J-qTm"/>
                                 <include reference="TRJ-Vg-vCw"/>
                                 <include reference="vrA-uJ-moe"/>
                                 <include reference="6BP-Dy-O9O"/>
                                 <include reference="9h6-4Y-vzA"/>
                                 <include reference="JI8-0r-6ym"/>
-                                <include reference="wyQ-Ls-KS2"/>
                             </mask>
                         </variation>
                     </view>

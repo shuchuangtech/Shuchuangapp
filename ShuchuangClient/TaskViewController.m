@@ -15,23 +15,23 @@
 #import "MyActivityIndicatorView.h"
 #import "MJRefresh.h"
 
-static NSArray *weekday;
 @interface TaskViewController ()
 @property (weak, nonatomic) IBOutlet UINavigationBar *naviBar;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet UIButton *addButton;
+@property (strong, nonatomic) UIBarButtonItem *rightEditButton;
+@property (strong, nonatomic) UIBarButtonItem *rightFinishButton;
 @property (strong, nonatomic) NSArray* tasks;
 @property (weak, nonatomic) SCDeviceClient *client;
-@property (weak, nonatomic) NSString *uuid;
+@property (copy, nonatomic) NSString *uuid;
 @property NSDictionary *modifyTask;
 @property NSInteger modifyIndex;
 @property (strong, nonatomic) MyActivityIndicatorView *acFrame;
-@property (strong, nonatomic) UIImageView *barBg;
-@property (strong, nonatomic) UIImageView *bgView;
-
 
 - (void)refreshTaskList;
 - (void)onLeftButton;
 - (void)onRightButton;
+- (void)onAddButton;
 @end
 
 @implementation TaskViewController
@@ -40,22 +40,24 @@ static NSArray *weekday;
     // Do any additional setup after loading the view.
     UINavigationItem *naviItem = [[UINavigationItem alloc] init];
     UIBarButtonItem *leftButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStylePlain target:self action:@selector(onLeftButton)];
-    UIBarButtonItem *rightButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"add"] style:UIBarButtonItemStylePlain target:self action:@selector(onRightButton)];
-    [leftButton setTintColor:[UIColor whiteColor]];
-    [rightButton setTintColor:[UIColor whiteColor]];
+    self.rightEditButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"edit"] style:UIBarButtonItemStylePlain target:self action:@selector(onRightButton)];
+    self.rightFinishButton = [[UIBarButtonItem alloc] initWithTitle:@"完成  " style:UIBarButtonItemStylePlain target:self action:@selector(onRightButton)];
+    [leftButton setTintColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]];
+    [self.rightEditButton setTintColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]];
+    [self.rightFinishButton setTintColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]];
     naviItem.leftBarButtonItem = leftButton;
-    naviItem.rightBarButtonItem = rightButton;
+    naviItem.rightBarButtonItem = self.rightEditButton;
     UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.naviBar.frame.size.width - 100, self.naviBar.frame.size.height)];
     [titleLab setText:@"定时任务"];
-    [titleLab setTextColor:[UIColor whiteColor]];
+    [titleLab setTextColor:[UIColor colorWithRed:21.0 / 255.0 green:37.0 / 255.0 blue:50.0 / 255.0 alpha:1.0]];
     [titleLab setFont:[UIFont systemFontOfSize:17.0]];
     titleLab.textAlignment = NSTextAlignmentCenter;
     naviItem.titleView = titleLab;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
-    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
-    
+
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
+    self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
     [self.tableView setBackgroundColor:[UIColor clearColor]];
     [self.tableView registerNib:[UINib nibWithNibName:@"TaskListTableViewCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"taskProtoCellXib"];
     self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
@@ -65,27 +67,21 @@ static NSArray *weekday;
     }];
     self.client = [[SCDeviceManager instance] getDevice:self.uuid];
     self.tasks = [self.client getLocalTasks];
-    weekday = [NSArray arrayWithObjects:@"日", @"一", @"二", @"三", @"四", @"五", @"六", nil];
     self.modifyTask = nil;
     self.modifyIndex = 0;
     
     self.acFrame = [[MyActivityIndicatorView alloc] initWithFrameInView:self.view];
     
-    self.barBg = [[UIImageView alloc] init];
-    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
-    [self.view addSubview:self.barBg];
-    [self.view bringSubviewToFront:self.naviBar];
-    self.bgView = [[UIImageView alloc] init];
-    [self.bgView setImage:[UIImage imageNamed:@"background"]];
-    [self.view addSubview:self.bgView];
-    [self.view sendSubviewToBack:self.bgView];
-    
+    [self.addButton addTarget:self action:@selector(onAddButton) forControlEvents:UIControlEventTouchUpInside];
 }
 
-- (void)viewWillLayoutSubviews {
-    [super viewWillLayoutSubviews];
-    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, 64.0)];
-    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
+- (void)viewWillDisappear:(BOOL)animated {
+    if (self.tableView.editing) {
+        UINavigationItem *naviItem = [self.naviBar.items objectAtIndex:0];
+        naviItem.rightBarButtonItem = self.rightEditButton;
+        [self.tableView setEditing:NO animated:YES];
+    }
+    [super viewWillDisappear:animated];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -98,6 +94,19 @@ static NSArray *weekday;
 }
 
 - (void)onRightButton {
+    if (self.tableView.editing) {
+        UINavigationItem *naviItem = [self.naviBar.items objectAtIndex:0];
+        naviItem.rightBarButtonItem = self.rightEditButton;
+        [self.tableView setEditing:NO animated:YES];
+    }
+    else {
+        UINavigationItem *naviItem = [self.naviBar.items objectAtIndex:0];
+        naviItem.rightBarButtonItem = self.rightFinishButton;
+        [self.tableView setEditing:YES animated:YES];
+    }
+}
+
+- (void)onAddButton {
     self.modifyTask = nil;
     [self performSegueWithIdentifier:@"TaskToAddTaskSegue" sender:self];
 }
@@ -153,13 +162,16 @@ static NSArray *weekday;
         [weakSelf.acFrame stopAc];
         if (![response[@"result"] isEqualToString:@"good"]) {
             TaskListTableViewCell *cell = [weakSelf.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
-            [cell.taskSwitch setOn:!active];
+            [cell setTaskActive:!active];
             [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:response[@"detail"] action:nil];
+        }
+        else {
+            weakSelf.tasks = [weakSelf.client getLocalTasks];
         }
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         [weakSelf.acFrame stopAc];
         TaskListTableViewCell *cell = [weakSelf.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
-        [cell.taskSwitch setOn:!active];
+        [cell setTaskActive:!active];
         [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
     }];
 }
@@ -193,45 +205,28 @@ static NSArray *weekday;
 }
 
 #pragma mark - Table Delegate
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (self.tableView.editing) {
+        return UITableViewCellEditingStyleDelete;
+    }
+    else {
+        return UITableViewCellEditingStyleNone;
+    }
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     TaskListTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"taskProtoCellXib" forIndexPath:indexPath];
     [cell setBackgroundColor:[UIColor clearColor]];
     NSDictionary *task = [self.tasks objectAtIndex:indexPath.row];
     cell.taskId = [task[@"id"] integerValue];
-    if ([task[@"option"] integerValue] == 0) {
-        cell.optionLabel.text = @"关闭";
-    }
-    else {
-        cell.optionLabel.text = @"开启";
-    }
-    cell.excuteTime.text = [NSString stringWithFormat:@"%02ld:%02ld", (long)[task[@"hour"] integerValue], (long)[task[@"minute"] integerValue]];
-    NSInteger mask = 0x40;
-    NSInteger taskRepeat = [task[@"weekday"] integerValue];
-    NSString *repeatDay = [[NSString alloc] init];
-    for (int i = 0; i < 7; i++) {
-        if ((taskRepeat & mask) != 0) {
-            repeatDay = [repeatDay stringByAppendingFormat:@"%@、", weekday[i]];
-        }
-        mask >>= 1;
-    }
-    if ([repeatDay length] > 0) {
-        repeatDay = [repeatDay substringToIndex:repeatDay.length - 1];
-    }
-    
-    cell.repeatDay.text = repeatDay;
-    if ([task[@"active"] integerValue] == 0) {
-        [cell.taskSwitch setOn:NO];
-    }
-    else {
-        [cell.taskSwitch setOn:YES];
-    }
+    [cell setTaskHour:[task[@"hour"] integerValue] minute:[task[@"minute"] integerValue] repeatDay:[task[@"weekday"] integerValue] option:[task[@"option"] integerValue] active:[task[@"active"] integerValue]];
     cell.taskIndex = indexPath.row;
     cell.modifyDelegate = self;
     return cell;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 75.0;
+    return 112.0;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {

@@ -341,12 +341,14 @@
 - (void)getDeviceModeSuccess:(void (^)(NSURLSessionDataTask * _Nullable, id _Nonnull))success failure:(void (^)(NSURLSessionDataTask * _Nullable, NSError * _Nonnull))failure {
     SCHTTPManager *http = [SCHTTPManager instance];
     NSDictionary *dict = @{@"type":@"request", @"action":@"device.getmode", @"param":@{@"uuid":self.uuid, @"token":self.token}};
+    self.mode = -1;
     [http sendMessage:dict
               success:^(NSURLSessionDataTask *task, id serverResponse) {
                   NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
                   if ([serverResponse[@"result"] isEqualToString:@"good"]) {
                       [response setValue:@"good" forKey:@"result"];
                       [response setValue:serverResponse[@"param"][@"mode"] forKey:@"mode"];
+                      self.mode = [serverResponse[@"param"][@"mode"] integerValue];
                   }
                   else {
                       NSString *detail = [SCErrorString errorString:serverResponse[@"detail"]];
@@ -366,6 +368,7 @@
                   NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
                   if ([serverResponse[@"result"] isEqualToString:@"good"]) {
                       [response setValue:@"good" forKey:@"result"];
+                      self.mode = mode;
                   }
                   else {
                       NSString *detail = [SCErrorString errorString:serverResponse[@"detail"]];

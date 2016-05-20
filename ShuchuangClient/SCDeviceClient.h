@@ -15,6 +15,7 @@
 @property (nonatomic) BOOL doorClose;
 @property (nonatomic) BOOL switchClose;
 @property (nonatomic) BOOL online;
+@property (nonatomic) NSInteger mode;
 
 - (nonnull id)initWithId:(nonnull NSString *)uuid user:(nonnull NSString *)user name:(nonnull NSString *)name type:(nonnull NSString *)type token:(nonnull NSString *)token;
 

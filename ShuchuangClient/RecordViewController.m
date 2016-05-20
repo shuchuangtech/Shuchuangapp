@@ -14,35 +14,46 @@
 #import "MyActivityIndicatorView.h"
 #import "RecordTableViewCell.h"
 #import "MJRefresh.h"
-#import "MyDatePickerView.h"
-#import "MyTimePickerView.h"
+#import "SCDatePickerView.h"
+#import "SCTextField.h"
 
-@interface RecordViewController ()
+@interface RecordViewController () <FSCalendarDelegate, FSCalendarDataSource, UITextFieldDelegate>
 @property (weak, nonatomic) IBOutlet UINavigationBar *naviBar;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UILabel *beginDate;
 @property (weak, nonatomic) IBOutlet UILabel *endDate;
 @property (weak, nonatomic) IBOutlet UILabel *beginTime;
 @property (weak, nonatomic) IBOutlet UILabel *endTime;
-@property (strong, nonatomic) MyDatePickerView* datePicker;
-@property (strong, nonatomic) MyTimePickerView* timePicker;
+@property (weak, nonatomic) IBOutlet UIView *beginView;
+@property (weak, nonatomic) IBOutlet UIView *endView;
+@property (weak, nonatomic) IBOutlet UIView *dateTimeContainer;
+@property (weak, nonatomic) IBOutlet UIButton *upButton;
+@property (weak, nonatomic) IBOutlet UIView *pickerContainer;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pickerContainerHeight;
+@property (weak, nonatomic) IBOutlet SCDatePickerView *datePicker;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *datePickerHeight;
+@property (weak, nonatomic) IBOutlet UIButton *searchButton;
+@property (weak, nonatomic) IBOutlet SCTextField *hourTextField;
+@property (weak, nonatomic) IBOutlet SCTextField *minuteTextField;
+@property (weak, nonatomic) IBOutlet UIButton *buttonTimeOK;
+@property (nonatomic) BOOL beginSet;
+@property (nonatomic) BOOL endSet;
+@property (nonatomic) BOOL beginTimeSet;
+@property (nonatomic) BOOL endTimeSet;
 @property (strong, nonatomic) NSDateComponents *beginComp;
 @property (strong, nonatomic) NSDateComponents *endComp;
-@property (strong, nonatomic) NSString *uuid;
+@property (copy, nonatomic) NSString *uuid;
 @property (strong, nonatomic) SCDeviceClient *client;
 @property NSInteger datePickerTag;
-@property NSInteger timePickerTag;
 @property (strong, nonatomic) NSMutableArray *records;
 @property (strong, nonatomic) MyActivityIndicatorView *acFrame;
-@property (strong, nonatomic) UIImageView *barBg;
-@property (strong, nonatomic) UIImageView *bgView;
+@property (nonatomic) CGFloat pickerOriginHeight;
 
-
-- (IBAction)onButtonSearch:(id)sender;
-- (void)onDateLabelBegin:(id)sender;
-- (void)onDateLabelEnd:(id)sender;
-- (void)onTimeLabelBegin:(id)sender;
-- (void)onTimeLabelEnd:(id)sender;
+- (void)onButtonTimeOK;
+- (void)onUpButton;
+- (void)onButtonSearch;
+- (void)onBeginView;
+- (void)onEndView;
 - (void)onLeftButton;
 - (void)loadMoreData;
 @end
@@ -55,66 +66,35 @@
     //navi bar
     UINavigationItem *naviItem = [[UINavigationItem alloc] init];
     UIBarButtonItem *leftButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStylePlain target:self action:@selector(onLeftButton)];
-    [leftButton setTintColor:[UIColor whiteColor]];
+    [leftButton setTintColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]];
     UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.naviBar.frame.size.width - 100, self.naviBar.frame.size.height)];
     [titleLab setText:@"记录查询"];
-    [titleLab setTextColor:[UIColor whiteColor]];
+    [titleLab setTextColor:[UIColor colorWithRed:21.0 / 255.0 green:37.0 / 255.0 blue:50.0 / 255.0 alpha:1.0]];
     [titleLab setFont:[UIFont systemFontOfSize:17.0]];
     titleLab.textAlignment = NSTextAlignmentCenter;
     naviItem.titleView = titleLab;
     naviItem.leftBarButtonItem = leftButton;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
-    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
-    
-    //picker view
-    self.datePicker = [[MyDatePickerView alloc] initWithFrameInView:self.view];
-    self.datePicker.datePickerDelegate = self;
-    self.timePicker = [[MyTimePickerView alloc] initWithFrameInView:self.view];
-    self.timePicker.timePickerDelegate = self;
     
     //date components
     self.beginComp = [[NSDateComponents alloc] init];
     self.endComp = [[NSDateComponents alloc] init];
     
-    NSDate *nowDate = [NSDate date];
-    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-    NSUInteger unitFlag = NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay|NSCalendarUnitHour|NSCalendarUnitMinute;
-    NSDateComponents *dateComponent = [calendar components:unitFlag fromDate:nowDate];
-    NSInteger year = [dateComponent year];
-    NSInteger month = [dateComponent month];
-    NSInteger day = [dateComponent day];
-    NSInteger hour = [dateComponent hour];
-    NSInteger minute = [dateComponent minute];
-    [self.beginComp setYear:year];
-    [self.endComp setYear:year];
-    [self.beginComp setMonth:month];
-    [self.endComp setMonth:month];
-    [self.beginComp setDay:day];
-    [self.endComp setDay:day];
-    [self.beginComp setHour:hour];
-    [self.endComp setHour:hour];
-    [self.beginComp setMinute:minute];
-    [self.endComp setMinute:minute];
-    
+    self.beginSet = NO;
+    self.endSet = NO;
+    self.beginTimeSet = NO;
+    self.endTimeSet = NO;
     //date
-    self.beginDate.userInteractionEnabled = YES;
-    self.endDate.userInteractionEnabled = YES;
-    UITapGestureRecognizer *gesture1 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onDateLabelBegin:)];
-    UITapGestureRecognizer *gesture2 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onDateLabelEnd:)];
-    [self.beginDate addGestureRecognizer:gesture1];
-    [self.endDate addGestureRecognizer:gesture2];
-    [self.beginDate setText:[NSString stringWithFormat:@"%04ld-%02ld-%02ld", (long)year, (long)month, (long)day]];
-    [self.endDate setText:[NSString stringWithFormat:@"%04ld-%02ld-%02ld", (long)year, (long)month, (long)day]];
+    UITapGestureRecognizer *gesture1 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onBeginView)];
+    UITapGestureRecognizer *gesture2 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onEndView)];
+    [self.beginView addGestureRecognizer:gesture1];
+    [self.endView addGestureRecognizer:gesture2];
+    [self.beginDate setText:@"-/-/-"];
+    [self.endDate setText:@"-/-/-"];
     
     //time
-    self.beginTime.userInteractionEnabled = YES;
-    self.endTime.userInteractionEnabled = YES;
-    UITapGestureRecognizer *gesture3 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTimeLabelBegin:)];
-    UITapGestureRecognizer *gesture4 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTimeLabelEnd:)];
-    [self.beginTime addGestureRecognizer:gesture3];
-    [self.endTime addGestureRecognizer:gesture4];
-    [self.beginTime setText:[NSString stringWithFormat:@"%02ld:%02ld", (long)hour, (long)minute]];
-    [self.endTime setText:[NSString stringWithFormat:@"%02ld:%02ld", (long)hour, (long)minute]];
+    [self.beginTime setText:@"-:-"];
+    [self.endTime setText:@"-:-"];
     
     //client
     self.client = [[SCDeviceManager instance] getDevice:self.uuid];
@@ -128,6 +108,7 @@
     //table view
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
+    [self.tableView setBackgroundColor:[UIColor whiteColor]];
     [self.tableView registerNib:[UINib nibWithNibName:@"RecordTableViewCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"RecordTableViewCell"];
     self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
     self.tableView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMoreData)];
@@ -135,21 +116,23 @@
         self.tableView.scrollEnabled = NO;
     }
     [self.tableView setBackgroundColor:[UIColor clearColor]];
+    //picker view
+    self.datePicker.pickDelegate = self;
+    self.datePicker.pickDataSource = self;
+    self.pickerContainer.clipsToBounds = YES;
     
-    self.barBg = [[UIImageView alloc] init];
-    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
-    [self.view addSubview:self.barBg];
-    [self.view bringSubviewToFront:self.naviBar];
-    self.bgView = [[UIImageView alloc] init];
-    [self.bgView setImage:[UIImage imageNamed:@"background"]];
-    [self.view addSubview:self.bgView];
-    [self.view sendSubviewToBack:self.bgView];
-}
-
-- (void)viewWillLayoutSubviews {
-    [super viewWillLayoutSubviews];
-    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, 64.0)];
-    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
+    self.hourTextField.delegate = self;
+    self.hourTextField.placeholder = @"00";
+    self.minuteTextField.delegate = self;
+    self.minuteTextField.placeholder = @"00";
+    [self.buttonTimeOK addTarget:self action:@selector(onButtonTimeOK) forControlEvents:UIControlEventTouchUpInside];
+    [self.upButton addTarget:self action:@selector(onUpButton) forControlEvents:UIControlEventTouchUpInside];
+    self.searchButton.layer.cornerRadius = 15.0;
+    self.searchButton.clipsToBounds = YES;
+    [self.searchButton addTarget:self action:@selector(onButtonSearch) forControlEvents:UIControlEventTouchUpInside];
+    
+    self.hourTextField.lineColor = [UIColor colorWithRed:227.0 / 255.0 green:93.0 / 255.0 blue:93.0 / 255.0 alpha:1.0];
+    self.minuteTextField.lineColor = [UIColor colorWithRed:227.0 / 255.0 green:93.0 / 255.0 blue:93.0 / 255.0 alpha:1.0];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -161,9 +144,9 @@
     NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
     NSDate *beginDate = [calendar dateFromComponents:self.beginComp];
     NSDate *endDate = [calendar dateFromComponents:self.endComp];
-    NSInteger tt1 = [beginDate timeIntervalSince1970] * 1000000;
-    NSInteger tt2 = [endDate timeIntervalSince1970] * 1000000;
-    NSDictionary *condition = @{RECORD_STARTTIME_STR:[NSNumber numberWithInteger:tt1], RECORD_ENDTIME_STR:[NSNumber numberWithInteger:tt2], RECORD_LIMIT_STR:[NSNumber numberWithInteger:10], RECORD_OFFSET_STR:[NSNumber numberWithInteger:[self.records count]]};
+    long long tt1 = [beginDate timeIntervalSince1970] * 1000000;
+    long long tt2 = [endDate timeIntervalSince1970] * 1000000;
+    NSDictionary *condition = @{RECORD_STARTTIME_STR:[NSNumber numberWithLongLong:tt1], RECORD_ENDTIME_STR:[NSNumber numberWithLongLong:tt2], RECORD_LIMIT_STR:[NSNumber numberWithInteger:10], RECORD_OFFSET_STR:[NSNumber numberWithInteger:[self.records count]]};
     __weak RecordViewController *weakSelf = self;
     [self.client getRecord:condition success:^(NSURLSessionDataTask *task, id response) {
         if ([response[@"result"] isEqualToString:@"good"]) {
@@ -176,10 +159,10 @@
             else {
                 for (int i = 0; i < [responseRecords count]; i++) {
                     NSMutableDictionary *record = [[NSMutableDictionary alloc] initWithDictionary:[responseRecords objectAtIndex:i]];
-                    NSInteger timestamp = [record[@"Timestamp"] integerValue];
+                    long long timestamp = [record[@"Timestamp"] longLongValue];
                     NSTimeInterval timeInterval = timestamp / 1000000.0;
                     NSDateComponents *comp = [calendar components:unitFlag fromDate:[NSDate dateWithTimeIntervalSince1970:timeInterval]];
-                    NSString *timeStr = [NSString stringWithFormat:@"%04ld-%02ld-%02ld %02ld:%02ld:%02ld", (long)[comp year], (long)[comp month], (long)[comp day], (long)[comp hour], (long)[comp minute], (long)[comp second]];
+                    NSString *timeStr = [NSString stringWithFormat:@"%02ld/%02ld/%04ld %02ld:%02ld:%02ld", (long)[comp day], (long)[comp month], (long)[comp year], (long)[comp hour], (long)[comp minute], (long)[comp second]];
                     [record setObject:timeStr forKey:@"Timestamp"];
                     [weakSelf.records addObject:record];
                 }
@@ -201,55 +184,18 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)onDatePickerOK:(NSDate*)pickedDate {
-    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-    NSUInteger unitFlag = NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay;
-    NSDateComponents *dateComponent = [calendar components:unitFlag fromDate:pickedDate];
-    if (self.datePickerTag == 0) {
-        [self.beginComp setYear:[dateComponent year]];
-        [self.beginComp setMonth:[dateComponent month]];
-        [self.beginComp setDay:[dateComponent day]];
-        [self.beginDate setText:[NSString stringWithFormat:@"%04ld-%02ld-%02ld", (long)[dateComponent year], (long)[dateComponent month], (long)[dateComponent day]]];
-    }
-    else {
-        [self.endComp setYear:[dateComponent year]];
-        [self.endComp setMonth:[dateComponent month]];
-        [self.endComp setDay:[dateComponent day]];
-        [self.endDate setText:[NSString stringWithFormat:@"%04ld-%02ld-%02ld", (long)[dateComponent year], (long)[dateComponent month], (long)[dateComponent day]]];
-    }
-    [self.datePicker hidePicker];
-}
-
-- (void)onDatePickerCancel {
-    [self.datePicker hidePicker];
-}
-
-- (void)onTimePickerOKHour:(NSInteger)hour minute:(NSInteger)minute {
-    if (self.timePickerTag == 0) {
-        [self.beginComp setHour:hour];
-        [self.beginComp setMinute:minute];
-        [self.beginTime setText:[NSString stringWithFormat:@"%02ld:%02ld", (long)hour, (long)minute]];
-    }
-    else {
-        [self.endComp setHour:hour];
-        [self.endComp setMinute:minute];
-        [self.endTime setText:[NSString stringWithFormat:@"%02ld:%02ld", (long)hour, (long)minute]];
-    }
-    [self.timePicker hidePicker];
-}
-
-- (void)onTimePickerCancel {
-    [self.timePicker hidePicker];
-}
-
-- (IBAction)onButtonSearch:(id)sender {
+- (void)onButtonSearch {
     [self.records removeAllObjects];
+    if (!(self.beginSet && self.endSet && self.beginTimeSet && self.endTimeSet)) {
+        [SCUtil viewController:self showAlertTitle:@"提示" message:@"请输入查询条件" action:nil];
+        return;
+    }
     NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
     NSDate *beginDate = [calendar dateFromComponents:self.beginComp];
     NSDate *endDate = [calendar dateFromComponents:self.endComp];
-    NSInteger tt1 = [beginDate timeIntervalSince1970] * 1000000;
-    NSInteger tt2 = [endDate timeIntervalSince1970] * 1000000;
-    NSDictionary *condition = @{RECORD_STARTTIME_STR:[NSNumber numberWithInteger:tt1], RECORD_ENDTIME_STR:[NSNumber numberWithInteger:tt2], RECORD_LIMIT_STR:[NSNumber numberWithInteger:10], RECORD_OFFSET_STR:[NSNumber numberWithInteger:0]};
+    long long tt1 = [beginDate timeIntervalSince1970] * 1000000;
+    long long tt2 = [endDate timeIntervalSince1970] * 1000000;
+    NSDictionary *condition = @{RECORD_STARTTIME_STR:[NSNumber numberWithLongLong:tt1], RECORD_ENDTIME_STR:[NSNumber numberWithLongLong:tt2], RECORD_LIMIT_STR:[NSNumber numberWithInteger:10], RECORD_OFFSET_STR:[NSNumber numberWithInteger:0]};
     [self.acFrame startAc];
     __weak RecordViewController *weakSelf = self;
     [self.client getRecord:condition success:^(NSURLSessionDataTask *task, id response) {
@@ -259,10 +205,10 @@
             NSArray *responseRecords = response[@"records"];
             for (int i = 0; i < [responseRecords count]; i++) {
                 NSMutableDictionary *record = [[NSMutableDictionary alloc] initWithDictionary:[responseRecords objectAtIndex:i]];
-                NSInteger timestamp = [record[@"Timestamp"] integerValue];
+                long long timestamp = [record[@"Timestamp"] longLongValue];
                 NSTimeInterval timeInterval = timestamp / 1000000.0;
                 NSDateComponents *comp = [calendar components:unitFlag fromDate:[NSDate dateWithTimeIntervalSince1970:timeInterval]];
-                NSString *timeStr = [NSString stringWithFormat:@"%04ld-%02ld-%02ld %02ld:%02ld:%02ld", (long)[comp year], (long)[comp month], (long)[comp day], (long)[comp hour], (long)[comp minute], (long)[comp second]];
+                NSString *timeStr = [NSString stringWithFormat:@"%02ld/%02ld/%04ld %02ld:%02ld:%02ld", (long)[comp day], (long)[comp month], (long)[comp year], (long)[comp hour], (long)[comp minute], (long)[comp second]];
                 [record setObject:timeStr forKey:@"Timestamp"];
                 [weakSelf.records addObject:record];
             }
@@ -271,6 +217,7 @@
                 [weakSelf.tableView reloadData];
             }
             else {
+                [SCUtil viewController:self showAlertTitle:@"提示" message:@"没有查询到操作记录" action:nil];
                 weakSelf.tableView.scrollEnabled = NO;
             }
             [weakSelf.acFrame stopAc];
@@ -286,25 +233,192 @@
     }];
 }
 
-#pragma --mark on time buttons
-- (void)onDateLabelBegin:(id)sender {
+- (void)onBeginView {
     self.datePickerTag = 0;
-    [self.datePicker showPicker];
+    [self.beginDate setTextColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]];
+    [self.endDate setTextColor:[UIColor colorWithRed:21.0 / 255.0 green:37.0 / 255.0 blue:50.0 / 255.0 alpha:1.0]];
+    if (self.endSet) {
+        NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+        [self.datePicker.calendar deselectDate:[calendar dateFromComponents:self.endComp]];
+    }
+    if (self.beginSet) {
+        NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+        NSDate *beginDate = [calendar dateFromComponents:self.beginComp];
+        [self.datePicker.calendar setCurrentPage:beginDate animated:NO];
+        [self.datePicker.calendar selectDate:beginDate];
+    }
+    else {
+        NSCalendar *cal = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+        NSDate *today = [NSDate date];
+        NSUInteger unitFlag = NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay;
+        NSDateComponents *comp = [cal components:unitFlag fromDate:today];
+        self.beginDate.text = [NSString stringWithFormat:@"%02ld/%02ld/%04ld", (long)[comp day], (long)[comp month], (long)[comp year]];
+        [self.beginComp setYear:[comp year]];
+        [self.beginComp setMonth:[comp month]];
+        [self.beginComp setDay:[comp day]];
+        [self.datePicker.calendar selectDate:today];
+        self.beginSet = YES;
+        [self.datePicker.calendar setCurrentPage:[NSDate date] animated:NO];
+    }
+    [UIView animateWithDuration:0.5 animations:^ {
+        [self.datePickerHeight setConstant:self.pickerOriginHeight];
+        [self.pickerContainerHeight setConstant:(self.pickerOriginHeight + 70.0)];
+        [self.view layoutIfNeeded];
+    }];
 }
 
-- (void)onDateLabelEnd:(id)sender {
+- (void)onEndView {
     self.datePickerTag = 1;
-    [self.datePicker showPicker];
+    [self.endDate setTextColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]];
+    [self.beginDate setTextColor:[UIColor colorWithRed:21.0 / 255.0 green:37.0 / 255.0 blue:50.0 / 255.0 alpha:1.0]];
+    if (self.beginSet) {
+        NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+        [self.datePicker.calendar deselectDate:[calendar dateFromComponents:self.beginComp]];
+    }
+    if (self.endSet) {
+        NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+        NSDate *endDate = [calendar dateFromComponents:self.endComp];
+        [self.datePicker.calendar setCurrentPage:endDate animated:NO];
+        [self.datePicker.calendar selectDate:endDate];
+    }
+    else {
+        NSCalendar *cal = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+        NSDate *today = [NSDate date];
+        NSUInteger unitFlag = NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay;
+        NSDateComponents *comp = [cal components:unitFlag fromDate:today];
+        self.endDate.text = [NSString stringWithFormat:@"%02ld/%02ld/%04ld", (long)[comp day], (long)[comp month], (long)[comp year]];
+        [self.endComp setYear:[comp year]];
+        [self.endComp setMonth:[comp month]];
+        [self.endComp setDay:[comp day]];
+        [self.datePicker.calendar selectDate:today];
+        self.endSet = YES;
+        [self.datePicker.calendar setCurrentPage:[NSDate date] animated:NO];
+    }
+    [UIView animateWithDuration:0.5 animations:^ {
+        [self.datePickerHeight setConstant:self.pickerOriginHeight];
+        [self.pickerContainerHeight setConstant:(self.pickerOriginHeight + 70.0)];
+        [self.view layoutIfNeeded];
+    }];
 }
 
-- (void)onTimeLabelBegin:(id)sender {
-    self.timePickerTag = 0;
-    [self.timePicker showPicker];
+- (void)onButtonTimeOK {
+    self.beginTimeSet = (self.datePickerTag == 0)?NO:self.beginTimeSet;
+    self.endTimeSet = (self.datePickerTag == 1)?NO:self.endTimeSet;
+    if ([self.hourTextField.text length] == 0 || [self.minuteTextField.text length] == 0) {
+        [SCUtil viewController:self showAlertTitle:@"提示" message:@"请输入查询时间" action:nil];
+        return;
+    }
+    NSInteger hour = [self.hourTextField.text integerValue];
+    NSInteger minute = [self.minuteTextField.text integerValue];
+    if (!(hour <= 23 && hour >= 0 && minute <= 60 && minute >= 0)) {
+        [SCUtil viewController:self showAlertTitle:@"提示" message:@"请输入正确的时间" action:nil];
+        return;
+    }
+    else {
+        if (self.datePickerTag == 0) {
+            [self.beginComp setHour:hour];
+            [self.beginComp setMinute:minute];
+            self.beginTime.text = [NSString stringWithFormat:@"%ld:%02ld", (long)hour, (long)minute];
+            self.beginTimeSet = YES;
+        }
+        else {
+            [self.endComp setHour:[self.hourTextField.text integerValue]];
+            [self.endComp setMinute:[self.minuteTextField.text integerValue]];
+            self.endTime.text = [NSString stringWithFormat:@"%ld:%02ld", (long)hour, (long)minute];
+            self.endTimeSet = YES;
+        }
+        self.hourTextField.text = @"";
+        self.minuteTextField.text = @"";
+        [self onUpButton];
+    }
 }
 
-- (void)onTimeLabelEnd:(id)sender {
-    self.timePickerTag = 1;
-    [self.timePicker showPicker];
+- (void)onUpButton {
+    [UIView animateWithDuration:0.5 animations:^ {
+        [self.pickerContainerHeight setConstant:0.0];
+        [self.view layoutIfNeeded];
+    }];
+    if (self.datePickerTag == 0) {
+        [self.beginDate setTextColor:[UIColor colorWithRed:21.0 / 255.0 green:37.0 / 255.0 blue:50.0 / 255.0 alpha:1.0]];
+    }
+    else {
+        [self.endDate setTextColor:[UIColor colorWithRed:21.0 / 255.0 green:37.0 / 255.0 blue:50.0 / 255.0 alpha:1.0]];
+    }
+}
+
+#pragma -mark Calendar delegate and datasource
+- (void)calendar:(FSCalendar *)calendar boundingRectWillChange:(CGRect)bounds animated:(BOOL)animated {
+    if (animated) {
+        [self.datePickerHeight setConstant:CGRectGetHeight(bounds)];
+        [self.pickerContainerHeight setConstant:(CGRectGetHeight(bounds) + 70.0)];
+        [self.view layoutIfNeeded];
+    }
+    else {
+        self.pickerOriginHeight = CGRectGetHeight(bounds);
+    }
+}
+
+- (BOOL)calendar:(FSCalendar *)calendar shouldSelectDate:(NSDate *)date {
+    if (self.datePickerTag == 0 && self.endSet) {
+        NSDateComponents *endCom = [[NSDateComponents alloc] init];
+        [endCom setYear:[self.endComp year]];
+        [endCom setMonth:[self.endComp month]];
+        [endCom setDay:[self.endComp day]];
+        NSCalendar *cal = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+        NSDate *endDate = [cal dateFromComponents:endCom];
+        if ([date compare:endDate] == NSOrderedDescending) {
+            [SCUtil viewController:self showAlertTitle:@"提示" message:@"起始日期不能大于结束日期，请重新选择" action:nil];
+            return NO;
+        }
+        else {
+            return YES;
+        }
+    }
+    else if (self.datePickerTag == 1 && self.beginSet){
+        NSDateComponents *beginCom = [[NSDateComponents alloc] init];
+        [beginCom setYear:[self.beginComp year]];
+        [beginCom setMonth:[self.beginComp month]];
+        [beginCom setDay:[self.beginComp day]];
+        NSCalendar *cal = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+        NSDate *beginDate = [cal dateFromComponents:beginCom];
+        if ([beginDate compare:date] == NSOrderedDescending) {
+            [SCUtil viewController:self showAlertTitle:@"提示" message:@"结束日期不能小于起始日期，请重新选择" action:nil];
+            return NO;
+        }
+        else {
+            return YES;
+        }
+    }
+    else {
+        return YES;
+    }
+}
+
+- (void)calendar:(FSCalendar *)calendar didSelectDate:(NSDate *)date {
+    NSCalendar *cal = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    NSUInteger unitFlag = NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay;
+    NSDateComponents *dateComponent = [cal components:unitFlag fromDate:date];
+    if (self.datePickerTag == 0) {
+        self.beginSet = YES;
+        [self.beginComp setYear:[dateComponent year]];
+        [self.beginComp setMonth:[dateComponent month]];
+        [self.beginComp setDay:[dateComponent day]];
+        [self.beginDate setText:[NSString stringWithFormat:@"%02ld/%02ld/%04ld", (long)[dateComponent day], (long)[dateComponent month], (long)[dateComponent year]]];
+    }
+    else {
+        self.endSet = YES;
+        [self.endComp setYear:[dateComponent year]];
+        [self.endComp setMonth:[dateComponent month]];
+        [self.endComp setDay:[dateComponent day]];
+        [self.endDate setText:[NSString stringWithFormat:@"%02ld/%02ld/%04ld", (long)[dateComponent day], (long)[dateComponent month], (long)[dateComponent year]]];
+    }
+
+}
+
+#pragma -mark textfield delegate
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    [textField resignFirstResponder];
+    return YES;
 }
 
 #pragma --mark tableview datasouce and delegate
@@ -321,10 +435,12 @@
     [cell setBackgroundColor:[UIColor clearColor]];
     NSDictionary *record = [self.records objectAtIndex:indexPath.row];
     if ([[record objectForKey:@"Operation"] integerValue] == 0) {
-        cell.optionLabel.text = @"关闭";
+        cell.optionLabel.text = @"设备上锁";
+        [cell.lockImg setImage:[UIImage imageNamed:@"lock_on"]];
     }
     else {
-        cell.optionLabel.text = @"开启";
+        cell.optionLabel.text = @"设备解锁";
+        [cell.lockImg setImage:[UIImage imageNamed:@"lock_off"]];
     }
     if ([[record objectForKey:@"Schema"] integerValue] == 0) {
         cell.userLabel.text = [record objectForKey:@"Username"];
@@ -333,6 +449,18 @@
         cell.userLabel.text = @"定时任务";
     }
     cell.timeLabel.text = [record objectForKey:@"Timestamp"];
+    if (indexPath.row == 0) {
+        cell.topLine.hidden = YES;
+    }
+    else {
+        cell.topLine.hidden = NO;
+    }
+    if (indexPath.row == [self.records count] - 1) {
+        cell.bottomLine.hidden = YES;
+    }
+    else {
+        cell.bottomLine.hidden = NO;
+    }
     return cell;
 }
 /*

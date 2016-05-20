@@ -12,20 +12,18 @@
 #import "UIButton+FillBackgroundImage.h"
 #import "MobileVerifyViewController.h"
 #import "SCUtil.h"
+#import "SCTextField.h"
 
 @interface SetPasswordViewController ()
 @property (weak, nonatomic) IBOutlet UINavigationBar *naviBar;
-@property (weak, nonatomic) IBOutlet UITextField *textFieldPass;
-@property (weak, nonatomic) IBOutlet UITextField *textFieldPassRepeat;
+@property (weak, nonatomic) IBOutlet SCTextField *textFieldPass;
+@property (weak, nonatomic) IBOutlet SCTextField *textFieldPassRepeat;
 @property (weak, nonatomic) IBOutlet UIButton *btnRegister;
 @property (strong, nonatomic) MyActivityIndicatorView *acFrame;
 @property (weak, nonatomic) NSString *phoneNumber;
 @property (weak, nonatomic) NSString *SMSCode;
 @property (nonatomic) BOOL registerNewUser;
-@property (strong, nonatomic) UIImageView *barBg;
 @property (strong, nonatomic) UIImageView *bgView;
-@property (strong, nonatomic) UIImageView *textFieldBg1;
-@property (strong, nonatomic) UIImageView *textFieldBg2;
 
 
 - (IBAction)passwordChanged:(id)sender;
@@ -49,7 +47,7 @@
     [self.textFieldPassRepeat setBackgroundColor:[UIColor clearColor]];
     
     //navigation bar
-    UIBarButtonItem * leftBarBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStyleDone target:self action:@selector(leftBarBtnClicked)];
+    UIBarButtonItem * leftBarBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back_white"] style:UIBarButtonItemStyleDone target:self action:@selector(leftBarBtnClicked)];
     [leftBarBtn setTintColor:[UIColor whiteColor]];
     UINavigationItem *naviItem = [[UINavigationItem alloc] init];
     naviItem.leftBarButtonItem = leftBarBtn;
@@ -77,33 +75,20 @@
     //button register
     [self.btnRegister setBackgroundImage:[UIImage imageNamed:@"longButtonActive"] forState:UIControlStateNormal];
     [self.btnRegister setBackgroundImage:[UIImage imageNamed:@"longButton"] forState:UIControlStateDisabled];
-    self.btnRegister.layer.cornerRadius = 5.0;
+    self.btnRegister.layer.cornerRadius = 18.0;
     self.btnRegister.layer.opaque = NO;
     self.btnRegister.layer.masksToBounds = YES;
     self.btnRegister.enabled = NO;
     
-    self.barBg = [[UIImageView alloc] init];
-    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
-    [self.view addSubview:self.barBg];
-    [self.view bringSubviewToFront:self.naviBar];
-    self.bgView = [[UIImageView alloc] init];
+    self.bgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
     [self.bgView setImage:[UIImage imageNamed:@"background"]];
-    self.textFieldBg1 = [[UIImageView alloc] init];
-    [self.textFieldBg1 setImage:[UIImage imageNamed:@"textFieldBg"]];
-    [self.textFieldPass addSubview:self.textFieldBg1];
-    self.textFieldBg2 = [[UIImageView alloc] init];
-    [self.textFieldBg2 setImage:[UIImage imageNamed:@"textFieldBg"]];
-    [self.textFieldPassRepeat addSubview:self.textFieldBg2];
     [self.view addSubview:self.bgView];
     [self.view sendSubviewToBack:self.bgView];
 }
 
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
-    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.naviBar.frame.size.height + self.naviBar.frame.origin.y)];
-    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
-    [self.textFieldBg1 setFrame:CGRectMake(0, 0, self.textFieldPass.frame.size.width, self.textFieldPass.frame.size.height)];
-    [self.textFieldBg2 setFrame:CGRectMake(0, 0, self.textFieldPassRepeat.frame.size.width, self.textFieldPassRepeat.frame.size.height)];
+
 }
 
 - (void)didReceiveMemoryWarning {
@@ -183,7 +168,7 @@
                 else {
                     [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"注册成功" action:^(UIAlertAction * action) {
                         [BmobUser loginWithUsernameInBackground:weakSelf.phoneNumber password:weakSelf.textFieldPass.text block:^(BmobUser *user, NSError *error) {
-                            [weakSelf.presentingViewController.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                            [weakSelf.presentingViewController.presentingViewController.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
                         }];
                     }];
                 }

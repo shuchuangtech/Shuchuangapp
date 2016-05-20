@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "AddTaskProtocol.h"
-#import "TimePickerProtocol.h"
-@interface AddTaskViewController : UIViewController <UIPickerViewDataSource, UIPickerViewDelegate, TimePickerProtocol>
+#import "EditTaskProtocol.h"
+@interface AddTaskViewController : UIViewController <EditTaskProtocol, UITableViewDelegate, UITableViewDataSource>
 @property (weak, nonatomic) id<AddTaskProtocol> addTaskDelegate;
 @end

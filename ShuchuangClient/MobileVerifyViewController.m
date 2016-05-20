@@ -23,9 +23,7 @@
 @property (nonatomic) NSInteger countdown;
 @property (weak, nonatomic) NSString *phoneNumber;
 @property (nonatomic) BOOL registerNewUser;
-@property (strong, nonatomic) UIImageView *barBg;
 @property (strong, nonatomic) UIImageView *bgView;
-@property (strong, nonatomic) UIImageView *textFieldBg;
 
 
 - (IBAction)textFieldChanged:(id)sender;
@@ -48,7 +46,7 @@
     self.acFrame = [[MyActivityIndicatorView alloc] initWithFrameInView:self.view];
     
     //navigation bar and navigation item
-    UIBarButtonItem * leftBarBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStyleDone target:self action:@selector(leftBarBtnClicked)];
+    UIBarButtonItem * leftBarBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back_white"] style:UIBarButtonItemStyleDone target:self action:@selector(leftBarBtnClicked)];
     [leftBarBtn setTintColor:[UIColor whiteColor]];
     UINavigationItem *naviItem = [[UINavigationItem alloc] init];
     naviItem.leftBarButtonItem = leftBarBtn;
@@ -59,19 +57,20 @@
     titleLab.textAlignment = NSTextAlignmentCenter;
     naviItem.titleView = titleLab;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
-    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
-    
+    [self.naviBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsCompact];
+    self.naviBar.clipsToBounds = YES;
     //button next
-    [self.btnNext setBackgroundImage:[UIImage imageNamed:@"longButtonActive"] forState:UIControlStateNormal];
-    [self.btnNext setBackgroundImage:[UIImage imageNamed:@"longButton"] forState:UIControlStateDisabled];
-    self.btnNext.layer.cornerRadius = 5.0;
+    [self.btnNext setBackgroundColor:[UIColor whiteColor]];
+    [self.btnNext setAlpha:0.3];
+    self.btnNext.layer.cornerRadius = 18.0;
     self.btnNext.layer.opaque = NO;
     self.btnNext.layer.masksToBounds = YES;
     self.btnNext.enabled = NO;
     
-    [self.btnResend setBackgroundImage:[UIImage imageNamed:@"resendButtonActive"] forState:UIControlStateNormal];
-    [self.btnResend setBackgroundImage:[UIImage imageNamed:@"resendButton"] forState:UIControlStateDisabled];
-    self.btnResend.layer.cornerRadius = 5.0;
+    //[self.btnResend setBackgroundColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:0.3]];
+    [self.btnResend setBackgroundColor:[UIColor lightGrayColor]];
+    [self.btnResend setAlpha:0.6];
+    self.btnResend.layer.cornerRadius = 12.0;
     self.btnResend.layer.opaque = NO;
     self.btnResend.layer.masksToBounds = YES;
     self.btnResend.enabled = NO;
@@ -80,24 +79,15 @@
     [self.btnResend setTitle:@"60 s" forState:UIControlStateDisabled];
     self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(timerHandler) userInfo:nil repeats:YES];
     
-    self.barBg = [[UIImageView alloc] init];
-    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
-    [self.view addSubview:self.barBg];
     [self.view bringSubviewToFront:self.naviBar];
-    self.bgView = [[UIImageView alloc] init];
+    self.bgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
     [self.bgView setImage:[UIImage imageNamed:@"background"]];
-    self.textFieldBg = [[UIImageView alloc] init];
-    [self.textFieldBg setImage:[UIImage imageNamed:@"textFieldBg"]];
-    [self.textField addSubview:self.textFieldBg];
     [self.view addSubview:self.bgView];
     [self.view sendSubviewToBack:self.bgView];
 }
 
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
-    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.naviBar.frame.size.height + self.naviBar.frame.origin.y)];
-    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
-    [self.textFieldBg setFrame:CGRectMake(0, 0, self.textField.frame.size.width, self.textField.frame.size.height)];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -166,6 +156,8 @@
         self.btnResend.titleLabel.font = [UIFont systemFontOfSize:11.0];
         [self.btnResend setTitle:@"重新发送" forState:UIControlStateNormal];
         self.btnResend.enabled = YES;
+        [self.btnResend setBackgroundColor:[UIColor colorWithRed:227.0 / 255.0 green:93.0 / 255.0 blue:93.0 / 255.0 alpha:1.0]];
+        [self.btnResend setAlpha:1.0];
         [self.timer invalidate];
     }
 }
@@ -182,9 +174,11 @@
 - (IBAction)textFieldChanged:(id)sender {
     if (self.textField.text.length < 6) {
         self.btnNext.enabled = NO;
+        [self.btnNext setAlpha:0.3];
     }
     else {
         self.btnNext.enabled = YES;
+        [self.btnNext setAlpha:1.0];
     }
 }
 
@@ -198,6 +192,8 @@
             [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"获取短信验证码失败，请稍后再试" action:nil];
         }
         else {
+            [weakSelf.btnResend setBackgroundColor:[UIColor grayColor]];
+            [weakSelf.btnResend setAlpha:0.6];
             weakSelf.btnResend.enabled = NO;
             weakSelf.countdown = 60;
             [weakSelf.btnResend setTitle:@"60 s" forState:UIControlStateDisabled];

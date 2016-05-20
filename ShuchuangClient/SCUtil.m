@@ -60,6 +60,7 @@
 + (void)viewController:(UIViewController *)view showAlertTitle:(NSString *)title message:(NSString *)message action:(void (^)(UIAlertAction * alertAction))action {
     UIAlertController * alert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction * defaultAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:action];
+    [alert.view setTintColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]];
     [alert addAction:defaultAction];
     [view presentViewController:alert animated:YES completion:nil];
 }

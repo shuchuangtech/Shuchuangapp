@@ -21,7 +21,7 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     self.icon = [[UIImageView alloc] init];
     self.label = [[UILabel alloc] init];
-    [self.label setFont:[UIFont systemFontOfSize:14.0]];
+    [self.label setFont:[UIFont systemFontOfSize:13.0]];
     [self.label setTextColor:[UIColor whiteColor]];
     [self addSubview:self.icon];
     [self addSubview:self.label];

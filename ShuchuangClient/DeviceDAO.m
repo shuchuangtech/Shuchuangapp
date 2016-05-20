@@ -69,7 +69,6 @@ static DeviceDAO* sharedMem = nil;
 
 - (void)loadDeviceList {
     self.deviceListPath = [self userDocumentsDirectoryFile:@"DeviceList"];
-    NSLog(@"device list path:%@", self.deviceListPath);
     [self createEditableCopyOfDataIfNeeded:self.deviceListPath];
     NSMutableArray *data = [[NSMutableArray alloc] initWithContentsOfFile:self.deviceListPath];
     if (data != nil) {

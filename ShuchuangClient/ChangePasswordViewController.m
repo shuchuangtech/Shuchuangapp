@@ -18,20 +18,11 @@
 @property (weak, nonatomic) IBOutlet UITextField *textField;
 @property (weak, nonatomic) IBOutlet UITextField *textFieldRepeat;
 @property (weak, nonatomic) IBOutlet UITextField *textFieldOldPassword;
-@property (weak, nonatomic) IBOutlet UIButton *nextButton;
 @property (strong, nonatomic) NSString *uuid;
 @property (strong, nonatomic) MyActivityIndicatorView *acFrame;
-@property (strong, nonatomic) UIImageView *barBg;
-@property (strong, nonatomic) UIImageView *bgView;
-@property (strong, nonatomic) UIImageView *textFieldBg;
-@property (strong, nonatomic) UIImageView *textFieldBg2;
-@property (strong, nonatomic) UIImageView *textFieldBg3;
 
 - (void)onLeftButton;
-- (void)onNextButton;
-- (IBAction)onTextFieldChanged:(id)sender;
-- (IBAction)onTextFieldRepeatChanged:(id)sender;
-- (IBAction)onTextFieldOldPasswordChanged:(id)sender;
+- (void)onRightButton;
 @end
 
 @implementation ChangePasswordViewController
@@ -40,25 +31,19 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     UINavigationItem *naviItem = [[UINavigationItem alloc] init];
-    UIBarButtonItem *leftButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStylePlain target:self action:@selector(onLeftButton)];
-    [leftButton setTintColor:[UIColor whiteColor]];
+    UIBarButtonItem *leftButton = [[UIBarButtonItem alloc] initWithTitle:@"  取消" style:UIBarButtonItemStylePlain target:self action:@selector(onLeftButton)];
+    [leftButton setTintColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]];
+    UIBarButtonItem *rightButton = [[UIBarButtonItem alloc] initWithTitle:@"完成  " style:UIBarButtonItemStylePlain target:self action:@selector(onRightButton)];
+    [rightButton setTintColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]];
     naviItem.leftBarButtonItem = leftButton;
+    naviItem.rightBarButtonItem = rightButton;
     UILabel *titleLab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.naviBar.frame.size.width - 100, self.naviBar.frame.size.height)];
-    [titleLab setText:@"修改密码"];
-    [titleLab setTextColor:[UIColor whiteColor]];
+    [titleLab setText:@"修改设备密码"];
+    [titleLab setTextColor:[UIColor colorWithRed:21.0 / 255.0 green:37.0 / 255.0 blue:50.0 / 255.0 alpha:1.0]];
     [titleLab setFont:[UIFont systemFontOfSize:17.0]];
     titleLab.textAlignment = NSTextAlignmentCenter;
     naviItem.titleView = titleLab;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
-    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
-    
-    [self.nextButton setBackgroundImage:[UIImage imageNamed:@"longButtonActive"] forState:UIControlStateNormal];
-    [self.nextButton setBackgroundImage:[UIImage imageNamed:@"longButton"] forState:UIControlStateDisabled];
-    [self.nextButton addTarget:self action:@selector(onNextButton) forControlEvents:UIControlEventTouchUpInside];
-    self.nextButton.layer.cornerRadius = 5.0;
-    self.nextButton.layer.opaque = NO;
-    self.nextButton.layer.masksToBounds = YES;
-    self.nextButton.enabled = NO;
     
     self.textField.delegate = self;
     self.textFieldRepeat.delegate = self;
@@ -67,40 +52,8 @@
     [self.textFieldRepeat setBackgroundColor:[UIColor clearColor]];
     [self.textFieldOldPassword setBackgroundColor:[UIColor clearColor]];
     
-    [self.textField addTarget:self action:@selector(onTextFieldChanged:) forControlEvents:UIControlEventEditingChanged];
-    [self.textFieldRepeat addTarget:self action:@selector(onTextFieldRepeatChanged:) forControlEvents:UIControlEventEditingChanged];
-    [self.textFieldOldPassword addTarget:self action:@selector(onTextFieldOldPasswordChanged:) forControlEvents:UIControlEventEditingChanged];
     self.acFrame = [[MyActivityIndicatorView alloc] initWithFrameInView:self.view];
     
-    self.barBg = [[UIImageView alloc] init];
-    [self.barBg setImage:[UIImage imageNamed:@"barBg"]];
-    [self.view addSubview:self.barBg];
-    [self.view bringSubviewToFront:self.naviBar];
-    self.bgView = [[UIImageView alloc] init];
-    [self.bgView setImage:[UIImage imageNamed:@"background"]];
-    [self.view addSubview:self.bgView];
-    [self.view sendSubviewToBack:self.bgView];
-    
-    self.textFieldBg = [[UIImageView alloc] init];
-    [self.textFieldBg setImage:[UIImage imageNamed:@"textFieldBg"]];
-    [self.textFieldOldPassword addSubview:self.textFieldBg];
-    
-    self.textFieldBg2 = [[UIImageView alloc] initWithFrame:self.textField.frame];
-    [self.textFieldBg2 setImage:[UIImage imageNamed:@"textFieldBg"]];
-    [self.textField addSubview:self.textFieldBg2];
-    
-    self.textFieldBg3 = [[UIImageView alloc] initWithFrame:self.textFieldRepeat.frame];
-    [self.textFieldBg3 setImage:[UIImage imageNamed:@"textFieldBg"]];
-    [self.textFieldRepeat addSubview:self.textFieldBg3];
-}
-
-- (void)viewWillLayoutSubviews {
-    [super viewWillLayoutSubviews];
-    [self.barBg setFrame:CGRectMake(0, 0, self.view.frame.size.width, 64)];
-    [self.bgView setFrame:CGRectMake(0, self.barBg.frame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.barBg.frame.size.height)];
-    [self.textFieldBg setFrame:CGRectMake(0, 0, self.textFieldOldPassword.frame.size.width, self.textFieldOldPassword.frame.size.height)];
-    [self.textFieldBg2 setFrame:CGRectMake(0, 0, self.textField.frame.size.width, self.textField.frame.size.height)];
-    [self.textFieldBg3 setFrame:CGRectMake(0, 0, self.textFieldRepeat.frame.size.width, self.textFieldRepeat.frame.size.height)];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -112,7 +65,7 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)onNextButton {
+- (void)onRightButton {
     if ([self.textFieldOldPassword isFirstResponder]) {
         [self.textFieldOldPassword resignFirstResponder];
     }
@@ -121,6 +74,14 @@
     }
     if ([self.textFieldRepeat isFirstResponder]) {
         [self.textFieldRepeat resignFirstResponder];
+    }
+    if ([self.textFieldOldPassword.text length] == 0) {
+        [SCUtil viewController:self showAlertTitle:@"提示" message:@"请输入旧密码" action:nil];
+        return;
+    }
+    if ([self.textField.text length] == 0 || [self.textFieldRepeat.text length] == 0) {
+        [SCUtil viewController:self showAlertTitle:@"提示" message:@"请输入两次新密码" action:nil];
+        return;
     }
     if (![self.textField.text isEqualToString:self.textFieldRepeat.text]) {
         [SCUtil viewController:self showAlertTitle:@"提示" message:@"两次输入的密码不一致" action:nil];
@@ -152,32 +113,6 @@
     }
 }
 
-- (IBAction)onTextFieldChanged:(id)sender {
-    if ([self.textField.text length] > 0 && [self.textFieldRepeat.text length] > 0 && [self.textFieldOldPassword.text length] > 0) {
-        self.nextButton.enabled = YES;
-    }
-    else {
-        self.nextButton.enabled = NO;
-    }
-}
-
-- (IBAction)onTextFieldRepeatChanged:(id)sender {
-    if ([self.textFieldRepeat.text length] > 0 && [self.textFieldRepeat.text length] > 0 && [self.textFieldOldPassword.text length] > 0) {
-        self.nextButton.enabled = YES;
-    }
-    else {
-        self.nextButton.enabled = NO;
-    }
-}
-
-- (IBAction)onTextFieldOldPasswordChanged:(id)sender {
-    if ([self.textFieldRepeat.text length] > 0 && [self.textFieldRepeat.text length] > 0 && [self.textFieldOldPassword.text length] > 0) {
-        self.nextButton.enabled = YES;
-    }
-    else {
-        self.nextButton.enabled = NO;
-    }
-}
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     [textField resignFirstResponder];

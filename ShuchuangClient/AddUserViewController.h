@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "DatePickerProtocol.h"
-@interface AddUserViewController : UIViewController<DatePickerProtocol, UITextFieldDelegate>
+@interface AddUserViewController : UIViewController<UITextFieldDelegate>
 
 @end

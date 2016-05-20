@@ -27,7 +27,6 @@
         self.widthConstr.constant = 0.0;
         self.heightConstr.constant = 0.0;
     }
-    [super layoutSubviews];
 }
 
 @end

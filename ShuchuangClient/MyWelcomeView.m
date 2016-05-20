@@ -46,15 +46,6 @@
     [self addSubview:self.bg3];
     [self addSubview:self.bg2];
     [self addSubview:self.bg1];
-    
-    UIImageView *logo1 = [[UIImageView alloc] initWithImage:[UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"launchLogo1" ofType:@"png"]]];
-    UIImageView *logo2 = [[UIImageView alloc] initWithImage:[UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"launchLogo2" ofType:@"png"]]];
-    [logo1 setFrame:CGRectMake(0, 0, logo1.frame.size.width / 3, logo1.frame.size.height / 3)];
-    [logo2 setFrame:CGRectMake(0, 0, logo2.frame.size.width / 3, logo2.frame.size.height / 3)];
-    [logo1 setCenter:CGPointMake(self.center.x, self.frame.size.height / 4)];
-    [logo2 setCenter:CGPointMake(self.center.x, logo1.center.y + 50)];
-    [self addSubview:logo1];
-    [self addSubview:logo2];
     self.animaStep = 0;
     self.started = NO;
     self.animating = NO;

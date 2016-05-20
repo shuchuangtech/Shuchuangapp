@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10117" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="AddTableViewCell1" id="KGk-i7-Jjw" customClass="AddTableViewCell1">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="设备序列号" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v5y-TR-H5g">
+                        <rect key="frame" x="18" y="11" width="85" height="21"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="85" id="YYr-BI-kox"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                        <color key="textColor" red="0.082352941176470587" green="0.14509803921568626" blue="0.19607843137254902" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="YYr-BI-kox"/>
+                            </mask>
+                        </variation>
+                        <variation key="widthClass=compact">
+                            <mask key="constraints">
+                                <include reference="YYr-BI-kox"/>
+                            </mask>
+                        </variation>
+                    </label>
+                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="请输入设备序列号" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="FoQ-z7-39W" customClass="SCTextField">
+                        <rect key="frame" x="108" y="7" width="194" height="30"/>
+                        <color key="tintColor" red="0.92941176470588238" green="0.22352941176470587" blue="0.2196078431372549" alpha="1" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="30" id="xKH-N8-dsK"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no"/>
+                    </textField>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bnz-Wz-PMw">
+                        <rect key="frame" x="284" y="16" width="18" height="12"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="12" id="4VE-wr-x8N"/>
+                            <constraint firstAttribute="width" constant="18" id="nwg-Z5-ilg"/>
+                        </constraints>
+                        <state key="normal" title="Button" image="scan"/>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="v5y-TR-H5g" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="3Pj-Hn-N0N"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="FoQ-z7-39W" secondAttribute="trailing" constant="10" id="J8M-OM-p8d"/>
+                    <constraint firstItem="FoQ-z7-39W" firstAttribute="leading" secondItem="v5y-TR-H5g" secondAttribute="trailing" constant="5" id="Rn1-Pd-eDQ"/>
+                    <constraint firstItem="FoQ-z7-39W" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="eVH-7d-VAD"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="bnz-Wz-PMw" secondAttribute="trailing" constant="10" id="n98-uL-YWe"/>
+                    <constraint firstItem="v5y-TR-H5g" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" constant="10" id="pta-se-lF7"/>
+                    <constraint firstItem="bnz-Wz-PMw" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="q2e-Dc-Yrj"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="scanButton" destination="bnz-Wz-PMw" id="KnI-WB-r6a"/>
+                <outlet property="uuidTextField" destination="FoQ-z7-39W" id="7nE-5D-PHf"/>
+            </connections>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="scan" width="16" height="12"/>
+    </resources>
+</document>
