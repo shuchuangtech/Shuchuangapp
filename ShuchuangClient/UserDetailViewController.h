@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "DatePickerProtocol.h"
-@interface UserDetailViewController : UIViewController<DatePickerProtocol>
+@interface UserDetailViewController : UIViewController
 
 @end
