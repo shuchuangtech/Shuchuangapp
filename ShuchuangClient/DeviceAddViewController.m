@@ -100,10 +100,8 @@
             [self.acFrame startAc];
             SCDeviceClient *client = [devManager getDevice:self.uuid];
             [client serverCheckSuccess:^(NSURLSessionDataTask *task, id response) {
-                [weakSelf.acFrame stopAc];
                 if ([response[@"result"]  isEqual: @"good"]) {
                     if ([response[@"state"] isEqualToString:@"online"]) {
-                        
                         [client login:weakSelf.loginUser password:weakSelf.password
                               success:^(NSURLSessionDataTask *task, id response) {
                                   [weakSelf.acFrame stopAc];
@@ -149,13 +147,15 @@
                                   [devManager removeDevice:weakSelf.uuid];
                                   [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
                               }];
-                    }
+                    }//check online
                     else {
+                        [weakSelf.acFrame stopAc];
                         [devManager removeDevice:weakSelf.uuid];
                         [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"设备不在线，请确认设备已经接入网络" action:nil];
                     }
-                }
+                }//check good
                 else {
+                    [weakSelf.acFrame stopAc];
                     [devManager removeDevice:weakSelf.uuid];
                     [SCUtil viewController:self showAlertTitle:@"提示" message:response[@"detail"] action:nil];
                 }
