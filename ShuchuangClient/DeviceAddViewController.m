@@ -28,6 +28,7 @@
 @property (strong, nonatomic) NSString *loginUser;
 @property (nonatomic) NSInteger userAuth;
 @property (copy, nonatomic) NSString *password;
+@property (weak, nonatomic) AddTableViewCell1 *cell1;
 
 @end
 
@@ -65,11 +66,6 @@
     
     //ac frame
     self.acFrame = [[MyActivityIndicatorView alloc] initWithFrameInView:self.view];
-
-}
-
-- (void)viewWillLayoutSubviews {
-    [super viewWillLayoutSubviews];
 
 }
 
@@ -201,9 +197,7 @@
         AddTableViewCell1 *cell = [tableView dequeueReusableCellWithIdentifier:@"AddTableViewCell1" forIndexPath:indexPath];
         cell.uuidTextField.delegate = self;
         [cell.scanButton addTarget:self action:@selector(onButtonQR) forControlEvents:UIControlEventTouchUpInside];
-        UIStoryboard *story = [UIStoryboard storyboardWithName:@"Device" bundle:[NSBundle mainBundle]];
-        id vc = [story instantiateViewControllerWithIdentifier:@"QRCodeVC"];
-        [vc setValue:cell forKey:@"scanDelegate"];
+        self.cell1 = cell;
         return cell;
     }
     else if (indexPath.row == 1) {
@@ -256,6 +250,8 @@
 #pragma mark - Navigation
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
-
-
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    id desVC = segue.destinationViewController;
+    [desVC setValue:self.cell1 forKey:@"scanDelegate"];
+}
 @end

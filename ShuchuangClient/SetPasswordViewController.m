@@ -42,7 +42,11 @@
     
     //text field
     self.textFieldPass.delegate = self;
+    self.textFieldPass.leftView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"password"]];
+    self.textFieldPass.leftViewMode = UITextFieldViewModeAlways;
     self.textFieldPassRepeat.delegate = self;
+    self.textFieldPassRepeat.leftView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"password"]];
+    self.textFieldPassRepeat.leftViewMode = UITextFieldViewModeAlways;
     [self.textFieldPass setBackgroundColor:[UIColor clearColor]];
     [self.textFieldPassRepeat setBackgroundColor:[UIColor clearColor]];
     
@@ -70,11 +74,12 @@
     }
     naviItem.titleView = titleLab;
     [self.naviBar pushNavigationItem:naviItem animated:NO];
-    [self.naviBar setBackgroundImage:[UIImage imageNamed:@"barBg"] forBarMetrics:UIBarMetricsCompact];
+    [self.naviBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsCompact];
+    self.naviBar.clipsToBounds = YES;
     
     //button register
-    [self.btnRegister setBackgroundImage:[UIImage imageNamed:@"longButtonActive"] forState:UIControlStateNormal];
-    [self.btnRegister setBackgroundImage:[UIImage imageNamed:@"longButton"] forState:UIControlStateDisabled];
+    [self.btnRegister setBackgroundColor:[UIColor whiteColor]];
+    [self.btnRegister setAlpha:0.3];    
     self.btnRegister.layer.cornerRadius = 18.0;
     self.btnRegister.layer.opaque = NO;
     self.btnRegister.layer.masksToBounds = YES;
@@ -99,12 +104,22 @@
 - (IBAction)passwordChanged:(id)sender {
     if (self.textFieldPass.text.length > 0 && self.textFieldPassRepeat.text.length > 0) {
         self.btnRegister.enabled = YES;
+        [self.btnRegister setAlpha:1.0];
+    }
+    else {
+        self.btnRegister.enabled = NO;
+        [self.btnRegister setAlpha:0.3];
     }
 }
 
 - (IBAction)passwordRepeatChanged:(id)sender {
     if (self.textFieldPass.text.length > 0 && self.textFieldPassRepeat.text.length > 0) {
         self.btnRegister.enabled = YES;
+        [self.btnRegister setAlpha:1.0];
+    }
+    else {
+        self.btnRegister.enabled = NO;
+        [self.btnRegister setAlpha:0.3];
     }
 }
 

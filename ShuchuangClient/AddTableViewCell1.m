@@ -22,6 +22,7 @@
 }
 
 - (void)getQRCodeStringValue:(NSString *)stringValue {
-    self.uuidTextField.text = stringValue;
+    [self.uuidTextField setText:stringValue];
+    [self.uuidTextField.delegate textFieldDidEndEditing:self.uuidTextField];
 }
 @end

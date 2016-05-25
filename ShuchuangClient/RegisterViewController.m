@@ -110,6 +110,7 @@
                 [BmobSMS requestSMSCodeInBackgroundWithPhoneNumber:weakSelf.registerId andTemplate:@"验证码" resultBlock:^(int number, NSError *error) {
                     if (error != nil) {
                         [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"获取短信验证码失败，请稍后再试" action:nil];
+                        NSLog(@"%@", error);
                     }
                     else {
                         [weakSelf performSegueWithIdentifier:@"regToMobileVerify" sender:weakSelf];
