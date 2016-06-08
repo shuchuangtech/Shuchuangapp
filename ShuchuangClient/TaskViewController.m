@@ -243,7 +243,7 @@
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         NSDictionary * task = [self.tasks objectAtIndex:indexPath.row];
-        NSInteger taskId = [[task objectForKey:@"id"] integerValue];
+        long long taskId = [[task objectForKey:@"id"] longLongValue];
         [self.acFrame startAc];
         __weak TaskViewController *weakSelf = self;
         [self.client removeTask:taskId atIndex:indexPath.row success:^(NSURLSessionDataTask *task, id response) {
