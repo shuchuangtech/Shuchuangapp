@@ -58,7 +58,7 @@
 
 - (void)addTask:(NSDictionary * _Nonnull)task success:(nullable void (^)(NSURLSessionDataTask * _Nullable task, id _Nonnull responseObject))success failure:(nullable void (^)(NSURLSessionDataTask * _Nullable task, NSError *   _Nonnull error))failure;
 
-- (void)removeTask:(NSInteger)taskId atIndex:(NSInteger)index success:(nullable void (^)(NSURLSessionDataTask * _Nullable task, id _Nonnull responseObject))success failure:(nullable void (^)(NSURLSessionDataTask * _Nullable task, NSError *   _Nonnull error))failure;
+- (void)removeTask:(long long)taskId atIndex:(NSInteger)index success:(nullable void (^)(NSURLSessionDataTask * _Nullable task, id _Nonnull responseObject))success failure:(nullable void (^)(NSURLSessionDataTask * _Nullable task, NSError *   _Nonnull error))failure;
 
 - (void)updateTask:(NSDictionary * _Nonnull)task atIndex:(NSInteger)index success:(nullable void (^)(NSURLSessionDataTask * _Nullable task, id _Nonnull responseObject))success failure:(nullable void (^)(NSURLSessionDataTask * _Nullable task, NSError *   _Nonnull error))failure;
 

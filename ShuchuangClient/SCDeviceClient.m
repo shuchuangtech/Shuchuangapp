@@ -430,10 +430,10 @@
     } failure:failure];
 }
 
-- (void)removeTask:(NSInteger)taskId atIndex:(NSInteger)index success:(void (^)(NSURLSessionDataTask * _Nullable, id _Nonnull))success failure:(void (^)(NSURLSessionDataTask * _Nullable, NSError * _Nonnull))failure {
+- (void)removeTask:(long long)taskId atIndex:(NSInteger)index success:(void (^)(NSURLSessionDataTask * _Nullable, id _Nonnull))success failure:(void (^)(NSURLSessionDataTask * _Nullable, NSError * _Nonnull))failure {
     SCHTTPManager *http = [SCHTTPManager instance];
     NSString *action = [NSString stringWithFormat:@"%@.%@", COMPONENT_TASK_STR, TASK_METHOD_REMOVE];
-    NSDictionary *dict = @{KEY_TYPE_STR:TYPE_REQUEST_STR, KEY_ACTION_STR:action, KEY_PARAM_STR:@{REG_TOKEN_STR:self.token, REG_UUID_STR:self.uuid, @"task":@{@"id":[NSNumber numberWithInteger:taskId]}}};
+    NSDictionary *dict = @{KEY_TYPE_STR:TYPE_REQUEST_STR, KEY_ACTION_STR:action, KEY_PARAM_STR:@{REG_TOKEN_STR:self.token, REG_UUID_STR:self.uuid, @"task":@{@"id":[NSNumber numberWithLongLong:taskId]}}};
     __weak SCDeviceClient *weakSelf = self;
     [http sendMessage:dict success:^(NSURLSessionDataTask *dataTask, id serverResponse){
         NSMutableDictionary *response = [[NSMutableDictionary alloc] init];

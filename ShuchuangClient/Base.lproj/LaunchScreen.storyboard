@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" initialViewController="01J-lp-oVM">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" initialViewController="01J-lp-oVM">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
@@ -73,16 +73,16 @@
                                 <exclude reference="hnj-vX-iFQ"/>
                             </mask>
                             <mask key="constraints">
+                                <exclude reference="F2v-oD-Yfj"/>
+                                <exclude reference="zSg-v6-02V"/>
+                                <exclude reference="Pio-n1-bMA"/>
+                                <exclude reference="y9y-FL-Sj0"/>
                                 <exclude reference="NhH-vs-13D"/>
                                 <exclude reference="OAY-u2-0Ej"/>
                                 <exclude reference="XO6-II-25H"/>
                                 <exclude reference="b0M-4b-N1S"/>
                                 <exclude reference="eT9-UX-a0B"/>
                                 <exclude reference="m5C-oM-VK5"/>
-                                <exclude reference="F2v-oD-Yfj"/>
-                                <exclude reference="zSg-v6-02V"/>
-                                <exclude reference="Pio-n1-bMA"/>
-                                <exclude reference="y9y-FL-Sj0"/>
                             </mask>
                         </variation>
                         <variation key="widthClass=compact">
@@ -93,16 +93,16 @@
                                 <include reference="hnj-vX-iFQ"/>
                             </mask>
                             <mask key="constraints">
+                                <include reference="F2v-oD-Yfj"/>
+                                <include reference="zSg-v6-02V"/>
+                                <include reference="Pio-n1-bMA"/>
+                                <include reference="y9y-FL-Sj0"/>
                                 <include reference="NhH-vs-13D"/>
                                 <include reference="OAY-u2-0Ej"/>
                                 <include reference="XO6-II-25H"/>
                                 <include reference="b0M-4b-N1S"/>
                                 <include reference="eT9-UX-a0B"/>
                                 <include reference="m5C-oM-VK5"/>
-                                <include reference="F2v-oD-Yfj"/>
-                                <include reference="zSg-v6-02V"/>
-                                <include reference="Pio-n1-bMA"/>
-                                <include reference="y9y-FL-Sj0"/>
                             </mask>
                         </variation>
                     </view>
