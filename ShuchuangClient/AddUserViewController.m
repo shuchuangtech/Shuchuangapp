@@ -175,6 +175,15 @@
 }
 
 - (void)onDateLabel {
+    if ([self.usernameTextField isFirstResponder]) {
+        [self.usernameTextField resignFirstResponder];
+    }
+    else if ([self.passwordTextField isFirstResponder]) {
+        [self.passwordTextField resignFirstResponder];
+    }
+    else if ([self.remainOpenTextField isFirstResponder]) {
+        [self.remainOpenTextField resignFirstResponder];
+    }
     [self.dateLabel setTextColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]];
     [self showCalendar];
 }

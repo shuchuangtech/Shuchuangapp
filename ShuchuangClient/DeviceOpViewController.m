@@ -66,6 +66,8 @@
     self.acFrame = [[MyActivityIndicatorView alloc] initWithFrameInView:self.view];
     self.modeView =[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"switch_on"]];
     
+    self.deviceCheckFinish = NO;
+    self.serverCheckFinish = NO;
     self.showUpdate = NO;
     self.showUpdateNew = NO;
     self.hasUpdate = NO;
@@ -286,16 +288,20 @@
                 [self resetDeviceConfig];
                 break;
             case 2:
-                self.showUpdate = YES;
-                [tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:3 inSection:2], [NSIndexPath indexPathForRow:4 inSection:2]] withRowAnimation:UITableViewRowAnimationAutomatic];
-                [self checkDeviceUpdate];
+                if (!self.showUpdate) {
+                    self.showUpdate = YES;
+                    [tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:3 inSection:2], [NSIndexPath indexPathForRow:4 inSection:2]] withRowAnimation:UITableViewRowAnimationAutomatic];
+                    [self checkDeviceUpdate];
+                }
                 break;
             case 3:
                 break;
             case 4:
                 if (self.hasUpdate) {
-                    self.showUpdateNew = YES;
-                    [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+                    if (!self.showUpdateNew) {
+                        self.showUpdateNew = YES;
+                        [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+                    }
                 }
                 break;
             default:
@@ -359,7 +365,7 @@
         if ([alert.textFields[0].text length] != 0) {
             NSString *password = alert.textFields[0].text;
             [weakSelf.acFrame startAc];
-            [weakSelf.client login:@"admin" password:password success:^(NSURLSessionDataTask *task, id response) {
+            [weakSelf.client login:weakSelf.client.user password:password success:^(NSURLSessionDataTask *task, id response) {
                 [weakSelf.acFrame stopAc];
                 if ([response[@"result"] isEqualToString:@"good"]) {
                     [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"密码重新验证成功" action:nil];
@@ -445,11 +451,11 @@
 }
 
 - (void)checkDeviceUpdate {
-    self.deviceCheckFinish = NO;
-    self.serverCheckFinish = NO;
-    [self.acFrame startAc];
-    [self checkDeviceVersion];
-    [self checkServerVersion];
+    if (!self.deviceCheckFinish && !self.serverCheckFinish) {
+        [self.acFrame startAc];
+        [self checkDeviceVersion];
+        [self checkServerVersion];
+    }
 }
 
 - (void)checkDeviceVersion {

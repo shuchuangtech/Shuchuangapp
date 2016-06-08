@@ -28,7 +28,8 @@
 @property (strong, nonatomic) NSString *loginUser;
 @property (nonatomic) NSInteger userAuth;
 @property (copy, nonatomic) NSString *password;
-@property (weak, nonatomic) AddTableViewCell1 *cell1;
+@property (weak, nonatomic) AddTableViewCell1 *cellId;
+@property (weak, nonatomic) AddTableViewCell3 *cellPass;
 
 @end
 
@@ -85,6 +86,12 @@
 - (void)onRightButton {
     NSString *regex = @"SC[0-9]{10,}";
     NSPredicate *test = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
+    if ([self.cellPass.passwordTextField isFirstResponder]) {
+        [self.cellPass.passwordTextField resignFirstResponder];
+    }
+    if ([self.cellId.uuidTextField isFirstResponder]) {
+        [self.cellId.uuidTextField resignFirstResponder];
+    }
     if (![test evaluateWithObject:self.uuid]) {
         [SCUtil viewController:self showAlertTitle:@"提示" message:@"请输入正确的设备序列号" action:nil];
     }
@@ -197,7 +204,7 @@
         AddTableViewCell1 *cell = [tableView dequeueReusableCellWithIdentifier:@"AddTableViewCell1" forIndexPath:indexPath];
         cell.uuidTextField.delegate = self;
         [cell.scanButton addTarget:self action:@selector(onButtonQR) forControlEvents:UIControlEventTouchUpInside];
-        self.cell1 = cell;
+        self.cellId = cell;
         return cell;
     }
     else if (indexPath.row == 1) {
@@ -208,6 +215,7 @@
     else if (indexPath.row == 2) {
         AddTableViewCell3 *cell = [tableView dequeueReusableCellWithIdentifier:@"AddTableViewCell3" forIndexPath:indexPath];
         cell.passwordTextField.delegate = self;
+        self.cellPass = cell;
         [cell.infoButton addTarget:self action:@selector(onInfoButton) forControlEvents:UIControlEventTouchUpInside];
         return cell;
     }
@@ -252,6 +260,6 @@
 // In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     id desVC = segue.destinationViewController;
-    [desVC setValue:self.cell1 forKey:@"scanDelegate"];
+    [desVC setValue:self.cellId forKey:@"scanDelegate"];
 }
 @end

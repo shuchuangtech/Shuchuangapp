@@ -46,8 +46,8 @@
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bnz-Wz-PMw">
                         <rect key="frame" x="284" y="16" width="18" height="12"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="12" id="4VE-wr-x8N"/>
-                            <constraint firstAttribute="width" constant="18" id="nwg-Z5-ilg"/>
+                            <constraint firstAttribute="height" constant="18" id="4VE-wr-x8N"/>
+                            <constraint firstAttribute="width" constant="27" id="nwg-Z5-ilg"/>
                         </constraints>
                         <state key="normal" title="Button" image="scan"/>
                     </button>
@@ -69,6 +69,6 @@
         </tableViewCell>
     </objects>
     <resources>
-        <image name="scan" width="16" height="12"/>
+        <image name="scan" width="44" height="32"/>
     </resources>
 </document>

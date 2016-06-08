@@ -172,6 +172,9 @@
 
 - (void)onRightButton {
     NSInteger remainopen;
+    if ([self.textField isFirstResponder]) {
+        [self.textField resignFirstResponder];
+    }
     if (self.textField.enabled) {
         remainopen = [self.modifyUserInfo[@"remainopen"] integerValue];
     }
@@ -200,6 +203,9 @@
 }
 
 - (void)onDateLabel {
+    if ([self.textField isFirstResponder]) {
+        [self.textField resignFirstResponder];
+    }
     [self.dateLabel setTextColor:[UIColor colorWithRed:237.0 / 255.0 green:57.0 / 255.0 blue:56.0 / 255.0 alpha:1.0]];
     [self showPicker];
 }

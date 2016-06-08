@@ -74,10 +74,6 @@
     [self.addButton addTarget:self action:@selector(onButtonAdd) forControlEvents:UIControlEventTouchUpInside];
 }
 
-- (void)viewWillLayoutSubviews {
-    [super viewWillLayoutSubviews];
-}
-
 - (void)viewWillDisappear:(BOOL)animated {
     if (self.tableView.editing) {
         [self.tableView setEditing:NO animated:YES];
@@ -252,6 +248,36 @@
     }
     else {
         return [self.invalidArray count];
+    }
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        NSDictionary *userInfo;
+        if ([self.segmentController selectedSegmentIndex] == 0) {
+            userInfo = [self.usersArray objectAtIndex:indexPath.row];
+        }
+        else {
+            userInfo = [self.invalidArray objectAtIndex:indexPath.row];
+        }
+        [self.acFrame startAc];
+        __weak UserViewController *weakSelf = self;
+        [self.client deleteUser:userInfo[@"username"] success:^(NSURLSessionDataTask *task, id response) {
+            [weakSelf.acFrame stopAc];
+            if ([response[@"result"] isEqualToString:@"good"]) {
+                [weakSelf.usersArray removeAllObjects];
+                [weakSelf.normalIndex removeAllObjects];
+                [weakSelf.invalidArray removeAllObjects];
+                weakSelf.tableView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingTarget:weakSelf refreshingAction:@selector(loadMoreData)];
+                [weakSelf loadMoreData];
+            }
+            else {
+                [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:response[@"detail"] action:nil];
+            }
+        } failure:^(NSURLSessionDataTask *task, NSError *error) {
+            [weakSelf.acFrame stopAc];
+            [SCUtil viewController:weakSelf showAlertTitle:@"提示" message:@"网络错误，请稍后再试" action:nil];
+        }];
     }
 }
 
